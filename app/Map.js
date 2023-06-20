@@ -22,22 +22,20 @@ L.Marker.prototype.options.icon = L.icon({
 });
 
 function MapComponent() {
-  const [firstCoordinates, setFirstCoordinates] = useState({
+  const [coord, setCoord] = useState([{ lat: 48.2082, lng: 16.3738 }]);
+
+  console.log('coord Map.js', coord, typeof coord);
+
+  const defaultCoordinates = {
     lat: 48.2082,
     lng: 16.3738,
-  });
+  };
 
   const defaultPosition = {
-    latAndLng: [firstCoordinates.lat, firstCoordinates.lng],
+    latAndLng: [defaultCoordinates.lat, defaultCoordinates.lng],
 
     zoom: 5,
   };
-
-  const [waypoints, setWaypoints] = useState([]);
-
-  const handleCoordinatesChange = useCallback((coordinates) => {
-    setWaypoints(coordinates);
-  }, []);
 
   return (
     <MapContainer
@@ -49,8 +47,12 @@ function MapComponent() {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution="Map data &copy; <a href='https://www.openstreetmap.org/'>OpenStreetMap</a> contributors"
       />
-      <RoutineMachine waypoints={waypoints} />
-      <AddAndRemoveMarker onCoordinatesChange={handleCoordinatesChange} />
+      {/* <RoutineMachine waypoints={coord} /> */}
+      <AddAndRemoveMarker
+        coord={coord}
+        setCoord={setCoord}
+        key={`coord-${coord.length}`}
+      />
     </MapContainer>
   );
 }

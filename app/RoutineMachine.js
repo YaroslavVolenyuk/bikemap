@@ -1,6 +1,8 @@
 import 'leaflet-routing-machine';
+import './leaflet-routing-machine.css';
 import { createControlComponent } from '@react-leaflet/core';
 import L from 'leaflet';
+import React from 'react';
 
 const createRoutineMachineLayer = ({ waypoints }) => {
   const waypointLatLngs = waypoints.map(({ lat, lng }) => L.latLng(lat, lng));
@@ -8,7 +10,6 @@ const createRoutineMachineLayer = ({ waypoints }) => {
   const instance = L.Routing.control({
     waypoints: waypointLatLngs,
 
-    // waypoints.map(({ lat, lng }) => L.latLng(lat, lng)),
     lineOptions: {
       styles: [{ color: '#6FA1EC', weight: 4 }],
       extendToWaypoints: true,
@@ -30,7 +31,5 @@ const RoutingMachine = ({ waypoints }) => {
   const RoutineMachine = createControlComponent(createRoutineMachineLayer);
   return <RoutineMachine waypoints={waypoints} />;
 };
-
-// const RoutingMachine = createControlComponent(createRoutineMachineLayer);
 
 export default RoutingMachine;

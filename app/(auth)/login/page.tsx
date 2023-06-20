@@ -1,9 +1,11 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { getValidSessionByToken } from '../../../database/sessions';
-import RegisterForm from './RegisterForm';
+import LoginForm from './LoginForm';
 
-export default async function RegisterPage() {
+type Props = { searchParams: { returnTo?: string | string[] } };
+
+export default async function LoginPage({ searchParams }: Props) {
   const sessionTokenCookie = cookies().get('sessionToken');
 
   const session =
@@ -11,5 +13,6 @@ export default async function RegisterPage() {
     (await getValidSessionByToken(sessionTokenCookie.value));
 
   if (session) redirect('/');
-  return <RegisterForm />;
+
+  return <LoginForm returnTo={searchParams.returnTo} />;
 }
