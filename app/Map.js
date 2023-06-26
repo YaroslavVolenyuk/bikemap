@@ -22,9 +22,11 @@ L.Marker.prototype.options.icon = L.icon({
 });
 
 function MapComponent() {
-  const [coord, setCoord] = useState([{ lat: 48.2082, lng: 16.3738 }]);
+  const [coord, setCoord] = useState([]);
 
   console.log('coord Map.js', coord, typeof coord);
+
+  const testCoord = [{ lat: 48.2082, lng: 16.3738 }];
 
   const defaultCoordinates = {
     lat: 48.2082,
@@ -47,7 +49,7 @@ function MapComponent() {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution="Map data &copy; <a href='https://www.openstreetmap.org/'>OpenStreetMap</a> contributors"
       />
-      {/* <RoutineMachine waypoints={coord} /> */}
+      <RoutineMachine waypoints={coord} />
       <AddAndRemoveMarker
         coord={coord}
         setCoord={setCoord}

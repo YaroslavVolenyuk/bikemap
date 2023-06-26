@@ -7,6 +7,8 @@ import React from 'react';
 const createRoutineMachineLayer = ({ waypoints }) => {
   const waypointLatLngs = waypoints.map(({ lat, lng }) => L.latLng(lat, lng));
 
+  console.log('waypointLatLngs, RoutineMachine: ', waypointLatLngs);
+
   const instance = L.Routing.control({
     waypoints: waypointLatLngs,
 
