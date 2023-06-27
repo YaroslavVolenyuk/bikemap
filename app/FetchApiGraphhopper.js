@@ -9,10 +9,10 @@ const FetchAPI = ({ startingPlace, destination }) => {
     if (dataAPI && dataAPI.paths && dataAPI.paths.length > 0) {
       const details = dataAPI.paths[0].details;
       const coverages = details.surface || [];
-      const uniqueCoverages = [
+      const uniqCoverages = [
         ...new Set(coverages.map((coverage) => coverage[2])),
       ].filter((coverage) => coverage !== 'missing');
-      setUniqueCoverages(uniqueCoverages);
+      setUniqueCoverages(uniqCoverages);
     }
   };
 
@@ -54,14 +54,34 @@ const FetchAPI = ({ startingPlace, destination }) => {
     };
   }, []);
 
+  // useEffect(() => {
+  //   if (data) {
+  //     onDataDistance(data.paths[0].instructions[0].distance);
+  //     onDataElevation(data.paths[0].instructions[0].distance);
+  //   } else {
+  //     console.log('FetchAPI PROPS data: no data yet');
+  //   }
+  // }, [data, onDataDistance, onDataElevation]);
+
+  //
+
+  // console.log(
+  //   'данные об отрезках',
+  //   data ? data.paths[0].instructions[0].distance : 'no data',
+  // );
+  // console.log(
+  //   'данные о координатах',
+  //   data ? data.paths[0].points.coordinates[0][2] : 'no data',
+  // );
+
   return (
     <div>
       {data ? (
         <div>
           <p>Up: {Math.floor(data.paths[0].ascend)} meters</p>
           <p>Down: {Math.floor(data.paths[0].descend)} meters</p>
-          <p>Distance: {Math.floor(data.paths[0].distance)} m</p>
-          <p>Time: {Math.floor(data.paths[0].time / 1000 / 60)} m</p>
+          <p>Distance: {Math.floor(data.paths[0].distance)} meters</p>
+          <p>Time: {Math.floor(data.paths[0].time / 1000 / 60)} min</p>
 
           {uniqueCoverages.length > 0 && (
             <div>
@@ -71,13 +91,13 @@ const FetchAPI = ({ startingPlace, destination }) => {
                   <li key={index}>{coverage}</li>
                 ))}
               </ul>
+              <button>Save the tour</button>
             </div>
           )}
         </div>
       ) : (
         <p>Start planning your journey</p>
       )}
-      <div>Save the tour</div>
     </div>
   );
 };

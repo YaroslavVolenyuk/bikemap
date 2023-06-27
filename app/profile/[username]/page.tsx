@@ -8,6 +8,7 @@ import {
   getUserByUsername,
 } from '../../../database/users';
 import { LogoutButton } from '../../LogoutButton';
+import UserSavedMaps from './UserSavedMaps';
 
 type Props = {
   params: { username: string };
@@ -34,6 +35,7 @@ export default async function ProfileUsernamePage({ params }: Props) {
   const userIsThere = !sessionToken?.value
     ? undefined
     : await getUserBySessionToken(sessionToken.value);
+
   return (
     <>
       <div />
@@ -43,6 +45,9 @@ export default async function ProfileUsernamePage({ params }: Props) {
             <div>Username: {userIsThere.username}</div>
             <div>id: {user.id}</div>
             <LogoutButton logout={logout} />
+
+            <div>Saved tours:</div>
+            <UserSavedMaps />
           </>
         ) : (
           <>

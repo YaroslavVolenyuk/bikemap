@@ -11,7 +11,7 @@ function LineChart({ chartData }) {
           plugins: {
             title: {
               display: true,
-              text: 'the road profile?',
+              text: 'The elevation profile',
             },
             legend: {
               display: false,
