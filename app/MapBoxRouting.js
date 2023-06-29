@@ -51,7 +51,7 @@ const MapBoxRouting = ({
     map.addControl(directions, 'bottom-left');
     map.addControl(geolocateControl, 'top-left');
     const navigation = new mapboxgl.NavigationControl();
-    // Add zoom and rotation controls to the map.
+
     map.addControl(navigation);
 
     // geolocateControl

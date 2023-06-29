@@ -8,24 +8,40 @@ import React, { useEffect } from 'react';
 mapboxgl.accessToken =
   'pk.eyJ1IjoieXJvYWNoIiwiYSI6ImNsaXJoZ2hrcjEyb28zZW8xOWoxOGphOGYifQ.-ZVzkyZ63Y6jlkvIQq4tQw';
 
-const UserSavedMaps = () => {
+// fake database:
+const savedRoutes = [
+  {
+    id: 1,
+    startPoint: { lng: 16.34985, lat: 48.21483 },
+    endPoint: { lng: 16.38058, lat: 48.20757 },
+  },
+  {
+    id: 2,
+    startPoint: { lng: 16.12345, lat: 48.54321 },
+    endPoint: { lng: 16.98765, lat: 48.13579 },
+  },
+];
+
+// call coordinates from DataBase API and draw route
+
+const UserSavedMaps = (savedUserPointA, savedUserPointB) => {
   useEffect(() => {
     // Create a map instance
     const map = new mapboxgl.Map({
       container: 'map',
       style: 'mapbox://styles/mapbox/streets-v12',
-      center: [-122.662323, 45.523751], // starting position
-      zoom: 12,
+      center: [16.3738, 48.2082], // starting position
+      zoom: 9,
     });
 
     // Add marker for the first coordinate
     const marker1 = new mapboxgl.Marker()
-      .setLngLat([-122.662323, 45.523751])
+      .setLngLat([16.34985, 48.21483])
       .addTo(map);
 
     // Add marker for the second coordinate
     const marker2 = new mapboxgl.Marker()
-      .setLngLat([-122.663309, 45.525278])
+      .setLngLat([16.38058, 48.20757])
       .addTo(map);
 
     // Fetch the route from Mapbox Directions API
@@ -55,11 +71,20 @@ const UserSavedMaps = () => {
           ],
         };
 
-        // Add the GeoJSON source to the map
         map.on('load', () => {
           map.addSource('route', {
             type: 'geojson',
             data: geojson,
+          });
+
+          const bounds = routeCoordinates.reduce(
+            (bounds, coord) => bounds.extend(coord),
+            new mapboxgl.LngLatBounds(routeCoordinates[0], routeCoordinates[0]),
+          );
+
+          // Fit the map to the bounds
+          map.fitBounds(bounds, {
+            padding: { top: 50, bottom: 50, left: 50, right: 50 },
           });
 
           // Add a line layer to the map
@@ -87,7 +112,7 @@ const UserSavedMaps = () => {
   }, []);
 
   return (
-    <div id="map" style={{ width: '400px', height: '300px' }}>
+    <div id="map" style={{ width: 'auto', height: '150px' }}>
       Map is loading..
     </div>
   );

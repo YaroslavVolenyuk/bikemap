@@ -4,6 +4,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { useState } from 'react';
 import RoadElevationChart from './chart';
 import FetchAPI from './FetchApiGraphhopper';
+import FetchApiGraphhopper from './FetchApiGraphhopper';
 import MapBoxRouting from './MapBoxRouting';
 
 // the main component
@@ -14,6 +15,10 @@ export default function HomePage() {
 
   const [startingPlace, setStartingPlace] = useState('');
   const [destination, setDestination] = useState('');
+
+  // saving coordinates to Database API of user
+  const [savedUserPointA, setSavedUserPointA] = useState('');
+  const [savedUserPointB, setSavedUserPointB] = useState('');
 
   return (
     <main>
@@ -36,7 +41,10 @@ export default function HomePage() {
         </div>
 
         <div>
-          <FetchAPI startingPlace={startingPlace} destination={destination} />
+          <FetchApiGraphhopper
+            startingPlace={startingPlace}
+            destination={destination}
+          />
         </div>
         <div>
           <RoadElevationChart />

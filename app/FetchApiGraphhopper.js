@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-const FetchAPI = ({ startingPlace, destination }) => {
+const FetchApiGraphhopper = ({ startingPlace, destination }) => {
   const [data, setData] = useState(null);
   const [uniqueCoverages, setUniqueCoverages] = useState([]);
   const [error, setError] = useState(null);
@@ -102,4 +102,4 @@ const FetchAPI = ({ startingPlace, destination }) => {
   );
 };
 
-export default FetchAPI;
+export default FetchApiGraphhopper;

@@ -2,6 +2,7 @@ import { cookies } from 'next/headers';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import { logout } from '../../(auth)/logout/actions';
+import { getRoutes } from '../../../database/routes';
 import { getValidSessionByToken } from '../../../database/sessions';
 import {
   getUserBySessionToken,
@@ -16,6 +17,10 @@ type Props = {
 
 export default async function ProfileUsernamePage({ params }: Props) {
   const user = await getUserByUsername(params.username);
+
+  const routes = await getRoutes();
+
+  console.log('routes:', routes);
 
   if (!user) {
     notFound();
@@ -47,7 +52,10 @@ export default async function ProfileUsernamePage({ params }: Props) {
             <LogoutButton logout={logout} />
 
             <div>Saved tours:</div>
-            <UserSavedMaps />
+            <UserSavedMaps
+            // savedUserPointA={savedUserPointA}
+            // savedUserPointB={savedUserPointB}
+            />
           </>
         ) : (
           <>
