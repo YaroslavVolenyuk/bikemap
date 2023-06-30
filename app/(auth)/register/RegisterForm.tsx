@@ -19,7 +19,7 @@ export default function RegisterForm() {
 
     const data: RegisterResponseBodyPost = await response.json();
 
-    console.log('data test? ', data);
+    // console.log('data test? ', data);
 
     if ('error' in data) {
       setError(data.error);

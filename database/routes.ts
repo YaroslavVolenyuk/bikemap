@@ -85,20 +85,20 @@ export const getRouteByUserId = cache(async (id: number) => {
 
 export const createRoute = cache(
   async (
-    route_id: number,
-    user_id: number,
-    startpoint_id: number,
-    endpoint_id: number,
+    routeId: number,
+    userId: number,
+    startpointId: number,
+    endpointId: number,
   ) => {
-    const [animal] = await sql<Route[]>`
+    const [route] = await sql<Route[]>`
       INSERT INTO routes
         (route_id, user_id, startpoint_id, endpoint_id)
       VALUES
-        (${routeId}, ${user_id}, ${startpoint_id}, ${endpoint_id})
+        (${routeId}, ${userId}, ${startpointId}, ${endpointId})
       RETURNING *
     `;
 
-    return animal;
+    return route;
   },
 );
 

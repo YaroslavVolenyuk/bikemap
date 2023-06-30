@@ -1,12 +1,26 @@
-'use client';
+// 'use client';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
+import { cookies } from 'next/headers';
+import { notFound } from 'next/navigation';
+import { getUserBySessionToken } from '../database/users';
 import HomePage from './HomePage';
 
-export default function Page() {
+export default async function Page() {
+  const cookieStore = cookies();
+  const sessionToken = cookieStore.get('sessionToken');
+  const user = !sessionToken?.value
+    ? undefined
+    : await getUserBySessionToken(sessionToken.value);
+  if (!user) {
+    notFound();
+  }
+  const userId = user.id;
+  console.log('user? ', user);
+
   return (
-    <div>
-      <HomePage />
-    </div>
+    <main>
+      <HomePage userId={userId} />
+    </main>
   );
 }

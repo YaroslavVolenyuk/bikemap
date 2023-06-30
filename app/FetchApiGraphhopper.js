@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useEffect, useState } from 'react';
 
 const FetchApiGraphhopper = ({ startingPlace, destination }) => {
@@ -85,13 +87,15 @@ const FetchApiGraphhopper = ({ startingPlace, destination }) => {
 
           {uniqueCoverages.length > 0 && (
             <div>
-              <h4>Path types:</h4>
-              <ul>
-                {uniqueCoverages.map((coverage, index) => (
-                  <li key={index}>{coverage}</li>
-                ))}
-              </ul>
-              <button>Save the tour</button>
+              <form>
+                <h4>Path types:</h4>
+                <ul>
+                  {uniqueCoverages.map((coverage, index) => (
+                    <li key={index}>{coverage}</li>
+                  ))}
+                </ul>
+                <button>Save the tour</button>
+              </form>
             </div>
           )}
         </div>

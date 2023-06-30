@@ -1,18 +1,18 @@
-import React, { useState } from 'react';
-import AddAndRemoveMarker from './AddAndRemoveMarker';
-import RoutingMachine from './RoutineMachine';
+// import React, { useState } from 'react';
+// import AddAndRemoveMarker from './AddAndRemoveMarker';
+// import RoutingMachine from './RoutineMachine';
 
-export default function App() {
-  const [coordinates, setCoordinates] = useState([]);
+// export default function App() {
+//   const [coordinates, setCoordinates] = useState([]);
 
-  const handleCoordinatesChange = (coords) => {
-    setCoordinates(coords);
-  };
+//   const handleCoordinatesChange = (coords) => {
+//     setCoordinates(coords);
+//   };
 
-  return (
-    <div>
-      <AddAndRemoveMarker onCoordinatesChange={handleCoordinatesChange} />
-      <RoutingMachine waypoints={coordinates} />
-    </div>
-  );
-}
+//   return (
+//     <div>
+//       <AddAndRemoveMarker onCoordinatesChange={handleCoordinatesChange} />
+//       <RoutingMachine waypoints={coordinates} />
+//     </div>
+//   );
+// }
