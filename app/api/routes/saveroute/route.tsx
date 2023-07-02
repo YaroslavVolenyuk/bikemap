@@ -39,6 +39,8 @@ export async function POST(
   const body = await request.json();
 
   const result = routesSchema.safeParse(body);
+  console.log('result of routesSchema', result);
+  console.log(result.error);
 
   if (!result.success) {
     return NextResponse.json(

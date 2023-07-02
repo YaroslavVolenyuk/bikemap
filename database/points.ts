@@ -52,29 +52,31 @@ export const getPoints = cache(async () => {
 //   },
 // );
 
-export const getPointsById = cache(async (id: number) => {
+export const getPointsById = cache(async (routeId: number) => {
   const [point] = await sql<Point[]>`
     SELECT
       *
     FROM
       points
     WHERE
-      id = ${id}
+    route_id = ${routeId}
   `;
   return point;
 });
 
-export const createPoint = cache(async (lat: string, lng: string) => {
-  const [animal] = await sql<Point[]>`
+export const createPoint = cache(
+  async (routeId: number, lat: string, lng: string) => {
+    const [point] = await sql<Point[]>`
       INSERT INTO points
-        (lat, lng)
+        (route_id, lat, lng)
       VALUES
-        (${lat}, ${lng})
+        (${routeId}, ${lat}, ${lng})
       RETURNING *
     `;
 
-  return animal;
-});
+    return point;
+  },
+);
 
 // export const updateAnimalById = cache(async (lat: string, lng: string) => {
 //   const [animal] = await sql<Animal[]>`

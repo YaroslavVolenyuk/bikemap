@@ -1,11 +1,7 @@
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import {
-  createRoute,
-  getRoutes,
-  getRoutesAndPointsById,
-} from '../../../../database/routes';
+import { getRoutes } from '../../../../database/routes';
 import { getValidSessionByToken } from '../../../../database/sessions';
 import { Route } from '../../../../migrations/1687943012-createRoutes';
 

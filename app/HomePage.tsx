@@ -2,11 +2,9 @@
 import 'leaflet/dist/leaflet.css';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { useState } from 'react';
-import RoadElevationChart from './chart';
 import FetchApiGraphhopper from './FetchApiGraphhopper';
 import MapBoxRouting from './MapBoxRouting';
-// import SaveButtonForm from './SaveButtonForm';
-import GetAllRoutes from './TestButton';
+import SaveTourForm from './SaveButtonForm';
 
 // the main component
 
@@ -20,13 +18,15 @@ export default function HomePage({ userId }) {
   const [savedUserPointA, setSavedUserPointA] = useState('');
   const [savedUserPointB, setSavedUserPointB] = useState('');
 
-  const startpointId = Date.now();
-  const endpointId = Date.now() + 1;
-  const routeId = Date.now() + 10;
+  const startpointId = Math.floor(Math.random() * 100000) + 1;
+  const endpointId = Math.floor(Math.random() * 100000) + 1;
+  const routeId = Math.floor(Math.random() * 100000) + 1;
 
-  // console.log(routeId);
-  // console.log(startpointId);
-  // console.log(endpointId);
+  console.log('routeId', routeId);
+  console.log('startpointId', startpointId);
+  console.log('endpointId', endpointId);
+  console.log('startingPlace', startingPlace);
+  console.log('destination', destination);
 
   // console.log(
   //   'HOMEPAGE:',
@@ -66,6 +66,13 @@ export default function HomePage({ userId }) {
             destination={destination}
           />
         </div>
+
+        <SaveTourForm
+          routeId={routeId}
+          userId={userId}
+          startpointId={startpointId}
+          endpointId={endpointId}
+        />
         {/* <SaveButtonForm
           routeId={10}
           userId={4}
