@@ -23,15 +23,17 @@ type RoutesResponseBodyPost = { routes: Route } | Error;
 const routesSchema = z.object({
   routeId: z.number(),
   userId: z.number(),
-  startpointId: z.number(),
-  endpointId: z.number(),
+  startpointLat: z.number(),
+  startpointLng: z.number(),
+  endpointLat: z.number(),
+  endpointLng: z.number(),
 });
 
-const pointsSchema = z.object({
-  id: z.number(),
-  lat: z.string(),
-  lng: z.string(),
-});
+// const pointsSchema = z.object({
+//   id: z.number(),
+//   lat: z.string(),
+//   lng: z.string(),
+// });
 
 export async function POST(
   request: NextRequest,
@@ -54,8 +56,10 @@ export async function POST(
   const route = await createRoute(
     result.data.routeId,
     result.data.userId,
-    result.data.startpointId,
-    result.data.endpointId,
+    result.data.startpointLat,
+    result.data.startpointLng,
+    result.data.endpointLat,
+    result.data.endpointLng,
   );
 
   if (!route) {
@@ -73,8 +77,10 @@ export async function POST(
     route: {
       routeId: result.data.routeId,
       userId: result.data.userId,
-      startpointId: result.data.startpointId,
-      endpointId: result.data.endpointId,
+      startpointLat: result.data.startpointLat,
+      startpointLng: result.data.startpointLng,
+      endpointLat: result.data.endpointLat,
+      endpointLng: result.data.endpointLng,
     },
   });
 }

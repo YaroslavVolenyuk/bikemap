@@ -1,15 +1,7 @@
 import { cache } from 'react';
-import { Point } from '../migrations/1687168505-createPoints';
+// import { Point } from '../migrations/1687168505-createPoints';
 import { Route } from '../migrations/1687943012-createRoutes';
 import { sql } from './connect';
-
-export const getRoutes = cache(async () => {
-  const routes = await sql<Route[]>`
-    SELECT * FROM routes
- `;
-
-  return routes;
-});
 
 // export const getAnimalsWithLimitAndOffset = cache(
 //   async (limit: number, offset: number) => {
@@ -59,26 +51,42 @@ export const getRoutesAndPointsBySessionToken = cache(
 
 // какой айди я ищу?
 
-export const getRouteById = cache(async (id: number) => {
+// export const getRouteById = cache(async (id: number) => {
+//   const [route] = await sql<Route[]>`
+//     SELECT
+//       *
+//     FROM
+//       routes
+//     WHERE
+//       route_id = ${id}
+//   `;
+//   return route;
+// });
+
+export const getRoutes = cache(async () => {
+  const routes = await sql<Route[]>`
+    SELECT * FROM routes
+ `;
+
+  return routes;
+});
+
+export const getRouteByUserId = cache(async (userId: number) => {
   const [route] = await sql<Route[]>`
-    SELECT
-      *
-    FROM
-      routes
-    WHERE
-      route_id = ${id}
+    SELECT startpoint_lat, startpoint_lng, endpoint_lat, endpoint_lng
+      FROM routes
+      WHERE user_id = ${userId}
   `;
   return route;
 });
 
-export const getRouteByUserId = cache(async (id: number) => {
+export const getAllRouteIdByUserId = cache(async (userId: number) => {
   const [route] = await sql<Route[]>`
-    SELECT
-      *
+    SELECT route_id
     FROM
       routes
     WHERE
-      user_id = ${id}
+      user_id = ${userId}
   `;
   return route;
 });
@@ -87,14 +95,16 @@ export const createRoute = cache(
   async (
     routeId: number,
     userId: number,
-    startpointId: number,
-    endpointId: number,
+    startpointLat: number,
+    startpointLng: number,
+    endpointLat: number,
+    endpointLng: number,
   ) => {
     const [route] = await sql<Route[]>`
       INSERT INTO routes
-        (route_id, user_id, startpoint_id, endpoint_id)
+        (route_id, user_id, startpoint_lat, startpoint_lng, endpoint_lat, endpoint_lng)
       VALUES
-        (${routeId}, ${userId}, ${startpointId}, ${endpointId})
+        (${routeId}, ${userId}, ${startpointLat}, ${startpointLng}, ${endpointLat}, ${endpointLng})
       RETURNING *
     `;
 
@@ -119,12 +129,23 @@ export const createRoute = cache(
 //   },
 // );
 
-export const deleteRoutelById = cache(async (id: number) => {
+export const deleteRouteById = cache(async (route_id: number) => {
   const [routes] = await sql<Route[]>`
     DELETE FROM
       routes
     WHERE
-      route_id = ${id}
+      route_id = ${route_id}
+    RETURNING *
+  `;
+  return routes;
+});
+
+export const deleteAllRoutesByUserId = cache(async (userId: number) => {
+  const [routes] = await sql<Route[]>`
+    DELETE FROM
+      routes
+    WHERE
+      user_id = ${userId}
     RETURNING *
   `;
   return routes;
@@ -159,31 +180,31 @@ export const deleteRoutelById = cache(async (id: number) => {
 
 // Route with points by user id?
 
-export const getRoutesAndPointsById = cache(async (id: number) => {
-  const [animal] = await sql<AnimalWithFoodsInJsonAgg[]>`
-SELECT
-  animals.id AS animal_id,
-  animals.first_name AS animal_name,
-  animals.type AS animal_type,
-  animals.accessory AS animal_accessory,
-  (
-    SELECT
-      json_agg(foods.*)
-    FROM
-      animal_foods
-    INNER JOIN
-      foods ON animal_foods.food_id = foods.id
-    WHERE
-      animal_foods.animal_id = animals.id
+// export const getRoutesAndPointsById = cache(async (id: number) => {
+//   const [animal] = await sql<AnimalWithFoodsInJsonAgg[]>`
+// SELECT
+//   animals.id AS animal_id,
+//   animals.first_name AS animal_name,
+//   animals.type AS animal_type,
+//   animals.accessory AS animal_accessory,
+//   (
+//     SELECT
+//       json_agg(foods.*)
+//     FROM
+//       animal_foods
+//     INNER JOIN
+//       foods ON animal_foods.food_id = foods.id
+//     WHERE
+//       animal_foods.animal_id = animals.id
 
-  ) AS animal_foods
-FROM
-  animals
-WHERE
-  animals.id = ${id}
-GROUP BY
-  animals.first_name, animals.type, animals.accessory, animals.id;
-  `;
+//   ) AS animal_foods
+// FROM
+//   animals
+// WHERE
+//   animals.id = ${id}
+// GROUP BY
+//   animals.first_name, animals.type, animals.accessory, animals.id;
+//   `;
 
-  return animal;
-});
+//   return animal;
+// });

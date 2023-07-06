@@ -2,8 +2,4 @@
 
 import React from 'react';
 
-export const Data = [
-  { distance: 150, elevation: 20 },
-  { distance: 15, elevation: 5 },
-  { distance: 50, elevation: 10 },
-];
+export const Data = [{ distance: 150, elevation: 20 }];

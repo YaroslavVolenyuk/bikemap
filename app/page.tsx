@@ -1,5 +1,3 @@
-// 'use client';
-
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { cookies } from 'next/headers';
 import { notFound } from 'next/navigation';
@@ -12,14 +10,13 @@ export default async function Page() {
   const user = !sessionToken?.value
     ? undefined
     : await getUserBySessionToken(sessionToken.value);
-  if (!user) {
-    notFound();
-  }
-  const userId = user.id;
+
+  const userId = user?.id;
   console.log('user? ', user);
 
   return (
     <main>
+      {/* loggedIn ? 'show component with form' : 'show component without form' */}
       <HomePage userId={userId} />
     </main>
   );

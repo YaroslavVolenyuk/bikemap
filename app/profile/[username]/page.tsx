@@ -2,7 +2,11 @@ import { cookies } from 'next/headers';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import { logout } from '../../(auth)/logout/actions';
-import { getRoutes } from '../../../database/routes';
+import {
+  getAllRouteIdByUserId,
+  getRouteByUserId,
+  getRoutes,
+} from '../../../database/routes';
 import { getValidSessionByToken } from '../../../database/sessions';
 import {
   getUserBySessionToken,
@@ -18,13 +22,11 @@ type Props = {
 export default async function ProfileUsernamePage({ params }: Props) {
   const user = await getUserByUsername(params.username);
 
-  const routes = await getRoutes();
+  const savedUserPoints = await getRoutes();
+  // const allUserRoutes = await getRouteByUserId(user.id);
+  const routeId = await getAllRouteIdByUserId(user.id);
 
-  console.log('routes:', routes);
-
-  if (!user) {
-    notFound();
-  }
+  console.log('data by userID:', routeId);
 
   const sessionTokenCookie = cookies().get('sessionToken');
 
@@ -48,13 +50,14 @@ export default async function ProfileUsernamePage({ params }: Props) {
         {userIsThere ? (
           <>
             <div>Username: {userIsThere.username}</div>
-            <div>id: {user.id}</div>
+            <div>id: {user?.id}</div>
             <LogoutButton logout={logout} />
 
             <div>Saved tours:</div>
+
             <UserSavedMaps
-            // savedUserPointA={savedUserPointA}
-            // savedUserPointB={savedUserPointB}
+              savedUserPoints={savedUserPoints}
+              userId={user?.id}
             />
           </>
         ) : (

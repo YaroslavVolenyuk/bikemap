@@ -42,6 +42,7 @@
     "server-only": "^0.0.1",
     "sharp": "^0.32.1",
     "tsm": "^2.3.0",
+    "turf": "^3.0.14",
     "zod": "^3.21.4"
   },
   "devDependencies": {

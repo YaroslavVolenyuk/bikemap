@@ -14,8 +14,6 @@ export async function GET(
 
   // fetch database
   const routes = await getRoutes();
-  // const routes = await getRoutesAndPointsById()
-  console.log('routes, GetRoutes', routes);
 
   // check session?
   const sessionTokenCookie = cookies().get('sessionToken');

@@ -98,6 +98,9 @@ dependencies:
   tsm:
     specifier: ^2.3.0
     version: 2.3.0
+  turf:
+    specifier: ^3.0.14
+    version: 3.0.14
   zod:
     specifier: ^3.21.4
     version: 3.21.4
@@ -1932,6 +1935,12 @@ packages:
     hasBin: true
     dev: true
 
+  /affine-hull@1.0.0:
+    resolution: {integrity: sha512-3QNG6+vFAwJvSZHsJYDJ/mt1Cxx9n5ffA+1Ohmj7udw0JuRgUVIXK0P9N9pCMuEdS3jCNt8GFX5q2fChq+GO3Q==}
+    dependencies:
+      robust-orientation: 1.2.1
+    dev: false
+
   /agent-base@6.0.2:
     resolution: {integrity: sha512-RZNwNclF7+MS/8bDg70amg32dyeZGZxiDuQmZxKLAlQjr3jGyLx+4Kkk58UO7D2QdgFIQCovuSuZESne6RG6XQ==}
     engines: {node: '>= 6.0.0'}
@@ -2282,6 +2291,10 @@ packages:
     resolution: {integrity: sha512-jDctJ/IVQbZoJykoeHbhXpOlNBqGNcwXJKJog42E5HDPUwQTSdjCHdihjj0DlnheQ7blbT6dHOafNAiS8ooQKA==}
     engines: {node: '>=8'}
 
+  /bit-twiddle@1.0.2:
+    resolution: {integrity: sha512-B9UhK0DKFZhoTFcfvAzhqsjStvGJp9vYWf3+6SNTtdSQnvIgfkHbgHrg/e4+TH71N2GDu8tpmCVoyfrL1d7ntA==}
+    dev: false
+
   /bl@4.1.0:
     resolution: {integrity: sha512-1W07cM9gS6DcLperZfFSj+bWLtaPGSOHWhPiGzXmvVJbRLdG82sH/Kn8EtW1VqWVA54AKf2h5k5BbnIbwF3h6w==}
     dependencies:
@@ -2588,6 +2601,14 @@ packages:
   /convert-source-map@2.0.0:
     resolution: {integrity: sha512-Kvp459HrV2FEJ1CAsi1Ku+MY3kasH19TFykTz2xWmMeq6bk2NU3XXvfJ+Q61m0xktWwt+1HSYf3JZsTms3aRJg==}
     dev: true
+
+  /convex-hull@1.0.3:
+    resolution: {integrity: sha512-24rZAoh81t41GHPLAxcsokgjH9XNoVqU2OiSi8iMHUn6HUURfiefcEWAPt1AfwZjBBWTKadOm1xUcUMnfFukhQ==}
+    dependencies:
+      affine-hull: 1.0.0
+      incremental-convex-hull: 1.0.1
+      monotone-convex-hull-2d: 1.0.1
+    dev: false
 
   /core-util-is@1.0.3:
     resolution: {integrity: sha512-ZQBvi1DcpJ4GDqanjucZ2Hj3wEO5pZDS89BWbkcrvdxksJorwUDDZamX9ldFkp9aw2lmBDLgkObEA4DWNJ9FYQ==}
@@ -3941,6 +3962,23 @@ packages:
     resolution: {integrity: sha512-3hN7NaskYvMDLQY55gnW3NQ+mesEAepTqlg+VEbj7zzqEMBVNhzcGYYeqFo/TlYz6eQiFcp1HcsCZO+nGgS8zg==}
     engines: {node: '>=6.9.0'}
 
+  /geojson-area@0.2.1:
+    resolution: {integrity: sha512-I+cht30/CFFObh8GgEa/1o9Kd7RwQTHmotYp3ToyCpxxDFNcuX5SlErKkvoy3otnrsWzODN8yscSTGOAkQ3tKQ==}
+    deprecated: 'This module is now under the @mapbox namespace: install @mapbox/geojson-area instead'
+    dependencies:
+      wgs84: 0.0.0
+    dev: false
+
+  /geojson-normalize@0.0.0:
+    resolution: {integrity: sha512-h/ldgc7C2DrYDIn+F/o+AgZLxmeC+O4q3wvGwiuBjTTRnhxvxaGz6cE6cRTeMH89jIJM3BiP+R6Yiht7f3PBuA==}
+    deprecated: 'This module is now under the @mapbox namespace: install @mapbox/geojson-normalize instead'
+    dev: false
+
+  /geojson-random@0.2.2:
+    resolution: {integrity: sha512-/vZQ14mjKPG3LJ7bpyXsJ0aoz8NzvwpwwP//uBgbzIu2BCFd4uRagp1QvY3RAzRQsHOHyVh33dbYUYws7vOCkg==}
+    hasBin: true
+    dev: false
+
   /geojson-vt@3.2.1:
     resolution: {integrity: sha512-EvGQQi/zPrDA6zr6BnJD/YhwAkBP8nnJ9emh3EnHQKVMfg/MRVtPbMYdgVy/IaEmn4UfagD2a6fafPDL5hbtwg==}
     dev: false
@@ -4334,6 +4372,13 @@ packages:
     resolution: {integrity: sha512-JmXMZ6wuvDmLiHEml9ykzqO6lwFbof0GG4IkcGaENdCRDDmMVnny7s5HsIgHCbaq0w2MyPhDqkhTUgS2LU2PHA==}
     engines: {node: '>=0.8.19'}
     dev: true
+
+  /incremental-convex-hull@1.0.1:
+    resolution: {integrity: sha512-mKRJDXtzo1R9LxCuB1TdwZXHaPaIEldoGPsXy2jrJc/kufyqp8y/VAQQxThSxM2aroLoh6uObexPk1ASJ7FB7Q==}
+    dependencies:
+      robust-orientation: 1.2.1
+      simplicial-complex: 1.0.0
+    dev: false
 
   /indent-string@4.0.0:
     resolution: {integrity: sha512-EdDDZu4A2OyIK7Lr/2zG+w5jmbuk1DVBnEwREQvBzspBJkCEbRa8GxU1lghYcaGJCnRWibjDXlq779X1/y5xwg==}
@@ -5215,6 +5260,11 @@ packages:
     engines: {node: '>=6'}
     hasBin: true
 
+  /jsts@1.1.2:
+    resolution: {integrity: sha512-4qWAI9gR72HcGWCl7bej9/2dCM6Nv6dh5Zn1G+wzJYW9wsFL/2bPA3kdR8IAPObmF4gb56l5EGlXxErmB+9GOw==}
+    engines: {node: '>= 4'}
+    dev: false
+
   /jsx-ast-utils@3.3.3:
     resolution: {integrity: sha512-fYQHZTZ8jSfmWZ0iyzfwiU4WDX4HpHbMCZ3gPlWYiCl3BoeOTsqKBqnTVfH2rYT7eP5c3sVbeSPHnnJOaTrWiw==}
     engines: {node: '>=4.0'}
@@ -5663,6 +5713,12 @@ packages:
     resolution: {integrity: sha512-vVqVZQyf3WLx2Shd0qJ9xuvqgAyKPLAiqITEtqW0oIUjzo3PePDd6fW9iFz30ef7Ysp/oiWqbhszeGWW2T6Gzw==}
     engines: {node: '>=10'}
     hasBin: true
+
+  /monotone-convex-hull-2d@1.0.1:
+    resolution: {integrity: sha512-ixQ3qdXTVHvR7eAoOjKY8kGxl9YjOFtzi7qOjwmFFPfBqZHVOjUFOBy/Dk9dusamRSPJe9ggyfSypRbs0Bl8BA==}
+    dependencies:
+      robust-orientation: 1.2.1
+    dev: false
 
   /mri@1.2.0:
     resolution: {integrity: sha512-tzzskb3bG8LvYGFF/mDTpq3jpI6Q9wc3LEmBaghu+DdCssd1FakN7Bc0hVNmEyGq1bq3RgfkCb3cmQLpNPOroA==}
@@ -6652,6 +6708,30 @@ packages:
     dependencies:
       glob: 7.2.3
 
+  /robust-orientation@1.2.1:
+    resolution: {integrity: sha512-FuTptgKwY6iNuU15nrIJDLjXzCChWB+T4AvksRtwPS/WZ3HuP1CElCm1t+OBfgQKfWbtZIawip+61k7+buRKAg==}
+    dependencies:
+      robust-scale: 1.0.2
+      robust-subtract: 1.0.0
+      robust-sum: 1.0.0
+      two-product: 1.0.2
+    dev: false
+
+  /robust-scale@1.0.2:
+    resolution: {integrity: sha512-jBR91a/vomMAzazwpsPTPeuTPPmWBacwA+WYGNKcRGSh6xweuQ2ZbjRZ4v792/bZOhRKXRiQH0F48AvuajY0tQ==}
+    dependencies:
+      two-product: 1.0.2
+      two-sum: 1.0.0
+    dev: false
+
+  /robust-subtract@1.0.0:
+    resolution: {integrity: sha512-xhKUno+Rl+trmxAIVwjQMiVdpF5llxytozXJOdoT4eTIqmqsndQqFb1A0oiW3sZGlhMRhOi6pAD4MF1YYW6o/A==}
+    dev: false
+
+  /robust-sum@1.0.0:
+    resolution: {integrity: sha512-AvLExwpaqUqD1uwLU6MwzzfRdaI6VEZsyvQ3IAQ0ZJ08v1H+DTyqskrf2ZJyh0BDduFVLN7H04Zmc+qTiahhAw==}
+    dev: false
+
   /run-applescript@5.0.0:
     resolution: {integrity: sha512-XcT5rBksx1QdIhlFOCtgZkB99ZEouFZ1E2Kc2LHqNW13U3/74YGdkQRmThTwxy4QIyookibDKYZOPqX//6BlAg==}
     engines: {node: '>=12'}
@@ -6811,6 +6891,17 @@ packages:
     resolution: {integrity: sha512-JA//kQgZtbuY83m+xT+tXJkmJncGMTFT+C+g2h2R9uxkYIrE2yy9sgmcLhCnw57/WSD+Eh3J97FPEDFnbXnDUg==}
     dependencies:
       is-arrayish: 0.3.2
+    dev: false
+
+  /simplicial-complex@1.0.0:
+    resolution: {integrity: sha512-mHauIKSOy3GquM5VnYEiu7eP5y4A8BiaN9ezUUgyYFz1k68PqDYcyaH3kenp2cyvWZE96QKE3nrxYw65Allqiw==}
+    dependencies:
+      bit-twiddle: 1.0.2
+      union-find: 1.0.2
+    dev: false
+
+  /simplify-js@1.2.4:
+    resolution: {integrity: sha512-vITfSlwt7h/oyrU42R83mtzFpwYk3+mkH9bOHqq/Qw6n8rtR7aE3NZQ5fbcyCUVVmuMJR6ynsAhOfK2qoah8Jg==}
     dev: false
 
   /sisteransi@1.0.5:
@@ -7397,15 +7488,456 @@ packages:
       safe-buffer: 5.2.1
     dev: false
 
+  /turf-along@3.0.12:
+    resolution: {integrity: sha512-9wHa3LiqsdEExCuPgw8O5fJzqeL4lf8srBBfjGid2Tjh2nwuqgkcFZxzbnLE0Y8oFh60iNJUdccGuJSTJ3YGyg==}
+    deprecated: 'Turf packages are now namespaced: please use @turf/along instead'
+    dependencies:
+      turf-bearing: 3.0.12
+      turf-destination: 3.0.12
+      turf-distance: 3.0.12
+      turf-helpers: 3.0.12
+    dev: false
+
+  /turf-area@3.0.12:
+    resolution: {integrity: sha512-62Rc1UD8b1yv+AkfhjQ6LSvzxnuJi+jj6q4EkginZxPMJh8HACyQkeNy6VI9WucUULXzoPs8IqeqNwltpMpZVw==}
+    deprecated: 'Turf packages are now namespaced: please use @turf/area instead'
+    dependencies:
+      geojson-area: 0.2.1
+    dev: false
+
+  /turf-bbox-polygon@3.0.12:
+    resolution: {integrity: sha512-9wuTI5eFBBe0bXNK8c5wk/zHbSne28KmUQVX66QhTRvUc34v+NUIzn4bzi3rZXpJvLSLyPVltPnYfn+YsuCkAQ==}
+    deprecated: 'Turf packages are now namespaced: please use @turf/bbox-polygon instead'
+    dependencies:
+      turf-helpers: 3.0.12
+    dev: false
+
+  /turf-bbox@3.0.12:
+    resolution: {integrity: sha512-ztNkTvRQ3ezArAQB2ZLLtJur9BiuWkwVv5u+aviC+3y0/mU5ITuoArOTUs4kLU+gNOjdpPwD0Ea/gqBR0lh2hw==}
+    deprecated: 'Turf packages are now namespaced: please use @turf/bbox instead'
+    dependencies:
+      turf-meta: 3.0.12
+    dev: false
+
+  /turf-bearing@3.0.12:
+    resolution: {integrity: sha512-oWAFtgpQwR78xWZn53BzdwHhd4uT5OtuvwEgzFkZWSa6kp+UpdJ39lDAcvdR0H8dCszuGB4KguaGCZLG+iyUvg==}
+    deprecated: 'Turf packages are now namespaced: please use @turf/bearing instead'
+    dependencies:
+      turf-invariant: 3.0.12
+    dev: false
+
+  /turf-bezier@3.0.12:
+    resolution: {integrity: sha512-8B4frrRtir9VJ6DTgGG5e81f7faPBnxTR2uJzWGd3bQkUaOBBX7rLQTBTBv1iFZVTU07QnWYgznm3c06FrtX2w==}
+    deprecated: 'Turf packages are now namespaced: please use @turf/bezier instead'
+    dependencies:
+      turf-helpers: 3.0.12
+    dev: false
+
+  /turf-buffer@3.0.12:
+    resolution: {integrity: sha512-2wy66sAd0EXX13ql2KeA1bFOtecqDCWmaayLueEaM7HOxY6i/VvroDIHZrFzuwPAa/4ZwMZPaTPiFQ6kh7VSGw==}
+    deprecated: 'Turf packages are now namespaced: please use @turf/buffer instead'
+    dependencies:
+      geojson-normalize: 0.0.0
+      jsts: 1.1.2
+      turf-combine: 3.0.12
+      turf-helpers: 3.0.12
+    dev: false
+
+  /turf-center@3.0.12:
+    resolution: {integrity: sha512-H2okrDla22kawwXsPvazV09mHr26/51sKONL52HTBeqiD2sK0WWRQkpdLfJdia0FT47wVk9mBiLXsKeIzDUi7Q==}
+    deprecated: 'Turf packages are now namespaced: please use @turf/center instead'
+    dependencies:
+      turf-bbox: 3.0.12
+      turf-helpers: 3.0.12
+    dev: false
+
+  /turf-centroid@3.0.12:
+    resolution: {integrity: sha512-OuH8ZZjnxiNETZ8vZkb+dC6C+fit+LdRBolLGDQzBKDLXV2z1nQX2+w/qTNKV9XP5ZZLeEpJPmP0z1MDSz+YRA==}
+    deprecated: 'Turf packages are now namespaced: please use @turf/centroid instead'
+    dependencies:
+      turf-helpers: 3.0.12
+      turf-meta: 3.0.12
+    dev: false
+
+  /turf-circle@3.0.12:
+    resolution: {integrity: sha512-dOGg9yQXA21SpgI1qjU+Kgq0esvBU+ZTqoM5A2fWmoa0458YUoB85hnbxFtnmsFB3qXDsrW9RBuC4kyNCcn9KQ==}
+    deprecated: 'Turf packages are now namespaced: please use @turf/circle instead'
+    dependencies:
+      turf-destination: 3.0.12
+      turf-helpers: 3.0.12
+    dev: false
+
+  /turf-collect@3.0.12:
+    resolution: {integrity: sha512-V36Hz03VmMXn0BUAZNY+w1bpCX6Ks2JzfvHdiWHh5MccziroaKOfOeC1odJcXSDrhoR14/0oSC4tHDKJslbcPA==}
+    deprecated: 'Turf packages are now namespaced: please use @turf/collect instead'
+    dependencies:
+      turf-inside: 3.0.12
+    dev: false
+
+  /turf-combine@3.0.12:
+    resolution: {integrity: sha512-j99I2ydmO4AzQQqzh+DBbxRr+a//DNbXJFcvBSy88G7vlKByPzr0ONVDNcvS/a1JRTl11C2vfrWxRtHwwmzzDg==}
+    deprecated: 'Turf packages are now namespaced: please use @turf/combine instead'
+    dependencies:
+      turf-meta: 3.0.12
+    dev: false
+
+  /turf-concave@3.0.12:
+    resolution: {integrity: sha512-0KQfAk1f7TRUtuNbIDsRcbi4ONMhtrQg0Y/uY/QM5wVIKMj5T5ZuSApqEfs4cDXcfWu//hwe2bgHJzu1GlUn4w==}
+    deprecated: 'Turf packages are now namespaced: please use @turf/concave instead'
+    dependencies:
+      turf-distance: 3.0.12
+      turf-meta: 3.0.12
+      turf-tin: 3.0.12
+      turf-union: 3.0.12
+    dev: false
+
+  /turf-convex@3.0.12:
+    resolution: {integrity: sha512-xfwhxDQKygFsdbEK8503/N+B4JZZB6i58lE39DTMcf97xCCLyv7zxGlalsKU4j+qywV3nbO6yhKHScv4t6t5bg==}
+    deprecated: 'Turf packages are now namespaced: please use @turf/convex instead'
+    dependencies:
+      convex-hull: 1.0.3
+      turf-helpers: 3.0.12
+      turf-meta: 3.0.12
+    dev: false
+
+  /turf-destination@3.0.12:
+    resolution: {integrity: sha512-nXKJfH5qv+eoNbw5ggLZNsUokgmaHnGD8Woauc8+7C36JRPSEm1Y3wcjAdJX0VadJJdL8AjNP65QOiWOLdVe1Q==}
+    deprecated: 'Turf packages are now namespaced: please use @turf/destination instead'
+    dependencies:
+      turf-helpers: 3.0.12
+      turf-invariant: 3.0.12
+    dev: false
+
+  /turf-difference@3.0.12:
+    resolution: {integrity: sha512-YRMUspic52qdwZZxuVp0LB2QG39q4Ps5ZTfZq+QIGsqdKK7FxvbJTxsb/a+n4xHe/K4zCcWo/AXUw1pOFLrNbA==}
+    deprecated: 'Turf packages are now namespaced: please use @turf/difference instead'
+    dependencies:
+      jsts: 1.1.2
+      turf-helpers: 3.0.12
+    dev: false
+
+  /turf-distance@3.0.12:
+    resolution: {integrity: sha512-dy2TguSbcCKJK7ZPwCZuG9+mK2DBKZ4g0wlmbKa7iGPFG18X1nPWJRzUkmNF3kdUe9K6+7SViTnbH6xQYCNpiw==}
+    deprecated: 'Turf packages are now namespaced: please use @turf/distance instead'
+    dependencies:
+      turf-helpers: 3.0.12
+      turf-invariant: 3.0.12
+    dev: false
+
+  /turf-envelope@3.0.12:
+    resolution: {integrity: sha512-2ahLojIP000MUhk7JC/ILASwiP074sFD5nc1HTYyHRhqkb8ukwFMHrR3haEmQdf7sJE3nexBELY9PMGyTQmBiQ==}
+    deprecated: 'Turf packages are now namespaced: please use @turf/envelope instead'
+    dependencies:
+      turf-bbox: 3.0.12
+      turf-bbox-polygon: 3.0.12
+    dev: false
+
+  /turf-explode@3.0.12:
+    resolution: {integrity: sha512-cBUdQl2RBbu5YdL+mBNOcou8OlHLF6F9s6Rwz4EuOOGG0Urs0NE2CmascINB1+TgbxJozb29ZKNXezgwhwnrpg==}
+    deprecated: 'Turf packages are now namespaced: please use @turf/explode instead'
+    dependencies:
+      turf-helpers: 3.0.12
+      turf-meta: 3.0.12
+    dev: false
+
   /turf-extent@1.0.4:
     resolution: {integrity: sha512-JPQtCq6Q5YwwkzQzSU8LYe1KbFnzEVbh21s/o8kYtgs6AeON47t0Gd2q+qLuQOr6usMiJoXylMvgk5qagOzYTQ==}
     dependencies:
       turf-meta: 1.0.2
     dev: false
 
+  /turf-flip@3.0.12:
+    resolution: {integrity: sha512-SV/DI8I/dczRlqBMcAZyyQq1rlkrFZigFUKhtDIBqEJJvqKy70kDxbHrAkJdeAZ20caflkaTV2K40x4UTUpNgg==}
+    deprecated: 'Turf packages are now namespaced: please use @turf/flip instead'
+    dependencies:
+      turf-meta: 3.0.12
+    dev: false
+
+  /turf-grid@1.0.1:
+    resolution: {integrity: sha512-T2jHZ2HOgvkZZQjMmtl9lexeY6Xk1POF6wbYE7aYLjBO43MQqYNEFDf3JQ1gJymrYEaNy7yDSDYDyiYSsK6sQw==}
+    dependencies:
+      turf-point: 2.0.1
+    dev: false
+
+  /turf-helpers@3.0.12:
+    resolution: {integrity: sha512-e0Oic1RVdTq3PAd5XlPgdtE3eZlN4kSd+Sr4iwayeeBRCMns60j9t6helyHxvbjLLy1uP28IiNfnm30BF+YThw==}
+    deprecated: 'Turf packages are now namespaced: please use @turf/helpers instead'
+    dev: false
+
+  /turf-hex-grid@3.0.12:
+    resolution: {integrity: sha512-3O580ujUHbAEi8vk38uyxvIQN3yjyeQEJtJppB2sYO7zcNORIcao68DlXQW29nSy1pUAYCbNkghDcumNL3A58A==}
+    deprecated: 'Turf packages are now namespaced: please use @turf/hex-grid instead'
+    dependencies:
+      turf-distance: 3.0.12
+      turf-helpers: 3.0.12
+    dev: false
+
+  /turf-inside@3.0.12:
+    resolution: {integrity: sha512-QjRDeSgDwf1hIEATsYgbYMB1GnnfwEqjapskOIojICeUBfKA+NMExjaBtMc2V1SY5jNqja6tVPH+ek0d+WO7Vg==}
+    deprecated: 'Turf packages are now namespaced: please use @turf/inside instead'
+    dependencies:
+      turf-invariant: 3.0.12
+    dev: false
+
+  /turf-intersect@3.0.12:
+    resolution: {integrity: sha512-eXDksaYFakN6BFcfiyqgH1PDizfkfhPUU2Axd+I5zjVEHgECplK+z8LYA/RqvQ59aWQ2MfNRqxwW12T07c4gMw==}
+    deprecated: 'Turf packages are now namespaced: please use @turf/intersect instead'
+    dependencies:
+      jsts: 1.1.2
+    dev: false
+
+  /turf-invariant@3.0.12:
+    resolution: {integrity: sha512-6BAyAupdij6X8gTlpGHCG/zpqXXaTi7kjMAbQrepTpnPhIEQJtlGsiZCQu4EckCZS5Rzj5/b8Xw4gaxNpadihw==}
+    deprecated: 'Turf packages are now namespaced: please use @turf/invariant instead'
+    dev: false
+
+  /turf-isolines@3.0.12:
+    resolution: {integrity: sha512-b4TY6fKYWvToxiYjYTiURUlljls8jG1oKFaBulu5pz0q6rxmpxkCGOA8t9AXQkNXzHBrDE+vjXashMtYEN9Tsw==}
+    deprecated: 'Turf packages are now namespaced: please use @turf/isolines instead'
+    dependencies:
+      turf-bbox: 3.0.12
+      turf-grid: 1.0.1
+      turf-helpers: 3.0.12
+      turf-inside: 3.0.12
+      turf-planepoint: 3.0.12
+      turf-square: 3.0.12
+      turf-tin: 3.0.12
+    dev: false
+
+  /turf-kinks@3.0.12:
+    resolution: {integrity: sha512-gzLqDKPqq9rSWIPy6NDZMspDqk1wvP1sg+jaSqdKnW3mPTDn32IbHLxihjGzZoaW0YlIZmnrZlVBLqId6kCZ5w==}
+    deprecated: 'Turf packages are now namespaced: please use @turf/kinks instead'
+    dependencies:
+      turf-helpers: 3.0.12
+    dev: false
+
+  /turf-line-distance@3.0.12:
+    resolution: {integrity: sha512-HzrxOEKdUgl1vdqIBLmaA99B0cg3+41kamQ650wn26BFUdMrrtkt+x2FT3Y7DifYTNljQ2fblbylqtMAAS0jag==}
+    deprecated: 'Turf packages are now namespaced: please use @turf/line-distance instead'
+    dependencies:
+      turf-distance: 3.0.12
+      turf-helpers: 3.0.12
+    dev: false
+
+  /turf-line-slice@3.0.12:
+    resolution: {integrity: sha512-1ecV3DCTRkv2azoaN/ZFcKxLBrw3l4SRSP/dVAk1Gwn83vBYJ9XtjmUiMLE2WbzTzuzuDxLb6fMvyGyteXBUeg==}
+    deprecated: 'Turf packages are now namespaced: please use @turf/line-slice instead'
+    dependencies:
+      turf-bearing: 3.0.12
+      turf-destination: 3.0.12
+      turf-distance: 3.0.12
+      turf-helpers: 3.0.12
+      turf-point-on-line: 3.0.12
+    dev: false
+
   /turf-meta@1.0.2:
     resolution: {integrity: sha512-oR+OxR++Wlie4fr2cMLbmdVAA9rfHxnuX/H5bphCaDTc14JDmd/ixWer08vhoawnvjE98Eq6o4UOGY8AMRbexw==}
     deprecated: 'Turf packages are now namespaced: please use @turf/meta instead'
+    dev: false
+
+  /turf-meta@3.0.12:
+    resolution: {integrity: sha512-B3YSKMpWGx1WYE8IM62pzOA0kqjrGjd/ZkSyrD5WXnrrpPfAUl0yBoZCJYL5IQcOwLqfd5xZt3HJnNH9cFiG7A==}
+    deprecated: 'Turf packages are now namespaced: please use @turf/meta instead'
+    dev: false
+
+  /turf-midpoint@3.0.12:
+    resolution: {integrity: sha512-Q1fZWQzc4SSF09hY+tJvgnDGBmVqTgBkIzOg0I0hy+ti0b9bSJ5P3+KY6wkVcC+zgDa8jzp8GZETijAV4WUAqw==}
+    deprecated: 'Turf packages are now namespaced: please use @turf/midpoint instead'
+    dependencies:
+      turf-bearing: 3.0.12
+      turf-destination: 3.0.12
+      turf-distance: 3.0.12
+      turf-invariant: 3.0.12
+    dev: false
+
+  /turf-nearest@3.0.12:
+    resolution: {integrity: sha512-4jyHgtpxVSM2LXh+lz4z47lketEXMKlcIpCJplHFpT1ZddIUoKvT6RJDhTUN8a+mohE8HAPgvcUA53vmjxxNEg==}
+    deprecated: 'Turf packages are now namespaced: please use @turf/nearest instead'
+    dependencies:
+      turf-distance: 3.0.12
+    dev: false
+
+  /turf-planepoint@3.0.12:
+    resolution: {integrity: sha512-2okyqSAjC00QWEyr1vi04Vgug6OaYfBRtvtzHs16IxBN5xhAuwtCnUICb/1ugbOgCiBFV6TzIle/vA0EUVuRxQ==}
+    deprecated: 'Turf packages are now namespaced: please use @turf/planepoint instead'
+    dev: false
+
+  /turf-point-grid@3.0.12:
+    resolution: {integrity: sha512-5keUPz8j0VWilANaX3bP1evAm/u1u8v10HfUjtoenvWAC5dTGMUVCskgFqX9XitwmsPtaFiCuakM8s3HQzydSQ==}
+    deprecated: 'Turf packages are now namespaced: please use @turf/point-grid instead'
+    dependencies:
+      turf-distance: 3.0.12
+      turf-helpers: 3.0.12
+    dev: false
+
+  /turf-point-on-line@3.0.12:
+    resolution: {integrity: sha512-0+gqSE3pK//ylzQZoc+tLpLUa1/14vvqbMvteFu2bl9NP6oudzZqTWoY9dBfyD9rLQtFOCf/IdkIk+IIwTn1cg==}
+    deprecated: 'Turf packages are now namespaced: please use @turf/point-on-line instead'
+    dependencies:
+      turf-bearing: 3.0.12
+      turf-destination: 3.0.12
+      turf-distance: 3.0.12
+      turf-helpers: 3.0.12
+    dev: false
+
+  /turf-point-on-surface@3.0.12:
+    resolution: {integrity: sha512-8/CXalHx672E2gR5FIZlazrx2Gj8HJW9JHb7UF/SH2CGDt/DUQKynz3/rn2fj4PyGtXGG7JoS/XuBwEdH99gAw==}
+    deprecated: 'Turf packages are now namespaced: please use @turf/point-on-surface instead'
+    dependencies:
+      turf-center: 3.0.12
+      turf-distance: 3.0.12
+      turf-explode: 3.0.12
+      turf-helpers: 3.0.12
+      turf-inside: 3.0.12
+    dev: false
+
+  /turf-point@2.0.1:
+    resolution: {integrity: sha512-DkzYiE8Gc7G6XNW3FsBEwKAMz7jVZ/cw+PqLLkiSR1bde0vRZumF26UDQrspyQNih/oShQ0i4mSfa/dw3tqzsA==}
+    hasBin: true
+    dependencies:
+      minimist: 1.2.8
+    dev: false
+
+  /turf-random@3.0.12:
+    resolution: {integrity: sha512-y0bRhHUfTQJBdEigLpS0+y8ReagylBlAgSKhCanMkw2WtQBj4y5MNOT+dgwX6iOCiWrzCsgPvDm/2hRxdYzmTQ==}
+    deprecated: 'Turf packages are now namespaced: please use @turf/random instead'
+    dependencies:
+      geojson-random: 0.2.2
+    dev: false
+
+  /turf-sample@3.0.12:
+    resolution: {integrity: sha512-aDwiE4kjSHt60hYdIhCFQp7xTauIPUVufbfJSVR2+Xrq6KdK8IPIkUAjDKNIo7iSetEsK9uHNHCFTTvW1emGMQ==}
+    deprecated: 'Turf packages are now namespaced: please use @turf/sample instead'
+    dependencies:
+      turf-helpers: 3.0.12
+    dev: false
+
+  /turf-simplify@3.0.12:
+    resolution: {integrity: sha512-g+kLtFhZaQD+OZwcl2KZ8RVWGQdsCJBT3/ZQiP6K8RYdD3d3QbruKIQdLgEZhK0lL0/EUCgzQz3/mhpxTA3RMw==}
+    deprecated: 'Turf packages are now namespaced: please use @turf/simplify instead'
+    dependencies:
+      simplify-js: 1.2.4
+    dev: false
+
+  /turf-square-grid@3.0.12:
+    resolution: {integrity: sha512-L8Bd3/YNYMqIYqWJDmGMJ7itSO7VMrbU1Vubt1f+GOHGnNcf789YXe1poNa6VdONw7spuRlgbQA94VMI5vzZUQ==}
+    deprecated: 'Turf packages are now namespaced: please use @turf/square-grid instead'
+    dependencies:
+      turf-distance: 3.0.12
+      turf-helpers: 3.0.12
+    dev: false
+
+  /turf-square@3.0.12:
+    resolution: {integrity: sha512-jBxMU+9ZO8WAEwFBC2AsBpwV/vmqdBFn73ONEYDb8n+LiOAMbwsDM+75pxg6kt5l3ugQJGbgfxVucVl3SUTJaQ==}
+    deprecated: 'Turf packages are now namespaced: please use @turf/square instead'
+    dependencies:
+      turf-distance: 3.0.12
+      turf-helpers: 3.0.12
+    dev: false
+
+  /turf-tag@3.0.12:
+    resolution: {integrity: sha512-tNC7FkAMdFjePrqZqjrxE5IXGdkrZcBjWbRmCSwy0DMKhLgPuXfWNACXt4FFC5dgQ3jc3NbDvfsML6gs1es1zA==}
+    deprecated: 'Turf packages are now namespaced: please use @turf/tag instead'
+    dependencies:
+      turf-inside: 3.0.12
+    dev: false
+
+  /turf-tesselate@3.0.12:
+    resolution: {integrity: sha512-LWalgrdZGqXoqxkqlD/uV7xpIbuhNJviLw1ANdiST6F6laz8qoi8C2hfHIyzcQB7T/0LeWsuWzHtJ1MotYhpuA==}
+    deprecated: 'Turf packages are now namespaced: please use @turf/tesselate instead'
+    dependencies:
+      earcut: 2.2.4
+      turf-helpers: 3.0.12
+    dev: false
+
+  /turf-tin@3.0.12:
+    resolution: {integrity: sha512-uqadTFrAE3pdVzAQN5CMGzZZtZMrirjRYL2iJRaHAXy9lDaVT+TlDe9gt+8SIwiPI1hVHq9NHHrEn6Cyn+xXxg==}
+    deprecated: 'Turf packages are now namespaced: please use @turf/tin instead'
+    dependencies:
+      turf-helpers: 3.0.12
+    dev: false
+
+  /turf-triangle-grid@3.0.12:
+    resolution: {integrity: sha512-hL17vUzp85YoQeqRs4zIKEZloLGt8DWie39j2EK1S8I030L2A60aznZzagnxgo2JnReS25tDSRA4JdrorrECOw==}
+    deprecated: 'Turf packages are now namespaced: please use @turf/triangle-grid instead'
+    dependencies:
+      turf-distance: 3.0.12
+      turf-helpers: 3.0.12
+    dev: false
+
+  /turf-union@3.0.12:
+    resolution: {integrity: sha512-9R3/SccBa6Qpqn1CYUU1n7gv1E1f+pNiLZmf1tEqPq0QQQE8jY3B03YrsIBK1bP6RI8N6wx/2hfX7h9LgFQvmw==}
+    deprecated: 'Turf packages are now namespaced: please use @turf/union instead'
+    dependencies:
+      jsts: 1.1.2
+    dev: false
+
+  /turf-within@3.0.12:
+    resolution: {integrity: sha512-RgVeZ8LBZjcUSX8OvVW/nk2hJ1Vp+RPD+axOWaRf+zMbIiiBBAxmE8FxJSm6EINUuOR8zkvWIt+pyeltRYtG8A==}
+    deprecated: 'Turf packages are now namespaced: please use @turf/within instead'
+    dependencies:
+      turf-helpers: 3.0.12
+      turf-inside: 3.0.12
+    dev: false
+
+  /turf@3.0.14:
+    resolution: {integrity: sha512-YKaS5wvijcTkGr1p6YQXh2xHWojhC6PMPo8pUFqphgJhq4DCtRBDc0UfbfbS/SD3ozzRFcGDrO3jrQqNBi3VAw==}
+    deprecated: 'This package has moved: use @turf/turf instead'
+    dependencies:
+      turf-along: 3.0.12
+      turf-area: 3.0.12
+      turf-bbox: 3.0.12
+      turf-bbox-polygon: 3.0.12
+      turf-bearing: 3.0.12
+      turf-bezier: 3.0.12
+      turf-buffer: 3.0.12
+      turf-center: 3.0.12
+      turf-centroid: 3.0.12
+      turf-circle: 3.0.12
+      turf-collect: 3.0.12
+      turf-combine: 3.0.12
+      turf-concave: 3.0.12
+      turf-convex: 3.0.12
+      turf-destination: 3.0.12
+      turf-difference: 3.0.12
+      turf-distance: 3.0.12
+      turf-envelope: 3.0.12
+      turf-explode: 3.0.12
+      turf-flip: 3.0.12
+      turf-helpers: 3.0.12
+      turf-hex-grid: 3.0.12
+      turf-inside: 3.0.12
+      turf-intersect: 3.0.12
+      turf-isolines: 3.0.12
+      turf-kinks: 3.0.12
+      turf-line-distance: 3.0.12
+      turf-line-slice: 3.0.12
+      turf-meta: 3.0.12
+      turf-midpoint: 3.0.12
+      turf-nearest: 3.0.12
+      turf-planepoint: 3.0.12
+      turf-point-grid: 3.0.12
+      turf-point-on-line: 3.0.12
+      turf-point-on-surface: 3.0.12
+      turf-random: 3.0.12
+      turf-sample: 3.0.12
+      turf-simplify: 3.0.12
+      turf-square: 3.0.12
+      turf-square-grid: 3.0.12
+      turf-tag: 3.0.12
+      turf-tesselate: 3.0.12
+      turf-tin: 3.0.12
+      turf-triangle-grid: 3.0.12
+      turf-union: 3.0.12
+      turf-within: 3.0.12
+    dev: false
+
+  /two-product@1.0.2:
+    resolution: {integrity: sha512-vOyrqmeYvzjToVM08iU52OFocWT6eB/I5LUWYnxeAPGXAhAxXYU/Yr/R2uY5/5n4bvJQL9AQulIuxpIsMoT8XQ==}
+    dev: false
+
+  /two-sum@1.0.0:
+    resolution: {integrity: sha512-phP48e8AawgsNUjEY2WvoIWqdie8PoiDZGxTDv70LDr01uX5wLEQbOgSP7Z/B6+SW5oLtbe8qaYX2fKJs3CGTw==}
     dev: false
 
   /type-check@0.3.2:
@@ -7477,6 +8009,10 @@ packages:
       has-symbols: 1.0.3
       which-boxed-primitive: 1.0.2
     dev: true
+
+  /union-find@1.0.2:
+    resolution: {integrity: sha512-wFA9bMD/40k7ZcpKVXfu6X1qD3ri5ryO8HUsuA1RnxPCQl66Mu6DgkxyR+XNnd+osD0aLENixcJVFj+uf+O4gw==}
+    dev: false
 
   /unique-filename@1.1.1:
     resolution: {integrity: sha512-Vmp0jIp2ln35UTXuryvjzkjGdRyf9b2lTXuSYUiPmzRcl3FDtYqAwOnTJkAngD9SWhnoJzDbTKwaOrZ+STtxNQ==}
@@ -7610,6 +8146,10 @@ packages:
     resolution: {integrity: sha512-VwddBukDzu71offAQR975unBIGqfKZpM+8ZX6ySk8nYhVoo5CYaZyzt3YBvYtRtO+aoGlqxPg/B87NGVZ/fu6g==}
     engines: {node: '>=12'}
     dev: true
+
+  /wgs84@0.0.0:
+    resolution: {integrity: sha512-ANHlY4Rb5kHw40D0NJ6moaVfOCMrp9Gpd1R/AIQYg2ko4/jzcJ+TVXYYF6kXJqQwITvEZP4yEthjM7U6rYlljQ==}
+    dev: false
 
   /whatwg-encoding@2.0.0:
     resolution: {integrity: sha512-p41ogyeMUrw3jWclHWTQg1k05DSVXPLcVxRTYsXUk+ZooOCZLcoYgPZ/HL/D/N+uQPOtcp1me1WhBEaX02mhWg==}

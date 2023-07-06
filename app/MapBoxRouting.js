@@ -9,22 +9,14 @@ import FetchAPI from './FetchApiGraphhopper';
 mapboxgl.accessToken =
   'pk.eyJ1IjoieXJvYWNoIiwiYSI6ImNsaXJoZ2hrcjEyb28zZW8xOWoxOGphOGYifQ.-ZVzkyZ63Y6jlkvIQq4tQw';
 const MapBoxRouting = ({
-  distance,
-  setDistance,
-  elevation,
-  setElevation,
-  startingPlace,
   setStartingPlace,
-  destination,
+
   setDestination,
 }) => {
-  // const [startingPlace, setStartingPlace] = useState('');
-  // const [destination, setDestination] = useState('');
-
   useEffect(() => {
     const map = new mapboxgl.Map({
       container: 'map',
-      style: 'mapbox://styles/mapbox/streets-v12',
+      style: 'mapbox://styles/mapbox/outdoors-v12',
       center: [16.3738, 48.2082], // vienna
       zoom: 13,
     });
@@ -40,7 +32,7 @@ const MapBoxRouting = ({
       controls: {
         inputs: true,
         instructions: false,
-        profileSwitcher: false, // aчйuto bikes peeps
+        profileSwitcher: false,
         waypointNameMarkers: true,
         reverseGeocode: true,
         clearButton: true,
