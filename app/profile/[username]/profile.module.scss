@@ -1,0 +1,14 @@
+.button {
+  background-color: rgb(102, 173, 245);
+  border-width: 0;
+  padding: 10px;
+  border-radius: 5px;
+  margin: 10px;
+}
+
+.profilePage {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}

@@ -12,7 +12,8 @@ import {
   getUserBySessionToken,
   getUserByUsername,
 } from '../../../database/users';
-import { LogoutButton } from '../../LogoutButton';
+import { LogoutButton } from './LogoutButton';
+import styles from './profile.module.scss';
 import UserSavedMaps from './UserSavedMaps';
 
 type Props = {
@@ -22,11 +23,11 @@ type Props = {
 export default async function ProfileUsernamePage({ params }: Props) {
   const user = await getUserByUsername(params.username);
 
-  const savedUserPoints = await getRoutes();
-  // const allUserRoutes = await getRouteByUserId(user.id);
-  const routeId = await getAllRouteIdByUserId(user.id);
+  // const savedUserPoints = await getRoutes();
+  const savedUserPoints = await getRouteByUserId(user.id);
+  // const routeId = await getAllRouteIdByUserId(user.id);
 
-  console.log('data by userID:', routeId);
+  // console.log('allUserRoutes:', allUserRoutes);
 
   const sessionTokenCookie = cookies().get('sessionToken');
 
@@ -49,16 +50,16 @@ export default async function ProfileUsernamePage({ params }: Props) {
       <div>
         {userIsThere ? (
           <>
-            <div>Username: {userIsThere.username}</div>
-            <div>id: {user?.id}</div>
+            <div className={styles.profilePage}>
+              <div>Hello, {userIsThere.username}</div>
+              {/* <div>id: {user?.id}</div> */}
+            </div>
+
             <LogoutButton logout={logout} />
 
-            <div>Saved tours:</div>
+            <div>Your saved tours:</div>
 
-            <UserSavedMaps
-              savedUserPoints={savedUserPoints}
-              userId={user?.id}
-            />
+            <UserSavedMaps savedUserPoints={savedUserPoints} />
           </>
         ) : (
           <>

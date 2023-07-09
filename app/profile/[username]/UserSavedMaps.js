@@ -7,18 +7,18 @@ import React, { useEffect } from 'react';
 mapboxgl.accessToken =
   'pk.eyJ1IjoieXJvYWNoIiwiYSI6ImNsaXJoZ2hrcjEyb28zZW8xOWoxOGphOGYifQ.-ZVzkyZ63Y6jlkvIQq4tQw';
 
-const UserSavedMaps = ({ savedUserPoints, userId }) => {
+const UserSavedMaps = ({ savedUserPoints }) => {
   useEffect(() => {
-    const filteredPoints = savedUserPoints.filter(
-      (savedUserPoint) => savedUserPoint.userId === userId,
-    );
+    // const filteredPoints = savedUserPoints.filter(
+    //   (savedUserPoint) => savedUserPoint.userId === userId,
+    // );
 
-    filteredPoints.forEach((savedUserPoint) => {
+    savedUserPoints.forEach((savedUserPoint) => {
       const { id, startpointLat, startpointLng, endpointLat, endpointLng } =
         savedUserPoint;
 
       console.log('savedUserPoints UserSavedMaps:', savedUserPoints);
-      console.log('USER ID IS: ', userId);
+      // console.log('USER ID IS: ', userId);
 
       const containerId = `map-${id}`;
 

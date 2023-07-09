@@ -1,5 +1,23 @@
+import {
+  Clock4,
+  MoveDownRight,
+  MoveHorizontal,
+  MoveUpRight,
+} from 'lucide-react';
 import React, { useEffect, useState } from 'react';
+import { AiOutlineProfile } from 'react-icons/ai';
+import {
+  FaCity,
+  FaCubes,
+  FaExclamationTriangle,
+  FaMountain,
+  FaRoad,
+  FaSquare,
+  FaTree,
+} from 'react-icons/fa';
+import { GiGrass, GiPathDistance, GiStoneWall } from 'react-icons/gi';
 import turf from 'turf';
+import styles from './homepage.module.scss';
 
 const FetchApiGraphhopper = ({
   startingPlace,
@@ -88,25 +106,80 @@ const FetchApiGraphhopper = ({
     };
   }, []);
 
+  const getCoverageIcon = (coverage) => {
+    switch (coverage) {
+      case 'asphalt':
+        return <FaRoad />;
+      case 'paved':
+        return <GiStoneWall />;
+      case 'concrete':
+        return <FaCity />;
+      case 'wood':
+        return <FaTree />;
+      case 'gravel':
+        return <FaMountain />;
+      case 'fine_gravel':
+        return <FaMountain />;
+      case 'ground':
+        return <FaMountain />;
+      case 'compacted':
+        return <FaSquare />;
+      case 'paving_stones':
+        return <GiStoneWall />;
+      case 'cobblestone':
+        return <FaCubes />;
+      case 'unpaved':
+        return <FaExclamationTriangle />;
+      case 'dirt':
+        return <FaExclamationTriangle />;
+      case 'grass':
+        return <GiGrass />;
+      default:
+        return null;
+    }
+  };
+
   return (
-    <div>
+    <div className={styles.tripInfo}>
       {data ? (
         <div>
-          <p>Up: {Math.floor(data.paths[0].ascend)} meters</p>
-          <p>Down: {Math.floor(data.paths[0].descend)} meters</p>
-          <p>Distance: {Math.floor(data.paths[0].distance)} meters</p>
-          <p>Time: {Math.floor(data.paths[0].time / 1000 / 60)} min</p>
+          <div className={styles.roadProfile}>
+            <h4 className={styles.fakeBackground}>
+              <AiOutlineProfile />
+              Road profile:
+            </h4>
+            <p className={styles.buttonLikeBackground}>
+              <MoveUpRight width={20} height={20} />{' '}
+              {Math.floor(data.paths[0].ascend)} m
+            </p>
+            <p className={styles.buttonLikeBackground}>
+              {' '}
+              <MoveDownRight width={20} height={20} />{' '}
+              {Math.floor(data.paths[0].descend)} m
+            </p>
+            <p className={styles.buttonLikeBackground}>
+              {' '}
+              <MoveHorizontal width={20} height={20} />{' '}
+              {Math.floor(data.paths[0].distance)} m
+            </p>
+            <p className={styles.buttonLikeBackground}>
+              {' '}
+              <Clock4 width={20} height={20} />{' '}
+              {Math.floor(data.paths[0].time / 1000 / 60)} min
+            </p>
+          </div>
 
           {uniqueCoverages.length > 0 && (
-            <div>
+            <div className={styles.pathType}>
               <form>
-                <h4>Path types:</h4>
-                <ul>
+                <ul className={styles.fakeBackground}>
+                  <GiPathDistance /> Path types:
                   {uniqueCoverages.map((coverage, index) => (
-                    <li key={index}>{coverage}</li>
+                    <li className={styles.list} key={index}>
+                      {getCoverageIcon(coverage)} {coverage}
+                    </li>
                   ))}
                 </ul>
-                <button>Save the tour</button>
               </form>
             </div>
           )}

@@ -3,6 +3,7 @@ import { cookies } from 'next/headers';
 import { notFound } from 'next/navigation';
 import { getUserBySessionToken } from '../database/users';
 import HomePage from './HomePage';
+import styles from './page.module.scss';
 
 export default async function Page() {
   const cookieStore = cookies();
@@ -17,7 +18,7 @@ export default async function Page() {
   return (
     <main>
       {/* loggedIn ? 'show component with form' : 'show component without form' */}
-      <HomePage userId={userId} />
+      <HomePage userId={userId} username={user?.username} />
     </main>
   );
 }

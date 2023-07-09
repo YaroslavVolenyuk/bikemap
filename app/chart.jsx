@@ -30,12 +30,13 @@ const RoadElevationChart = ({ distance, elevation }) => {
 
   const chartOptions = {
     responsive: true,
+    maintainAspectRatio: false,
     scales: {
       x: {
         type: 'linear',
         display: true,
         title: {
-          display: true,
+          display: false,
           text: 'Distance',
         },
         ticks: {

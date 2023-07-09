@@ -2,9 +2,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import './index.css';
 import MapboxDirections from '@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions';
 import mapboxgl from 'mapbox-gl';
-import React, { useEffect, useState } from 'react';
-import RoadElevationChart from './chart';
-import FetchAPI from './FetchApiGraphhopper';
+import React, { useEffect } from 'react';
 
 mapboxgl.accessToken =
   'pk.eyJ1IjoieXJvYWNoIiwiYSI6ImNsaXJoZ2hrcjEyb28zZW8xOWoxOGphOGYifQ.-ZVzkyZ63Y6jlkvIQq4tQw';
@@ -41,7 +39,7 @@ const MapBoxRouting = ({
     });
     const geolocateControl = new mapboxgl.GeolocateControl();
     map.addControl(directions, 'bottom-left');
-    map.addControl(geolocateControl, 'top-left');
+    map.addControl(geolocateControl, 'top-right');
     const navigation = new mapboxgl.NavigationControl();
 
     map.addControl(navigation);

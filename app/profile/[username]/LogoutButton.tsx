@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import styles from './profile.module.scss';
 
 // import styles from './LogoutButton.module.scss';
 
@@ -13,6 +14,7 @@ export function LogoutButton(props: Props) {
   return (
     <form>
       <button
+        className={styles.button}
         formAction={async () => {
           await props.logout();
           router.refresh();

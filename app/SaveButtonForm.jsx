@@ -1,5 +1,6 @@
 import { useRouter } from 'next/router';
 import { useState } from 'react';
+import styles from './homepage.module.scss';
 
 export default function SaveTourForm({
   routeId,
@@ -39,7 +40,13 @@ export default function SaveTourForm({
 
   return (
     <form onSubmit={(event) => event.preventDefault()}>
-      <button onClick={saveRouteToUser}>Save the route Button</button>
+      <div className={styles.centeredElements}>
+        {startpointLat && endpointLat ? (
+          <button className={styles.saveRouteButton} onClick={saveRouteToUser}>
+            Save your route
+          </button>
+        ) : null}
+      </div>
     </form>
   );
 }

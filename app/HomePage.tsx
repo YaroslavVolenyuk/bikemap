@@ -1,15 +1,23 @@
 'use client';
 import 'leaflet/dist/leaflet.css';
 import 'mapbox-gl/dist/mapbox-gl.css';
+import { LogIn, User, UserPlus } from 'lucide-react';
+import Link from 'next/link';
 import { useState } from 'react';
 import RoadElevationChart from './chart';
 import FetchApiGraphhopper from './FetchApiGraphhopper';
+import styles from './homepage.module.scss';
 import MapBoxRouting from './MapBoxRouting';
 import SaveTourForm from './SaveButtonForm';
 
 // the main component
 
-export default function HomePage({ userId }) {
+type Props = {
+  userId: number;
+  username: string;
+};
+
+export default function HomePage({ userId, username }) {
   const [distance, setDistance] = useState([]);
   const [elevation, setElevation] = useState([]);
 
@@ -39,6 +47,23 @@ export default function HomePage({ userId }) {
         <div id="map" style={{ height: '400px' }}>
           Map is loading! keep waiting!
         </div>
+        <Link className={styles.profileIcon} href={`/profile/${username}`}>
+          <User width={25} height={25} /> Profile
+        </Link>
+        <div className={styles.loginRegisterIcon}>
+          <LogIn width={25} height={25} /> <Link href={`/login`}> Sign in</Link>
+          /
+          <UserPlus width={25} height={25} />{' '}
+          <Link href={`/register`}> Sign up</Link>
+        </div>
+        <div className={styles.elevationChart}>
+          {userId && startingPlace && endpointLat ? (
+            <>
+              <p className={styles.fakeBackground}> Elevation profile:</p>{' '}
+              <RoadElevationChart elevation={elevation} distance={distance} />{' '}
+            </>
+          ) : null}
+        </div>
 
         <div>
           <FetchApiGraphhopper
@@ -49,19 +74,16 @@ export default function HomePage({ userId }) {
           />
         </div>
 
-        <SaveTourForm
-          routeId={routeId}
-          userId={userId}
-          startpointLat={startpointLat}
-          startpointLng={startpointLng}
-          endpointLat={endpointLat}
-          endpointLng={endpointLng}
-        />
-
-        <div>
-          Elevation:{' '}
-          <RoadElevationChart elevation={elevation} distance={distance} />
-        </div>
+        {userId ? (
+          <SaveTourForm
+            routeId={routeId}
+            userId={userId}
+            startpointLat={startpointLat}
+            startpointLng={startpointLng}
+            endpointLat={endpointLat}
+            endpointLng={endpointLng}
+          />
+        ) : null}
       </div>
 
       <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
