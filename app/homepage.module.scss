@@ -17,9 +17,25 @@
 //   border-radius: 10px;
 // }
 
+.transparent {
+  display: none;
+}
+
+.background {
+  // background-image: url('/public/images/bg3.jpg');
+  background-image: url('./../public/images/bg6.jpg');
+
+  // background-color: red;
+  background-repeat: no-repeat;
+  background-size: cover;
+  backdrop-filter: blur(5px);
+  width: 100vw;
+  height: 110vh;
+}
+
 .loginRegisterIcon {
   position: absolute;
-  top: 100px;
+  top: 25px;
   left: 25px;
   background-color: white;
   width: 220px;
@@ -36,12 +52,15 @@
   width: auto;
   border-radius: 5px;
   padding: 20px 20px 50px 20px;
+  background-color: rgb(255, 255, 255);
+  margin: 30px;
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
 }
 
 .tripInfo {
-  // font-family: 'Exo 2', sans-serif;
-
+  background-color: rgb(255, 255, 255);
   border-width: 0;
+  margin: 30px;
 }
 
 .saveRouteButton {
@@ -50,6 +69,7 @@
   padding: 10px;
   border-radius: 5px;
   margin-left: 10px;
+  margin-bottom: 30px;
 }
 
 .roadProfile {
@@ -94,6 +114,13 @@
   align-items: center;
 }
 
+.staredText {
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: rgba(0, 0, 0, 0.15) 0px 5px 15px;
+  font-size: large;
+}
+
 @media screen and (max-width: 1000px) {
   .saveRouteButton {
     margin-bottom: 30px;
@@ -102,6 +129,7 @@
   .roadProfile {
     background-color: rgb(230, 243, 255);
     align-items: center;
+    margin: 0px;
   }
 
   .elevationChart {

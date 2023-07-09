@@ -35,7 +35,7 @@ export default function HomePage({ userId, username }) {
   const endpointLng = destination[1];
 
   return (
-    <div>
+    <div className={styles.background}>
       <div>
         <MapBoxRouting
           setStartingPlace={setStartingPlace}
@@ -47,21 +47,27 @@ export default function HomePage({ userId, username }) {
         <div id="map" style={{ height: '400px' }}>
           Map is loading! keep waiting!
         </div>
-        <Link className={styles.profileIcon} href={`/profile/${username}`}>
-          <User width={25} height={25} /> Profile
-        </Link>
-        <div className={styles.loginRegisterIcon}>
-          <LogIn width={25} height={25} /> <Link href={`/login`}> Sign in</Link>
-          /
-          <UserPlus width={25} height={25} />{' '}
-          <Link href={`/register`}> Sign up</Link>
-        </div>
-        <div className={styles.elevationChart}>
+
+        {userId ? (
+          <Link className={styles.profileIcon} href={`/profile/${username}`}>
+            <User width={25} height={25} /> Profile
+          </Link>
+        ) : (
+          <div className={styles.loginRegisterIcon}>
+            <LogIn width={25} height={25} />{' '}
+            <Link href={`/login`}> Sign in</Link>
+            /
+            <UserPlus width={25} height={25} />{' '}
+            <Link href={`/register`}> Sign up</Link>
+          </div>
+        )}
+
+        <div>
           {userId && startingPlace && endpointLat ? (
-            <>
+            <div className={styles.elevationChart}>
               <p className={styles.fakeBackground}> Elevation profile:</p>{' '}
               <RoadElevationChart elevation={elevation} distance={distance} />{' '}
-            </>
+            </div>
           ) : null}
         </div>
 

@@ -185,7 +185,11 @@ const FetchApiGraphhopper = ({
           )}
         </div>
       ) : (
-        <p>Start planning your journey</p>
+        <p className={styles.staredText}>
+          Start planning your journey. Select point A and point B to create a
+          route, calculate the distance, and get detailed information about the
+          planned route.
+        </p>
       )}
     </div>
   );

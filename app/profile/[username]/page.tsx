@@ -45,29 +45,30 @@ export default async function ProfileUsernamePage({ params }: Props) {
     : await getUserBySessionToken(sessionToken.value);
 
   return (
-    <>
-      <div />
-      <div>
-        {userIsThere ? (
-          <>
-            <div className={styles.profilePage}>
-              <div>Hello, {userIsThere.username}</div>
-              {/* <div>id: {user?.id}</div> */}
-            </div>
+    <div className={styles.background}>
+      {userIsThere ? (
+        <>
+          <div className={styles.profilePage}>
+            <div className={styles.username}>Hello, {userIsThere.username}</div>
+            {/* <div>id: {user?.id}</div> */}
+          </div>
 
+          <div className={styles.description}>Your saved tours:</div>
+
+          <UserSavedMaps savedUserPoints={savedUserPoints} />
+          <div className={styles.centeredElements}>
             <LogoutButton logout={logout} />
-
-            <div>Your saved tours:</div>
-
-            <UserSavedMaps savedUserPoints={savedUserPoints} />
-          </>
-        ) : (
-          <>
-            <Link href="/register">register</Link>
-            <Link href="/login">login</Link>
-          </>
-        )}
-      </div>
-    </>
+            <Link className={styles.button} href="/">
+              Back to planning
+            </Link>
+          </div>
+        </>
+      ) : (
+        <>
+          <Link href="/register">register</Link>
+          <Link href="/login">Login</Link>
+        </>
+      )}
+    </div>
   );
 }
