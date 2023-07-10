@@ -29,6 +29,9 @@ const FetchApiGraphhopper = ({
   const [uniqueCoverages, setUniqueCoverages] = useState([]);
   const [error, setError] = useState(null);
 
+  if (data) {
+    console.log('raw data, fetched from API:', data);
+  }
   const filterCoverages = (dataAPI) => {
     if (dataAPI && dataAPI.paths && dataAPI.paths.length > 0) {
       const details = dataAPI.paths[0].details;
@@ -185,11 +188,28 @@ const FetchApiGraphhopper = ({
           )}
         </div>
       ) : (
-        <p className={styles.staredText}>
-          Start planning your journey. Select point A and point B to create a
-          route, calculate the distance, and get detailed information about the
-          planned route.
-        </p>
+        <div className={styles.staredText}>
+          <p>How to start planning your journey:</p>
+          <p>
+            Select point A and point B to create a route, calculate the
+            distance, and get detailed information about the planned route:
+          </p>
+
+          <p>
+            1. click on the map to enter a departure point or enter a name in
+            the input field.
+          </p>
+
+          <p>
+            2. click on the map to enter the destination point or enter a name
+            in the input field.{' '}
+          </p>
+
+          <p>
+            3. to change the route, move point A or B to the desired location by
+            dragging.
+          </p>
+        </div>
       )}
     </div>
   );

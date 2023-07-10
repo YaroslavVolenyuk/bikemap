@@ -1,6 +1,7 @@
 'use client';
 
 import { Route } from 'next';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { getSafeReturnToPath } from '../../../util/validation';
@@ -67,6 +68,10 @@ export default function LoginForm(props: Props) {
           <button className={styles.button} onClick={async () => await login()}>
             log in
           </button>
+          <br />
+          <Link className={styles.button} href={`/`}>
+            main page
+          </Link>
           {error !== '' && <div className={styles.error}>{error}</div>}
         </form>
       </div>

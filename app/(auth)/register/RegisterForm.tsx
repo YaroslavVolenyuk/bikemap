@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { RegisterResponseBodyPost } from '../../api/(auth)/register/route';
@@ -33,25 +34,44 @@ export default function RegisterForm() {
   }
 
   return (
-    <form onSubmit={(event) => event.preventDefault()}>
-      <label>
-        username:
-        <input
-          value={username}
-          onChange={(event) => setUsername(event.currentTarget.value)}
-        />
-      </label>
-      <label>
-        password:
-        <input
-          value={password}
-          onChange={(event) => setPassword(event.currentTarget.value)}
-        />
-      </label>
-      <button className={styles.button} onClick={async () => await register()}>
-        sign up
-      </button>
-      {error !== '' && <div className={styles.error}>{error}</div>}
-    </form>
+    <div className={styles.registerPage}>
+      <div className={styles.inputs}>
+        <form
+          className={styles.form}
+          onSubmit={(event) => event.preventDefault()}
+        >
+          <label>
+            {/* username: */}
+            <input
+              className={styles.inputField}
+              placeholder="username"
+              value={username}
+              onChange={(event) => setUsername(event.currentTarget.value)}
+            />
+          </label>
+          <label>
+            {/* password: */}
+            <input
+              className={styles.inputField}
+              placeholder="password"
+              value={password}
+              onChange={(event) => setPassword(event.currentTarget.value)}
+            />
+          </label>
+          <button
+            className={styles.button}
+            onClick={async () => await register()}
+          >
+            sign up
+          </button>
+          <br />
+
+          <Link className={styles.button} href={`/`}>
+            main page
+          </Link>
+          {error !== '' && <div className={styles.error}>{error}</div>}
+        </form>
+      </div>
+    </div>
   );
 }

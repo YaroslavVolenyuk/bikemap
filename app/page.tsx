@@ -1,9 +1,7 @@
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { cookies } from 'next/headers';
-import { notFound } from 'next/navigation';
 import { getUserBySessionToken } from '../database/users';
 import HomePage from './HomePage';
-import styles from './page.module.scss';
 
 export default async function Page() {
   const cookieStore = cookies();
