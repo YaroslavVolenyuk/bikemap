@@ -22,3 +22,5 @@ export default async function RootLayout({ children }) {
     </html>
   );
 }
+
+// vercel ready
