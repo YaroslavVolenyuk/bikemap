@@ -20,16 +20,11 @@ export default function RegisterForm() {
 
     const data: RegisterResponseBodyPost = await response.json();
 
-    // console.log('data test? ', data);
-
     if ('error' in data) {
       setError(data.error);
       return;
     }
 
-    // console.log('data user', data.user);
-    // router.push(`/profile/${data.user.username}`);
-    // we may have in the future revalidatePath()
     router.refresh();
   }
 

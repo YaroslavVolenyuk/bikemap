@@ -1,5 +1,4 @@
 .mainContainer {
-  background-color: red;
   width: 100vw;
   height: 100vh;
 
@@ -175,7 +174,7 @@
     display: flex;
     flex-direction: column;
 
-    width: 90%;
+    width: 100%;
     height: 100%;
   }
 
@@ -190,11 +189,6 @@
   }
 
   .imageContainer {
-    // background-image: url('./../public/images/landingPage-2.jpg');
-    // background-repeat: no-repeat;
-    // background-size: cover;
-    // background-position: 75% 0;
-
     width: 100%;
     height: 150%;
     border-radius: 0 0 15px 15px;
@@ -238,9 +232,6 @@
 
   .list {
     display: inline-flex;
-    // flex-direction: column;
-
-    // background-color: rgb(245, 161, 221);
 
     border-radius: 5px;
     padding: 5px;

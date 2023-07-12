@@ -23,9 +23,6 @@ dependencies:
   '@routingjs/graphhopper':
     specifier: ^0.1.0
     version: 0.1.0
-  '@types/leaflet':
-    specifier: ^1.9.3
-    version: 1.9.3
   axios:
     specifier: ^1.4.0
     version: 1.4.0
@@ -133,12 +130,24 @@ devDependencies:
   '@types/dotenv-safe':
     specifier: ^8.1.2
     version: 8.1.2
+  '@types/leaflet':
+    specifier: ^1.9.3
+    version: 1.9.3
+  '@types/leaflet-routing-machine':
+    specifier: ^3.2.4
+    version: 3.2.4
   '@types/mapbox-gl':
     specifier: ^2.7.11
     version: 2.7.11
+  '@types/mapbox__polyline':
+    specifier: ^1.0.2
+    version: 1.0.2
   '@types/react':
     specifier: ^18.2.6
     version: 18.2.11
+  '@types/react-autocomplete':
+    specifier: ^1.8.6
+    version: 1.8.6
   '@types/react-dom':
     specifier: ^18.2.4
     version: 18.2.4
@@ -2601,16 +2610,28 @@ packages:
       '@types/node': 20.3.1
     dev: false
 
+  /@types/leaflet-routing-machine@3.2.4:
+    resolution: {integrity: sha512-CFcWghU+eDel/zY2Q1u1tI6rxL2V6SfJ85/prt7s2QEw8tK+OkH+o5PLm/7eYsZH86i30ff5rmEk8GN1nZ9ODg==}
+    dependencies:
+      '@types/leaflet': 1.9.3
+    dev: true
+
   /@types/leaflet@1.9.3:
     resolution: {integrity: sha512-Caa1lYOgKVqDkDZVWkto2Z5JtVo09spEaUt2S69LiugbBpoqQu92HYFMGUbYezZbnBkyOxMNPXHSgRrRY5UyIA==}
     dependencies:
       '@types/geojson': 7946.0.10
-    dev: false
+    dev: true
 
   /@types/mapbox-gl@2.7.11:
     resolution: {integrity: sha512-4vSwPSTQIawZTFRiTY2R74aZwAiM9gE6KGj871xdyAPpa+DmEObXxQQXqL2PsMH31/rP9nxJ2Kv0boeTVJMXVw==}
     dependencies:
       '@types/geojson': 7946.0.10
+
+  /@types/mapbox__polyline@1.0.2:
+    resolution: {integrity: sha512-Kr/oznVL3e8uvWM0+VPlVu2rVP+jKyVW/994HE9YJFBfcAcKqB4wMvqCdgXLG0SSrxxlKc5Nqaj7zt+KRl9oCA==}
+    dependencies:
+      '@types/geojson': 7946.0.10
+    dev: true
 
   /@types/minimatch@5.1.2:
     resolution: {integrity: sha512-K0VQKziLUWkVKiRVrx4a40iPaxTUefQmjtkQofBkYRcoaaL/8rhwDWww9qWbrgicNOgnpIsMxyNIUM4+n6dUIA==}
@@ -2631,6 +2652,12 @@ packages:
 
   /@types/prop-types@15.7.5:
     resolution: {integrity: sha512-JCB8C6SnDoQf0cNycqd/35A7MjcnK+ZTqE7judS6o7utxUCg6imJg3QK2qzHKszlTjcj2cn+NwMB2i96ubpj7w==}
+    dev: true
+
+  /@types/react-autocomplete@1.8.6:
+    resolution: {integrity: sha512-v3MOyT7gfMfu0K1Y6n9inGVO325evf96YY3Aw4i4WJs5f9+7Y/TVMPbNXoXRnbhlubgkqel19VnrCdBSodwOEg==}
+    dependencies:
+      '@types/react': 18.2.11
     dev: true
 
   /@types/react-dom@18.2.4:

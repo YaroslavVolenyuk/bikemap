@@ -1,0 +1,17 @@
+{
+  "short_name": "BikeMap",
+  "name": "BikeMap",
+  "description": "The Routing app",
+  "¡cons": [
+    {
+      "src": "./icons.apple-touch-icon.png",
+      "type": "image/png",
+      "sizes": "36x36"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#FFFFFF",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#000000"
+}
