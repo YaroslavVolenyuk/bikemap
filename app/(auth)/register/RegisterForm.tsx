@@ -49,6 +49,7 @@ export default function RegisterForm() {
             <input
               className={styles.inputField}
               placeholder="password"
+              type="password"
               value={password}
               onChange={(event) => setPassword(event.currentTarget.value)}
             />

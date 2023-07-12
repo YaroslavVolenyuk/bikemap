@@ -29,9 +29,6 @@ const FetchApiGraphhopper = ({
   const [uniqueCoverages, setUniqueCoverages] = useState([]);
   const [error, setError] = useState(null);
 
-  if (data) {
-    console.log('raw data, fetched from API:', data);
-  }
   const filterCoverages = (dataAPI) => {
     if (dataAPI && dataAPI.paths && dataAPI.paths.length > 0) {
       const details = dataAPI.paths[0].details;
@@ -177,8 +174,8 @@ const FetchApiGraphhopper = ({
               <form>
                 <ul className={styles.fakeBackground}>
                   <GiPathDistance /> Path types:
-                  {uniqueCoverages.map((coverage, index) => (
-                    <li className={styles.list} key={index}>
+                  {uniqueCoverages.map((coverage, index, id) => (
+                    <li className={styles.list} key={id}>
                       {getCoverageIcon(coverage)} {coverage}
                     </li>
                   ))}

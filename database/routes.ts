@@ -1,5 +1,4 @@
 import { cache } from 'react';
-// import { Point } from '../migrations/1687168505-createPoints';
 import { Route } from '../migrations/1687943012-createRoutes';
 import { sql } from './connect';
 
@@ -13,15 +12,16 @@ export const getRoutes = cache(async () => {
 
 export const getRouteByUserId = cache(async (userId: number) => {
   const route = await sql<Route[]>`
-    SELECT id, user_id, startpoint_lat, startpoint_lng, endpoint_lat, endpoint_lng
-      FROM routes
-      WHERE user_id = ${userId}
+    SELECT
+      *
+    FROM routes
+    WHERE user_id = ${userId}
   `;
   return route;
 });
 
 export const getAllRouteIdByUserId = cache(async (userId: number) => {
-  const route = await sql<Route[]>`
+  const route = await sql<{ routeId: number }[]>`
     SELECT route_id
     FROM
       routes

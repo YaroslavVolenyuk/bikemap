@@ -17,7 +17,7 @@ type Props = {
   username: string;
 };
 
-export default function Map({ userId, username }) {
+export default function Map({ userId, username }: Props) {
   const [distance, setDistance] = useState([]);
   const [elevation, setElevation] = useState([]);
 

@@ -1,12 +1,8 @@
 import { cookies } from 'next/headers';
 import Link from 'next/link';
-import { notFound, redirect } from 'next/navigation';
+import { redirect } from 'next/navigation';
 import { logout } from '../../(auth)/logout/actions';
-import {
-  getAllRouteIdByUserId,
-  getRouteByUserId,
-  getRoutes,
-} from '../../../database/routes';
+import { getRouteByUserId } from '../../../database/routes';
 import { getValidSessionByToken } from '../../../database/sessions';
 import {
   getUserBySessionToken,
@@ -16,11 +12,11 @@ import { LogoutButton } from './LogoutButton';
 import styles from './profile.module.scss';
 import UserSavedMaps from './UserSavedMaps';
 
-type Props = {
-  params: { username: string };
-};
+// type Props = {
+//   params: { username: string };
+// };
 
-export default async function ProfileUsernamePage({ params }: Props) {
+export default async function ProfileUsernamePage({ params }) {
   const user = await getUserByUsername(params.username);
 
   // const savedUserPoints = await getRoutes();

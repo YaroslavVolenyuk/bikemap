@@ -69,10 +69,10 @@ export default function LoginForm(props: Props) {
             log in
           </button>
           <br />
-          <Link className={styles.button} href={`/`}>
+          <Link className={styles.button} href="/">
             main page
           </Link>
-          {error !== '' && <div className={styles.error}>{error}</div>}
+          {error !== '' && <div>{error}</div>}
         </form>
       </div>
     </div>

@@ -11,7 +11,6 @@ export default async function Page() {
     : await getUserBySessionToken(sessionToken.value);
 
   const userId = user?.id;
-  console.log('user? ', user);
 
   return (
     <main>

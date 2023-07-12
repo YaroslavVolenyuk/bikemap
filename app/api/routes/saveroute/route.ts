@@ -1,24 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import {
-  createRoute,
-  getRoutes,
-  getRoutesAndPointsById,
-} from '../../../../database/routes';
+import { createRoute } from '../../../../database/routes';
 import { Route } from '../../../../migrations/1687943012-createRoutes';
-
-// POST
-
-// 1.
 
 export type Error = {
   error: string;
 };
 
-type RoutesResponseBodyGet = { routes: Route[] } | Error;
 type RoutesResponseBodyPost = { routes: Route } | Error;
-// type PointsResponseBodyGet = { ?? : Animal[] } | Error;
-// type PointsResponseBodyPost = { ?? : Animal } | Error;
 
 const routesSchema = z.object({
   routeId: z.number(),
@@ -29,12 +18,6 @@ const routesSchema = z.object({
   endpointLng: z.number(),
 });
 
-// const pointsSchema = z.object({
-//   id: z.number(),
-//   lat: z.string(),
-//   lng: z.string(),
-// });
-
 export async function POST(
   request: NextRequest,
 ): Promise<NextResponse<RoutesResponseBodyPost>> {
@@ -42,7 +25,6 @@ export async function POST(
 
   const result = routesSchema.safeParse(body);
   console.log('result of routesSchema', result);
-  console.log(result.error);
 
   if (!result.success) {
     return NextResponse.json(
@@ -63,8 +45,6 @@ export async function POST(
   );
 
   if (!route) {
-    // zod send you details about the error
-    // console.log(result.error);
     return NextResponse.json(
       {
         error: 'Error creating the new route',
@@ -74,13 +54,6 @@ export async function POST(
   }
 
   return NextResponse.json({
-    route: {
-      routeId: result.data.routeId,
-      userId: result.data.userId,
-      startpointLat: result.data.startpointLat,
-      startpointLng: result.data.startpointLng,
-      endpointLat: result.data.endpointLat,
-      endpointLng: result.data.endpointLng,
-    },
+    routes: route,
   });
 }

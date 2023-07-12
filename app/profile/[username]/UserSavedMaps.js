@@ -17,9 +17,6 @@ const UserSavedMaps = ({ savedUserPoints }) => {
       const { id, startpointLat, startpointLng, endpointLat, endpointLng } =
         savedUserPoint;
 
-      console.log('savedUserPoints UserSavedMaps:', savedUserPoints);
-      // console.log('USER ID IS: ', userId);
-
       const containerId = `map-${id}`;
 
       const map = new mapboxgl.Map({
@@ -69,7 +66,7 @@ const UserSavedMaps = ({ savedUserPoints }) => {
             });
 
             const bounds = routeCoordinates.reduce(
-              (bounds, coord) => bounds.extend(coord),
+              (allbounds, coord) => allbounds.extend(coord),
               new mapboxgl.LngLatBounds(
                 routeCoordinates[0],
                 routeCoordinates[0],
