@@ -15,7 +15,7 @@ import UserSavedMaps from './UserSavedMaps';
 // type Props = {
 //   params: { username: string };
 // };
-
+//
 export default async function ProfileUsernamePage({ params }) {
   const user = await getUserByUsername(params.username);
 
