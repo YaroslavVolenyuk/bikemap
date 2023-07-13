@@ -15,6 +15,7 @@
     "bcrypt": "^5.1.0",
     "bikemap": "link:",
     "chart.js": "^4.3.0",
+    "dotenv": "^16.3.1",
     "leaflet": "^1.9.4",
     "ley": "^0.8.1",
     "lucide-react": "^0.258.0",
