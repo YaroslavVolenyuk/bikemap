@@ -6,7 +6,7 @@ import styles from './homepage.module.scss';
 //   username: string | undefined;
 // };
 
-export default async function LandingPage() {
+export default function LandingPage() {
   return (
     <main className={styles.mainContainer}>
       <div className={styles.textAndImageContainer}>
@@ -23,10 +23,6 @@ export default async function LandingPage() {
             <Link href="/map">Start Exploring</Link> <br />
             <Link href="/login">Sign in</Link> /{' '}
             <Link href="/register">Sign up</Link>
-            {/* <Link href="/login">Sign in</Link> to your BikeMap account or{' '}
-            <Link href="/register">create</Link> a new one — and get the
-            feature-packed experience for literally nothing. Or just{' '}
-            <Link href="/map">Start Exploring</Link> */}
           </h3>
         </div>
         <div className={styles.imageContainer}>{''}</div>

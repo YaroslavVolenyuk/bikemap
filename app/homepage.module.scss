@@ -14,7 +14,6 @@
 }
 
 .textAndImageContainer {
-  background-color: rgb(142, 174, 255);
   display: flex;
 
   justify-content: center;
@@ -136,19 +135,22 @@
 .pathType {
   justify-content: center;
   display: inline-flex;
+
   align-items: center;
-  // flex-wrap: wrap;
 
   padding: 10px;
 }
 
 .list {
-  display: inline;
+  display: inline-flex;
+
   background-color: rgb(203, 227, 247);
   border-radius: 5px;
   padding: 5px;
-  gap: 50px;
+
+  gap: 5px;
   margin-left: 10px;
+  margin-bottom: 5px;
 }
 
 .centeredElements {
@@ -226,13 +228,10 @@
   .pathType {
     display: flex;
     flex-direction: column;
-
-    // background-color: red;
   }
 
   .list {
     display: inline-flex;
-
     border-radius: 5px;
     padding: 5px;
     gap: 2px;

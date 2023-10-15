@@ -1,7 +1,5 @@
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { cookies } from 'next/headers';
-import { getUserBySessionToken } from '../database/users';
-import HomePage from './LandingPage';
+import LandingPage from './LandingPage';
 
 // type User = {
 //   userId: number | undefined;
@@ -9,19 +7,9 @@ import HomePage from './LandingPage';
 // };
 
 export default async function Page() {
-  // const cookieStore = cookies();
-  // const sessionToken = cookieStore.get('sessionToken');
-  // const user = !sessionToken?.value
-  //   ? undefined
-  //   : await getUserBySessionToken(sessionToken.value);
-
-  // const userId = user?.id;
-  // console.log('user? ', user);
-
   return (
     <main>
-      {/* <HomePage userId={userId} username={user?.username} /> */}
-      <HomePage />
+      <LandingPage />
     </main>
   );
 }

@@ -28,12 +28,14 @@ const FetchApiGraphhopper = ({
   const [data, setData] = useState(null);
   const [uniqueCoverages, setUniqueCoverages] = useState([]);
   const [error, setError] = useState(null);
+  console.log('uniqueCoverages', uniqueCoverages);
 
   const filterCoverages = (dataAPI) => {
     if (dataAPI && dataAPI.paths && dataAPI.paths.length > 0) {
       const details = dataAPI.paths[0].details;
 
       const coverages = details.surface || [];
+      console.log('coverages', coverages);
       const uniqCoverages = [
         ...new Set(coverages.map((coverage) => coverage[2])),
       ].filter((coverage) => coverage !== 'missing');
@@ -171,16 +173,14 @@ const FetchApiGraphhopper = ({
 
           {uniqueCoverages.length > 0 && (
             <div className={styles.pathType}>
-              <form>
-                <ul className={styles.fakeBackground}>
-                  <GiPathDistance /> Path types:
-                  {uniqueCoverages.map((coverage, index, id) => (
-                    <li className={styles.list} key={id}>
-                      {getCoverageIcon(coverage)} {coverage}
-                    </li>
-                  ))}
-                </ul>
-              </form>
+              <ul className={styles.fakeBackground}>
+                <GiPathDistance /> Path types:
+                {uniqueCoverages.map((coverage, index) => (
+                  <li className={styles.list} key={`coverage-${index}`}>
+                    {getCoverageIcon(coverage)} {coverage}
+                  </li>
+                ))}
+              </ul>
             </div>
           )}
         </div>

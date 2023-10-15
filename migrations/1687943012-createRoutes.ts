@@ -12,15 +12,15 @@ export type Route = {
 
 export async function up(sql: Sql) {
   await sql`
-    CREATE TABLE routes (
-      id integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-      route_id integer NOT NULL UNIQUE,
-      user_id integer NOT NULL,
-      startpoint_lat DOUBLE PRECISION NOT NULL UNIQUE,
-      startpoint_lng DOUBLE PRECISION NOT NULL UNIQUE,
-      endpoint_lat DOUBLE PRECISION NOT NULL UNIQUE,
-      endpoint_lng DOUBLE PRECISION NOT NULL UNIQUE
-    )
+  CREATE TABLE routes (
+    id integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    route_id integer NOT NULL UNIQUE,
+    user_id integer NOT NULL,
+    startpoint_lat DOUBLE PRECISION NOT NULL UNIQUE,
+    startpoint_lng DOUBLE PRECISION NOT NULL UNIQUE,
+    endpoint_lat DOUBLE PRECISION NOT NULL UNIQUE,
+    endpoint_lng DOUBLE PRECISION NOT NULL UNIQUE
+  )
   `;
 }
 
