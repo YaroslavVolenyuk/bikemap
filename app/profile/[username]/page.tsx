@@ -42,7 +42,7 @@ export default async function ProfileUsernamePage({ params }: Props) {
 
       <div className={styles.description}>Your saved tours:</div>
 
-      <UserSavedMaps savedUserPoints={savedUserPoints} />
+      <UserSavedMaps savedUserPoints={savedUserPoints} username={username} />
       <div className={styles.centeredElements}>
         <LogoutButton logout={logout} />
         <Link className={styles.button} href="/map">

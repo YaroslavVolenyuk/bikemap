@@ -14,9 +14,9 @@ import {
   Download,
   EyeOff,
   Gauge,
+  History,
   Layers,
   LogIn,
-  MapPin,
   Save,
   Trash2,
   User,
@@ -30,6 +30,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 import MapboxPlanner from './MapboxPlanner';
@@ -42,6 +43,9 @@ import {
   createRouteDetails,
   getFallbackRouteDetails,
 } from './routeDetails';
+import { buildGpxString } from '../../util/gpx';
+import { parseGpxString } from '../../util/parseGpx';
+import type { ParsedGpx } from '../../util/parseGpx';
 
 type Props = {
   userId?: number;
@@ -134,26 +138,6 @@ function getRouteWarnings(details?: RouteDetails): string[] {
   return warnings;
 }
 
-function buildGpx(details: RouteDetails, name: string): string {
-  const trkpts = details.geometry
-    .map((coord, i) => {
-      const elevPoint = details.elevation[i];
-      const ele = elevPoint ? `<ele>${elevPoint.elevationMeters.toFixed(1)}</ele>` : '';
-      return `      <trkpt lat="${coord[1]}" lon="${coord[0]}">${ele}</trkpt>`;
-    })
-    .join('\n');
-
-  return `<?xml version="1.0" encoding="UTF-8"?>
-<gpx version="1.1" creator="bikemap" xmlns="http://www.topografix.com/GPX/1/1">
-  <metadata><name>${name.replace(/[<>&"]/g, '')}</name></metadata>
-  <trk>
-    <name>${name.replace(/[<>&"]/g, '')}</name>
-    <trkseg>
-${trkpts}
-    </trkseg>
-  </trk>
-</gpx>`;
-}
 
 function getDifficulty(details?: RouteDetails, route?: ReturnType<typeof getFallbackRouteDetails>) {
   const distanceMeters = details?.distanceMeters || route?.distanceMeters || 0;
@@ -477,6 +461,8 @@ export default function Map({ userId, username }: Props) {
   const [mapControls, setMapControls] = useState<MapControls | null>(null);
   const [saveModalOpen, setSaveModalOpen] = useState(false);
   const [routeName, setRouteName] = useState('');
+  const [importedTrack, setImportedTrack] = useState<ParsedGpx | null>(null);
+  const importFileRef = useRef<HTMLInputElement>(null);
 
   const handleRouteChange = useCallback((route: PlannerRouteChange) => {
     setRoutePoints({
@@ -533,10 +519,27 @@ export default function Map({ userId, username }: Props) {
     setSaveModalOpen(true);
   }
 
+  function handleImportGpx(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const text = ev.target?.result;
+      if (typeof text !== 'string') return;
+      try {
+        setImportedTrack(parseGpxString(text));
+      } catch {
+        // invalid GPX — ignore silently
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  }
+
   function exportGpx() {
     if (!routeDetails) return;
     const name = 'bike-route';
-    const gpx = buildGpx(routeDetails, name);
+    const gpx = buildGpxString(name, routeDetails.geometry, routeDetails.elevation);
     const blob = new Blob([gpx], { type: 'application/gpx+xml' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -594,18 +597,30 @@ export default function Map({ userId, username }: Props) {
   return (
     <div className={styles.mapShell}>
       <div className={styles.mapCanvas} id="map" />
-      <MapboxPlanner onControlsReady={handleControlsReady} onRouteChange={handleRouteChange} />
+      <MapboxPlanner importedTrack={importedTrack} onControlsReady={handleControlsReady} onRouteChange={handleRouteChange} />
 
       <div className={styles.topActions}>
-        <Link className={styles.pillLink} href={'/old/map' as NextRoute}>
-          <MapPin size={17} />
-          Old design
+        <Link className={`${styles.pillLink} ${styles.oldDesignLink}`} href={'/old/map' as NextRoute}>
+          <History size={17} />
+          Old
         </Link>
         <IconButton
-          icon={<Download size={18} />}
+          icon={<><Download size={16} /><span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.02em' }}>GPX</span></>}
           label="Export GPX"
           disabled={!routeDetails}
           onClick={exportGpx}
+        />
+        <input
+          accept=".gpx"
+          ref={importFileRef}
+          style={{ display: 'none' }}
+          type="file"
+          onChange={handleImportGpx}
+        />
+        <IconButton
+          icon={<><Bike size={16} /><span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.02em' }}>Import</span></>}
+          label={importedTrack ? `Track: ${importedTrack.name}` : 'Import GPX'}
+          onClick={() => importFileRef.current?.click()}
         />
         {userId && username ? (
           <Link className={styles.pillLink} href={`/profile/${username}` as NextRoute}>
@@ -717,6 +732,11 @@ export default function Map({ userId, username }: Props) {
 
           <SectionLabel>Surface</SectionLabel>
           <SurfaceChips items={routeDetails?.surfaces || []} />
+
+          <div className={styles.panelElevation}>
+            <SectionLabel>Elevation profile</SectionLabel>
+            <ElevationProfile details={routeDetails} />
+          </div>
         </aside>
       ) : (
         <button

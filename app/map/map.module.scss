@@ -117,11 +117,11 @@ $paper: #fff;
 }
 
 .iconButton {
-  display: grid;
-  place-items: center;
-  width: 40px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   height: 40px;
-  padding: 0;
+  padding: 0 10px;
   border-radius: 11px;
   cursor: pointer;
 }
@@ -482,8 +482,8 @@ $paper: #fff;
 }
 
 .sparkline {
-  flex: none;
-  width: 120px;
+  flex: 1;
+  min-width: 60px;
   height: 48px;
   overflow: hidden;
 }
@@ -593,6 +593,10 @@ $paper: #fff;
   font-size: 11px;
 }
 
+
+.panelElevation {
+  display: none;
+}
 
 .warningsList {
   display: flex;
@@ -715,14 +719,23 @@ $paper: #fff;
   }
 
   .topActions {
+    top: 18px;
     right: 12px;
-    left: 12px;
-    overflow-x: auto;
-    justify-content: flex-end;
+    left: auto;
+  }
+
+  .oldDesignLink {
+    display: none;
   }
 
   .leftLogo {
+    top: 18px;
     left: 12px;
+  }
+
+  .logo {
+    height: 44px;
+    font-size: 17px;
   }
 
   .routePanel {
@@ -764,5 +777,9 @@ $paper: #fff;
   .routePanel + .bottomDock,
   .bottomDock[data-state='full'] {
     display: none;
+  }
+
+  .panelElevation {
+    display: block;
   }
 }

@@ -74,7 +74,7 @@ function RoutePreviewSvg({ geometry }) {
   );
 }
 
-function RouteCard({ route, onDelete, onRename }) {
+function RouteCard({ route, username, onDelete, onRename }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [editing, setEditing] = useState(false);
   const [nameValue, setNameValue] = useState(route.name || '');
@@ -94,7 +94,9 @@ function RouteCard({ route, onDelete, onRename }) {
 
   return (
     <article className={styles.routeCard}>
-      <RoutePreviewSvg geometry={route.geometry} />
+      <Link href={`/profile/${username}/routes/${route.routeId}`}>
+        <RoutePreviewSvg geometry={route.geometry} />
+      </Link>
       <div className={styles.routeCardBody}>
         <div className={styles.routeCardHeader}>
           <div style={{ flex: 1, minWidth: 0 }}>
@@ -187,6 +189,52 @@ function RouteCard({ route, onDelete, onRename }) {
   );
 }
 
+const DISTANCE_FILTERS = [
+  { id: 'any', label: 'Any distance' },
+  { id: 'short', label: '< 20 km' },
+  { id: 'medium', label: '20–50 km' },
+  { id: 'long', label: '50+ km' },
+];
+
+const SURFACE_FILTERS = [
+  { id: 'paved', label: 'Paved' },
+  { id: 'gravel', label: 'Gravel / Dirt' },
+  { id: 'mixed', label: 'Mixed' },
+];
+
+function getSurfaceType(surfaces) {
+  if (!surfaces || !Array.isArray(surfaces) || surfaces.length === 0) return null;
+  const total = surfaces.reduce((sum, s) => sum + (s.distanceMeters || 0), 0);
+  if (total === 0) return null;
+  const paved = surfaces
+    .filter((s) => {
+      const n = (s.name || '').toLowerCase();
+      return n.includes('paved') || n.includes('asphalt') || n.includes('concrete');
+    })
+    .reduce((sum, s) => sum + (s.distanceMeters || 0), 0);
+  const pavedPct = paved / total;
+  if (pavedPct >= 0.8) return 'paved';
+  if (pavedPct <= 0.3) return 'gravel';
+  return 'mixed';
+}
+
+function filterRoutes(routes, { distance, surfaces }) {
+  return routes.filter((r) => {
+    if (distance !== 'any') {
+      const km = (r.distanceMeters || 0) / 1000;
+      if (distance === 'short' && km >= 20) return false;
+      if (distance === 'medium' && (km < 20 || km > 50)) return false;
+      if (distance === 'long' && km <= 50) return false;
+    }
+    if (surfaces.length > 0) {
+      const type = getSurfaceType(r.surfaces);
+      if (type === null) return true;
+      if (!surfaces.includes(type)) return false;
+    }
+    return true;
+  });
+}
+
 const SORT_OPTIONS = [
   { id: 'newest', label: 'Newest' },
   { id: 'oldest', label: 'Oldest' },
@@ -211,10 +259,26 @@ function sortRoutes(routes, sortBy) {
   }
 }
 
-export default function UserSavedMaps({ savedUserPoints: initialRoutes }) {
+export default function UserSavedMaps({ savedUserPoints: initialRoutes, username }) {
   const [routes, setRoutes] = useState(initialRoutes);
   const [sortBy, setSortBy] = useState('newest');
   const [search, setSearch] = useState('');
+  const [distanceFilter, setDistanceFilter] = useState('any');
+  const [surfaceFilters, setSurfaceFilters] = useState([]);
+
+  function toggleSurface(id) {
+    setSurfaceFilters((prev) =>
+      prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id],
+    );
+  }
+
+  const activeFilterCount =
+    (distanceFilter !== 'any' ? 1 : 0) + surfaceFilters.length;
+
+  function clearFilters() {
+    setDistanceFilter('any');
+    setSurfaceFilters([]);
+  }
 
   async function handleDelete(routeId) {
     await fetch(`/api/routes/${routeId}`, { method: 'DELETE' });
@@ -247,9 +311,10 @@ export default function UserSavedMaps({ savedUserPoints: initialRoutes }) {
   }
 
   const query = search.trim().toLowerCase();
-  const filtered = query
+  const searched = query
     ? routes.filter((r) => (r.name || `Route #${r.routeId}`).toLowerCase().includes(query))
     : routes;
+  const filtered = filterRoutes(searched, { distance: distanceFilter, surfaces: surfaceFilters });
   const sorted = sortRoutes(filtered, sortBy);
 
   return (
@@ -275,12 +340,51 @@ export default function UserSavedMaps({ savedUserPoints: initialRoutes }) {
             </button>
           ))}
         </div>
+        <div className={styles.filterRow}>
+          <div className={styles.filterGroup}>
+            <span className={styles.filterLabel}>Distance</span>
+            <div className={styles.filterChips}>
+              {DISTANCE_FILTERS.map((opt) => (
+                <button
+                  className={styles.filterChip}
+                  data-active={distanceFilter === opt.id}
+                  key={opt.id}
+                  onClick={() => setDistanceFilter(opt.id)}
+                  type="button"
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className={styles.filterGroup}>
+            <span className={styles.filterLabel}>Surface</span>
+            <div className={styles.filterChips}>
+              {SURFACE_FILTERS.map((opt) => (
+                <button
+                  className={styles.filterChip}
+                  data-active={surfaceFilters.includes(opt.id)}
+                  key={opt.id}
+                  onClick={() => toggleSurface(opt.id)}
+                  type="button"
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
+          {activeFilterCount > 0 && (
+            <button className={styles.clearFilters} onClick={clearFilters} type="button">
+              Clear filters ({activeFilterCount})
+            </button>
+          )}
+        </div>
       </div>
 
       {sorted.length === 0 ? (
         <div className={styles.emptyRoutes} style={{ maxWidth: 480, margin: '24px auto' }}>
           <h2>No routes match</h2>
-          <p>Try a different search term.</p>
+          <p>Try adjusting your search or filters.</p>
         </div>
       ) : (
         <div className={styles.routesGrid}>
@@ -290,6 +394,7 @@ export default function UserSavedMaps({ savedUserPoints: initialRoutes }) {
               onDelete={handleDelete}
               onRename={handleRename}
               route={route}
+              username={username}
             />
           ))}
         </div>

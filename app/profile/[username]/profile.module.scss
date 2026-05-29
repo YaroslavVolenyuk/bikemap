@@ -282,6 +282,72 @@
   color: #b23b30;
 }
 
+.filterRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+}
+
+.filterGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.filterLabel {
+  font-size: 12px;
+  font-weight: 700;
+  color: #86837b;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.filterChips {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.filterChip {
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid #ebe9e3;
+  border-radius: 9px;
+  background: white;
+  color: #86837b;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s, border-color 0.1s;
+
+  &[data-active='true'] {
+    background: #1f5fd6;
+    color: white;
+    border-color: #1f5fd6;
+  }
+}
+
+.clearFilters {
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid #e0b0aa;
+  border-radius: 9px;
+  background: #fbe6e3;
+  color: #b23b30;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover {
+    background: #f5cfc9;
+  }
+}
+
 .dangerBtn {
   height: 30px;
   padding: 0 10px;
