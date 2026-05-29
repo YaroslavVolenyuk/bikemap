@@ -2,6 +2,26 @@ import { cache } from 'react';
 import { Route } from '../migrations/1687943012-createRoutes';
 import { sql } from './connect';
 
+type JsonValue =
+  | string
+  | number
+  | boolean
+  | null
+  | JsonValue[]
+  | { [key: string]: JsonValue | undefined };
+
+export type RoutePayload = {
+  name?: string;
+  distanceMeters?: number;
+  durationMs?: number;
+  ascentMeters?: number;
+  descentMeters?: number;
+  geometry?: JsonValue;
+  elevation?: JsonValue;
+  surfaces?: JsonValue;
+  wayTypes?: JsonValue;
+};
+
 export const getRoutes = cache(async () => {
   const routes = await sql<Route[]>`
     SELECT * FROM routes
@@ -31,28 +51,59 @@ export const getAllRouteIdByUserId = cache(async (userId: number) => {
   return route;
 });
 
-export const createRoute = cache(
-  async (
-    routeId: number,
-    userId: number,
-    startpointLat: number,
-    startpointLng: number,
-    endpointLat: number,
-    endpointLng: number,
-  ) => {
-    const [route] = await sql<Route[]>`
+export async function createRoute(
+  routeId: number,
+  userId: number,
+  startpointLat: number,
+  startpointLng: number,
+  endpointLat: number,
+  endpointLng: number,
+  payload: RoutePayload = {},
+) {
+  const [route] = await sql<Route[]>`
       INSERT INTO routes
-        (route_id, user_id, startpoint_lat, startpoint_lng, endpoint_lat, endpoint_lng)
+        (
+          route_id,
+          user_id,
+          startpoint_lat,
+          startpoint_lng,
+          endpoint_lat,
+          endpoint_lng,
+          name,
+          distance_meters,
+          duration_ms,
+          ascent_meters,
+          descent_meters,
+          geometry,
+          elevation,
+          surfaces,
+          way_types
+        )
       VALUES
-        (${routeId}, ${userId}, ${startpointLat}, ${startpointLng}, ${endpointLat}, ${endpointLng})
+        (
+          ${routeId},
+          ${userId},
+          ${startpointLat},
+          ${startpointLng},
+          ${endpointLat},
+          ${endpointLng},
+          ${payload.name ?? null},
+          ${payload.distanceMeters ?? null},
+          ${payload.durationMs ?? null},
+          ${payload.ascentMeters ?? null},
+          ${payload.descentMeters ?? null},
+          ${payload.geometry === undefined ? null : sql.json(payload.geometry)},
+          ${payload.elevation === undefined ? null : sql.json(payload.elevation)},
+          ${payload.surfaces === undefined ? null : sql.json(payload.surfaces)},
+          ${payload.wayTypes === undefined ? null : sql.json(payload.wayTypes)}
+        )
       RETURNING *
     `;
 
-    return route;
-  },
-);
+  return route;
+}
 
-export const deleteRouteById = cache(async (route_id: number) => {
+export async function deleteRouteById(route_id: number) {
   const [routes] = await sql<Route[]>`
     DELETE FROM
       routes
@@ -61,9 +112,9 @@ export const deleteRouteById = cache(async (route_id: number) => {
     RETURNING *
   `;
   return routes;
-});
+}
 
-export const deleteAllRoutesByUserId = cache(async (userId: number) => {
+export async function deleteAllRoutesByUserId(userId: number) {
   const [routes] = await sql<Route[]>`
     DELETE FROM
       routes
@@ -72,4 +123,4 @@ export const deleteAllRoutesByUserId = cache(async (userId: number) => {
     RETURNING *
   `;
   return routes;
-});
+}

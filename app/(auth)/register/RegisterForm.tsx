@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { RegisterResponseBodyPost } from '../../api/(auth)/register/route';
+import type { RegisterResponseBodyPost } from '../../api/(auth)/register/route';
 import styles from './RegisterForm.module.scss';
 
 export default function RegisterForm() {
@@ -13,19 +13,29 @@ export default function RegisterForm() {
   const router = useRouter();
 
   async function register() {
-    const response = await fetch('/api/register', {
-      method: 'POST',
-      body: JSON.stringify({ username, password }),
-    });
+    setError('');
 
-    const data: RegisterResponseBodyPost = await response.json();
+    try {
+      const response = await fetch('/api/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      });
 
-    if ('error' in data) {
-      setError(data.error);
-      return;
+      const data = (await response.json()) as RegisterResponseBodyPost;
+
+      if ('error' in data) {
+        setError(data.error);
+        return;
+      }
+
+      router.push(`/profile/${data.user.username}`);
+      router.refresh();
+    } catch {
+      setError('Unable to register right now');
     }
-
-    router.refresh();
   }
 
   return (
@@ -33,7 +43,10 @@ export default function RegisterForm() {
       <div className={styles.inputs}>
         <form
           className={styles.form}
-          onSubmit={(event) => event.preventDefault()}
+          onSubmit={async (event) => {
+            event.preventDefault();
+            await register();
+          }}
         >
           <label>
             {/* username: */}
@@ -54,15 +67,12 @@ export default function RegisterForm() {
               onChange={(event) => setPassword(event.currentTarget.value)}
             />
           </label>
-          <button
-            className={styles.button}
-            onClick={async () => await register()}
-          >
+          <button className={styles.button}>
             sign up
           </button>
           <br />
 
-          <Link className={styles.button} href={`/`}>
+          <Link className={styles.button} href="/">
             main page
           </Link>
           {error !== '' && <div className={styles.error}>{error}</div>}

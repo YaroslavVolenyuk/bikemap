@@ -1,5 +1,5 @@
 import { cache } from 'react';
-import { User } from '../migrations/1686743093-createUsers';
+import type { User } from '../migrations/1686743093-createUsers';
 import { sql } from './connect';
 
 type UserWithPasswordHash = User & {
@@ -35,7 +35,6 @@ export const getUserByUsername = cache(async (username: string) => {
 
 export const createUser = cache(
   async (username: string, passwordHash: string) => {
-    console.log(passwordHash);
     const [user] = await sql<User[]>`
     INSERT INTO users
       (username, password_hash)
