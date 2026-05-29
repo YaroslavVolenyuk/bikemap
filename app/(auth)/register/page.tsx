@@ -4,7 +4,8 @@ import { getValidSessionByToken } from '../../../database/sessions';
 import RegisterForm from './RegisterForm';
 
 export default async function RegisterPage() {
-  const sessionTokenCookie = cookies().get('sessionToken');
+  const cookieStore = await cookies();
+  const sessionTokenCookie = cookieStore.get('sessionToken');
 
   const session =
     sessionTokenCookie &&

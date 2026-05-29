@@ -1,4 +1,4 @@
-import { Sql } from 'postgres';
+import type { Sql } from 'postgres';
 
 export type Route = {
   id: number;
@@ -8,6 +8,16 @@ export type Route = {
   startpointLng: number;
   endpointLat: number;
   endpointLng: number;
+  name?: string | null;
+  distanceMeters?: number | null;
+  durationMs?: number | null;
+  ascentMeters?: number | null;
+  descentMeters?: number | null;
+  geometry?: unknown;
+  elevation?: unknown;
+  surfaces?: unknown;
+  wayTypes?: unknown;
+  createdAt?: Date;
 };
 
 export async function up(sql: Sql) {

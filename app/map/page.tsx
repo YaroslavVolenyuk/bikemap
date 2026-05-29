@@ -4,7 +4,7 @@ import { getUserBySessionToken } from '../../database/users';
 import Map from './Map';
 
 export default async function Page() {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const sessionToken = cookieStore.get('sessionToken');
   const user = !sessionToken?.value
     ? undefined

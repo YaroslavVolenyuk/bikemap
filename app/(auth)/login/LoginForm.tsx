@@ -1,11 +1,11 @@
 'use client';
 
-import { Route } from 'next';
+import type { Route } from 'next';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { getSafeReturnToPath } from '../../../util/validation';
-import { LoginResponseBodyPost } from '../../api/(auth)/login/route';
+import type { LoginResponseBodyPost } from '../../api/(auth)/login/route';
 import styles from '../login/LoginForm.module.scss';
 
 type Props = { returnTo?: string | string[] };
@@ -17,25 +17,34 @@ export default function LoginForm(props: Props) {
   const router = useRouter();
 
   async function login() {
-    const response = await fetch('/api/login', {
-      method: 'POST',
-      body: JSON.stringify({ username, password }),
-    });
+    setError('');
 
-    const data: LoginResponseBodyPost = await response.json();
+    try {
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      });
 
-    if ('error' in data) {
-      setError(data.error);
-      console.log(data.error);
-      return;
+      const data = (await response.json()) as LoginResponseBodyPost;
+
+      if ('error' in data) {
+        setError(data.error);
+        return;
+      }
+
+      const redirectTo =
+        getSafeReturnToPath(props.returnTo) ??
+        (`/profile/${data.user.username}` as Route);
+
+      router.push(redirectTo);
+
+      router.refresh();
+    } catch {
+      setError('Unable to log in right now');
     }
-
-    router.push(
-      getSafeReturnToPath(props.returnTo) ||
-        (`/profile/${data.user.username}` as Route),
-    );
-
-    router.refresh();
   }
 
   return (
@@ -43,7 +52,10 @@ export default function LoginForm(props: Props) {
       <div className={styles.inputs}>
         <form
           className={styles.form}
-          onSubmit={(event) => event.preventDefault()}
+          onSubmit={async (event) => {
+            event.preventDefault();
+            await login();
+          }}
         >
           <label>
             {/* username: */}
@@ -65,7 +77,7 @@ export default function LoginForm(props: Props) {
             />
           </label>
           <br />
-          <button className={styles.button} onClick={async () => await login()}>
+          <button className={styles.button}>
             log in
           </button>
           <br />

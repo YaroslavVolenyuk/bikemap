@@ -4,14 +4,19 @@ import MapboxDirections from '@mapbox/mapbox-gl-directions/dist/mapbox-gl-direct
 import mapboxgl from 'mapbox-gl';
 import React, { useEffect } from 'react';
 
-mapboxgl.accessToken =
-  'pk.eyJ1IjoieXJvYWNoIiwiYSI6ImNsaXJoZ2hrcjEyb28zZW8xOWoxOGphOGYifQ.-ZVzkyZ63Y6jlkvIQq4tQw';
+const mapboxAccessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
+
+mapboxgl.accessToken = mapboxAccessToken;
 const MapBoxRouting = ({
   setStartingPlace,
 
   setDestination,
 }) => {
   useEffect(() => {
+    if (!mapboxAccessToken) {
+      throw new Error('NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN is not configured');
+    }
+
     const map = new mapboxgl.Map({
       container: 'map',
       style: 'mapbox://styles/mapbox/outdoors-v12',
@@ -20,7 +25,7 @@ const MapBoxRouting = ({
     });
 
     const directions = new MapboxDirections({
-      accessToken: mapboxgl.accessToken,
+      accessToken: mapboxAccessToken,
       unit: 'metric',
       alternatives: true,
       profile: 'mapbox/cycling',

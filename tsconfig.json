@@ -18,5 +18,6 @@
     "**/*.cjs",
     "**/*.mjs",
     ".next/types/**/*.ts"
-  ]
+  ],
+  "exclude": ["node_modules", "redesign"]
 }

@@ -1,165 +1,660 @@
-// .profileIcon {
-//   position: absolute;
-//   top: 25px;
-//   left: 25px;
-//   background-color: white;
-//   width: 100px;
-//   height: 50px;
+$accent: #1f5fd6;
+$ink: #23221f;
+$muted: #86837b;
+$line: #ebe9e3;
+$paper: #fff;
 
-//   border-radius: 10px;
-//   display: flex;
-//   align-items: center;
-//   justify-content: space-evenly;
-// }
+.mapShell {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: #e8e6df;
+  color: $ink;
+}
 
-// .transparent {
-//   display: none;
-// }
+.mapCanvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
 
-// .background {
-//   background-image: url('./../../public/images/bg6.jpg');
-//   background-repeat: no-repeat;
-//   background-size: cover;
-//   backdrop-filter: blur(5px);
-//   width: 100vw;
-//   height: 110vh;
-// }
+.mapShell :global(.mapboxgl-ctrl-top-left) {
+  left: 24px;
+  top: 82px;
+  z-index: 8;
+}
 
-// .loginRegisterIcon {
-//   position: absolute;
-//   top: 25px;
-//   left: 25px;
-//   background-color: white;
-//   width: 220px;
-//   height: 50px;
-//   border-radius: 10px;
-//   display: flex;
-//   align-items: center;
-//   justify-content: space-evenly;
-// }
+.mapShell :global(.mapboxgl-ctrl-top-left .mapboxgl-ctrl) {
+  margin: 0;
+}
 
-// .elevationChart {
-//   height: 250px;
-//   width: auto;
-//   border-radius: 5px;
-//   padding: 20px 20px 50px 20px;
-//   background-color: rgb(255, 255, 255);
-//   margin: 30px;
-//   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
-// }
+.mapShell :global(.mapboxgl-ctrl-directions) {
+  min-width: 352px;
+  max-width: 352px;
+  width: 352px;
+  border: 1px solid $line;
+  border-radius: 14px;
+  box-shadow: 0 8px 30px rgba(28, 30, 40, 0.12);
+  overflow: hidden;
+}
 
-// .tripInfo {
-//   background-color: rgb(255, 255, 255);
-//   border-width: 0;
-//   margin: 30px;
-// }
+.mapShell :global(.directions-control-inputs) {
+  background: $paper;
+}
 
-// .saveRouteButton {
-//   background-color: rgb(102, 173, 245);
-//   border-width: 0;
-//   padding: 10px;
-//   border-radius: 5px;
-//   margin-left: 10px;
-//   margin-bottom: 30px;
-// }
-// .saveRouteButton:hover {
-//   background-color: rgb(155, 205, 255);
-// }
-// .roadProfile {
-//   display: flex;
-//   padding: 10px;
-//   gap: 10px;
-// }
+.mapShell :global(.mapboxgl-ctrl-geocoder) {
+  max-width: calc(100% - 40px);
+}
 
-// .buttonLikeBackground {
-//   background-color: rgb(203, 227, 247);
-//   border-radius: 5px;
-//   padding: 5px;
-// }
+.mapShell :global(.mapboxgl-ctrl-top-right) {
+  right: 24px;
+  top: 84px;
+}
 
-// .fakeBackground {
-//   border-radius: 5px;
-//   padding: 5px;
-// }
+.mapShell :global(.mapboxgl-ctrl-top-right .mapboxgl-ctrl) {
+  margin: 0 0 12px;
+  border: 1px solid #e7e5df;
+  border-radius: 13px;
+  box-shadow: 0 2px 6px rgba(20, 20, 20, 0.08);
+  overflow: hidden;
+}
 
-// .pathType {
-//   justify-content: center;
-//   display: inline-flex;
-//   align-items: center;
-//   // flex-wrap: wrap;
+.topActions {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  z-index: 10;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
 
-//   padding: 10px;
-// }
+.leftLogo {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  z-index: 10;
+}
 
-// .list {
-//   display: inline;
-//   background-color: rgb(203, 227, 247);
-//   border-radius: 5px;
-//   padding: 5px;
-//   gap: 50px;
-//   margin-left: 10px;
-// }
+.logo,
+.pillLink,
+.primaryPillLink,
+.pillButton,
+.primaryPillButton,
+.iconButton {
+  border: 1px solid #e7e5df;
+  background: $paper;
+  box-shadow: 0 1px 2px rgba(20, 20, 20, 0.05);
+  color: #33322e;
+  text-decoration: none;
+}
 
-// .centeredElements {
-//   display: flex;
-//   flex-direction: row;
-//   justify-content: center;
-//   align-items: center;
-// }
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  height: 52px;
+  padding: 0 16px;
+  border-radius: 14px;
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: 0;
+}
 
-// .staredText {
-//   padding: 10px;
-//   border-radius: 5px;
-//   box-shadow: rgba(0, 0, 0, 0.15) 0px 5px 15px;
-//   font-size: large;
-// }
+.logo span span {
+  color: $accent;
+}
 
-// @media screen and (max-width: 1000px) {
-//   .saveRouteButton {
-//     margin-bottom: 30px;
-//   }
+.logoMark {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  color: $paper;
+  background: $accent;
+  border-radius: 9px;
+}
 
-//   .roadProfile {
-//     background-color: rgb(230, 243, 255);
-//     align-items: center;
-//     margin: 0px;
-//   }
+.iconButton {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: 11px;
+  cursor: pointer;
+}
 
-//   .elevationChart {
-//     display: flex;
-//     flex-direction: column;
-//     justify-content: center;
-//     align-items: center;
-//   }
+.pillButton,
+.primaryPillButton,
+.pillLink,
+.primaryPillLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 16px;
+  border-radius: 11px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
 
-//   .buttonLikeBackground {
-//     display: flex;
-//     flex-direction: column;
-//     border-radius: 5px;
-//     align-items: center;
-//   }
+.primaryPillButton,
+.primaryPillLink {
+  border: 0;
+  background: $accent;
+  color: $paper;
+  box-shadow: 0 2px 8px rgba(31, 95, 214, 0.28);
+}
 
-//   .fakeBackground {
-//     justify-content: center;
-//     padding: 5px;
-//   }
+.pillButton:disabled,
+.primaryPillButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
 
-//   .pathType {
-//     display: flex;
-//     flex-direction: column;
+.routePanel,
+.bottomDock,
+.reopenPanelButton,
+.reopenDockButton,
+.toast {
+  border: 1px solid $line;
+  background: $paper;
+  box-shadow: 0 8px 30px rgba(28, 30, 40, 0.12);
+}
 
-//     // background-color: red;
-//   }
+.routePanel {
+  position: absolute;
+  z-index: 9;
+  top: 194px;
+  left: 24px;
+  width: 352px;
+  padding: 20px 22px 22px;
+  border-radius: 18px;
+}
 
-//   .list {
-//     display: inline-flex;
-//     // flex-direction: column;
+.panelHeader {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
 
-//     // background-color: rgb(245, 161, 221);
+.panelHeader h1 {
+  margin: 0 0 8px;
+  font-size: 21px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0;
+}
 
-//     border-radius: 5px;
-//     padding: 5px;
-//     gap: 2px;
-//     margin-bottom: 5px;
-//   }
-// }
+.routeMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  color: $muted;
+  font-size: 13px;
+}
+
+.difficultyBadge {
+  display: inline-flex;
+  gap: 7px;
+  align-items: center;
+  padding: 4px 11px;
+  border-radius: 999px;
+  color: #3f7a35;
+  font-size: 12px;
+  font-weight: 800;
+  background: #e7f3e2;
+}
+
+.difficultyBadge span {
+  width: 7px;
+  height: 7px;
+  background: #5aa544;
+  border-radius: 50%;
+}
+
+.difficultyBadge[data-level='moderate'] {
+  color: #a9702a;
+  background: #fdf1dd;
+}
+
+.difficultyBadge[data-level='moderate'] span {
+  background: #e2932f;
+}
+
+.difficultyBadge[data-level='hard'] {
+  color: #b23b30;
+  background: #fbe6e3;
+}
+
+.difficultyBadge[data-level='hard'] span {
+  background: #d6463a;
+}
+
+.panelCollapseButton,
+.dockIconButton,
+.viewToggle {
+  border: 1px solid #e7e5df;
+  background: $paper;
+  color: #46453f;
+  cursor: pointer;
+}
+
+.panelCollapseButton,
+.dockIconButton {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+}
+
+.sectionLabel {
+  margin: 20px 0 13px;
+  color: #a4a097;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.wayTypeBar {
+  display: flex;
+  gap: 2px;
+  height: 12px;
+  overflow: hidden;
+  background: #eceae4;
+  border-radius: 7px;
+}
+
+.wayTypeList {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  margin-top: 16px;
+}
+
+.wayTypeList div {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  font-size: 15px;
+}
+
+.wayTypeList span {
+  flex: none;
+  width: 11px;
+  height: 11px;
+  border-radius: 3px;
+}
+
+.wayTypeList strong {
+  font-weight: 600;
+}
+
+.wayTypeList em {
+  margin-left: auto;
+  color: $muted;
+  font-style: normal;
+  font-variant-numeric: tabular-nums;
+}
+
+.surfaceChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.surfaceChips span {
+  display: inline-flex;
+  gap: 7px;
+  align-items: center;
+  padding: 6px 10px;
+  border: 1px solid #e7e5df;
+  border-radius: 9px;
+  background: #f4f3ef;
+  color: #46453f;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.surfaceChips svg {
+  color: $accent;
+}
+
+.surfaceChips small {
+  color: #a09c92;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.emptyBar {
+  display: flex;
+  align-items: center;
+  min-height: 46px;
+  padding: 12px 14px;
+  border: 1px dashed #d8d5cc;
+  border-radius: 12px;
+  color: $muted;
+  font-size: 13px;
+  background: #faf9f6;
+}
+
+.reopenPanelButton {
+  position: absolute;
+  z-index: 9;
+  top: 194px;
+  left: 24px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  height: 46px;
+  padding: 0 16px 0 14px;
+  border-radius: 15px;
+  color: $ink;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.reopenPanelButton span {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  color: $paper;
+  background: $accent;
+  border-radius: 8px;
+}
+
+.bottomDock {
+  --dock-left: 396px;
+
+  position: absolute;
+  right: 24px;
+  bottom: 24px;
+  left: var(--dock-left);
+  z-index: 9;
+  padding: 16px 24px 18px;
+  border-radius: 18px;
+}
+
+.bottomDock[data-state='compact'] {
+  padding: 13px 24px;
+}
+
+.dockSummary {
+  display: flex;
+  gap: 22px;
+  align-items: center;
+}
+
+.dockStat {
+  min-width: 0;
+}
+
+.dockStatValue {
+  display: flex;
+  gap: 3px;
+  align-items: baseline;
+  white-space: nowrap;
+}
+
+.dockStatValue span {
+  color: $ink;
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+.dockStatValue small {
+  color: $muted;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.dockStatLabel {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  margin-top: 5px;
+  color: $muted;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.dockStatLabel svg {
+  color: #a4a097;
+}
+
+.dockControls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-left: auto;
+}
+
+.viewToggle {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  height: 38px;
+  padding: 0 8px 0 14px;
+  border-radius: 11px;
+  color: #33322e;
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  background: #f4f3ef;
+}
+
+.highLow {
+  display: grid;
+  grid-template-columns: auto auto auto auto;
+  gap: 4px 6px;
+  align-items: baseline;
+  color: $muted;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.highLow span {
+  color: $ink;
+}
+
+.highLow small {
+  color: $muted;
+}
+
+.dockBody {
+  padding-top: 10px;
+  margin-top: 12px;
+  border-top: 1px solid #eceae4;
+}
+
+.sparkline {
+  flex: none;
+  width: 120px;
+  height: 48px;
+  overflow: hidden;
+}
+
+.elevationSvg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.chartPlaceholder,
+.compactChartPlaceholder {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-height: 150px;
+  border: 1px dashed #d8d5cc;
+  border-radius: 13px;
+  color: $muted;
+  font-size: 13px;
+  background: #faf9f6;
+}
+
+.compactChartPlaceholder {
+  min-height: 48px;
+  font-size: 0;
+}
+
+.reopenDockButton {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  z-index: 9;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  height: 46px;
+  padding: 0 18px;
+  border-radius: 18px;
+  color: $ink;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  transform: translateX(-50%);
+}
+
+.reopenDockButton svg {
+  color: $accent;
+}
+
+.toast {
+  position: absolute;
+  right: 24px;
+  bottom: 220px;
+  z-index: 11;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 14px;
+  border-radius: 13px;
+  color: #b23b30;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.toast button {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  background: transparent;
+}
+
+.scaleBar {
+  position: absolute;
+  bottom: 16px;
+  left: 24px;
+  z-index: 4;
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  color: #5e5a51;
+  font-size: 11px;
+}
+
+.scaleBar span {
+  width: 70px;
+  height: 6px;
+  border-right: 2px solid #5e5a51;
+  border-bottom: 2px solid #5e5a51;
+  border-left: 2px solid #5e5a51;
+}
+
+.mapCredit {
+  position: absolute;
+  right: 12px;
+  bottom: 10px;
+  z-index: 4;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.7);
+  color: #8c887e;
+  font-size: 11px;
+}
+
+@media screen and (max-width: 900px) {
+  .mapShell :global(.mapboxgl-ctrl-top-left) {
+    top: 88px;
+    right: 12px;
+    left: 12px;
+  }
+
+  .mapShell :global(.mapboxgl-ctrl-directions) {
+    width: auto;
+    min-width: 0;
+    max-width: none;
+  }
+
+  .topActions {
+    right: 12px;
+    left: 12px;
+    overflow-x: auto;
+    justify-content: flex-end;
+  }
+
+  .leftLogo {
+    left: 12px;
+  }
+
+  .routePanel {
+    top: auto;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: auto;
+    max-height: 54vh;
+    overflow: auto;
+    border-radius: 24px 24px 0 0;
+  }
+
+  .reopenPanelButton {
+    top: auto;
+    bottom: 24px;
+    left: 12px;
+  }
+
+  .bottomDock {
+    right: 0;
+    bottom: 0;
+    left: 0;
+    max-height: 58vh;
+    overflow: auto;
+    border-radius: 24px 24px 0 0;
+  }
+
+  .dockSummary {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dockControls {
+    grid-column: 1 / -1;
+    margin-left: 0;
+  }
+
+  .routePanel + .bottomDock,
+  .bottomDock[data-state='full'] {
+    display: none;
+  }
+}

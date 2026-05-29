@@ -1,15 +1,5 @@
-import 'mapbox-gl/dist/mapbox-gl.css';
-import LandingPage from './LandingPage';
+import { redirect } from 'next/navigation';
 
-// type User = {
-//   userId: number | undefined;
-//   username: string | undefined;
-// };
-
-export default async function Page() {
-  return (
-    <main>
-      <LandingPage />
-    </main>
-  );
+export default function Page() {
+  redirect('/map');
 }

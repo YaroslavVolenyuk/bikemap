@@ -1,4 +1,4 @@
-import { Route } from 'next';
+import type { Route } from 'next';
 import { z } from 'zod';
 
 const returnToSchema = z.string().refine((value) => {

@@ -1,7 +1,10 @@
+import crypto from 'node:crypto';
+import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { createRoute } from '../../../../database/routes';
-import { Route } from '../../../../migrations/1687943012-createRoutes';
+import { createRoute, type RoutePayload } from '../../../../database/routes';
+import { getUserBySessionToken } from '../../../../database/users';
+import type { Route } from '../../../../migrations/1687943012-createRoutes';
 
 export type Error = {
   error: string;
@@ -10,12 +13,21 @@ export type Error = {
 type RoutesResponseBodyPost = { routes: Route } | Error;
 
 const routesSchema = z.object({
-  routeId: z.number(),
-  userId: z.number(),
+  routeId: z.number().int().positive().optional(),
+  userId: z.number().optional(),
   startpointLat: z.number(),
   startpointLng: z.number(),
   endpointLat: z.number(),
   endpointLng: z.number(),
+  name: z.string().optional(),
+  distanceMeters: z.number().optional(),
+  durationMs: z.number().optional(),
+  ascentMeters: z.number().optional(),
+  descentMeters: z.number().optional(),
+  geometry: z.unknown().optional(),
+  elevation: z.unknown().optional(),
+  surfaces: z.unknown().optional(),
+  wayTypes: z.unknown().optional(),
 });
 
 export async function POST(
@@ -24,7 +36,6 @@ export async function POST(
   const body = await request.json();
 
   const result = routesSchema.safeParse(body);
-  console.log('result of routesSchema', result);
 
   if (!result.success) {
     return NextResponse.json(
@@ -34,14 +45,38 @@ export async function POST(
       { status: 400 },
     );
   }
-  // query the database t§o get all the routes
+
+  const cookieStore = await cookies();
+  const sessionToken = cookieStore.get('sessionToken');
+  const user = !sessionToken?.value
+    ? undefined
+    : await getUserBySessionToken(sessionToken.value);
+
+  if (!user) {
+    return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+  }
+
+  const routeId = result.data.routeId || crypto.randomInt(1, 2147483647);
+  const payload: RoutePayload = {
+    name: result.data.name,
+    distanceMeters: result.data.distanceMeters,
+    durationMs: result.data.durationMs,
+    ascentMeters: result.data.ascentMeters,
+    descentMeters: result.data.descentMeters,
+    geometry: result.data.geometry as RoutePayload['geometry'],
+    elevation: result.data.elevation as RoutePayload['elevation'],
+    surfaces: result.data.surfaces as RoutePayload['surfaces'],
+    wayTypes: result.data.wayTypes as RoutePayload['wayTypes'],
+  };
+
   const route = await createRoute(
-    result.data.routeId,
-    result.data.userId,
+    routeId,
+    user.id,
     result.data.startpointLat,
     result.data.startpointLng,
     result.data.endpointLat,
     result.data.endpointLng,
+    payload,
   );
 
   if (!route) {
