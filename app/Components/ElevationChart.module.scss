@@ -1,0 +1,24 @@
+.elevationSvg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.chartPlaceholder,
+.compactChartPlaceholder {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-height: 150px;
+  border: 1px dashed #d8d5cc;
+  border-radius: 13px;
+  color: #86837b;
+  font-size: 13px;
+  background: #faf9f6;
+}
+
+.compactChartPlaceholder {
+  min-height: 48px;
+  font-size: 0;
+}

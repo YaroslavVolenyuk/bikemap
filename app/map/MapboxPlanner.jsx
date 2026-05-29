@@ -3,7 +3,7 @@
 import 'mapbox-gl/dist/mapbox-gl.css';
 import '../index.css';
 import mapboxgl from 'mapbox-gl';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 const mapboxAccessToken =
   process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
@@ -54,7 +54,46 @@ function setDirectionsInputValue(type, coordinates, options = {}) {
   input.dispatchEvent(new Event('input', { bubbles: true }));
 }
 
-export default function MapboxPlanner({ onRouteChange, onControlsReady }) {
+export default function MapboxPlanner({ onRouteChange, onControlsReady, importedTrack }) {
+  const mapRef = useRef(null);
+
+  useEffect(() => {
+    if (!mapRef.current) return;
+    const map = mapRef.current;
+
+    const coords = importedTrack?.coordinates ?? [];
+    const geojson = {
+      type: 'Feature',
+      properties: {},
+      geometry: { type: 'LineString', coordinates: coords },
+    };
+
+    if (map.getSource('imported-track')) {
+      map.getSource('imported-track').setData(geojson);
+    } else if (map.isStyleLoaded() && coords.length >= 2) {
+      map.addSource('imported-track', { type: 'geojson', data: geojson });
+      map.addLayer({
+        id: 'imported-track-line',
+        type: 'line',
+        source: 'imported-track',
+        layout: { 'line-cap': 'round', 'line-join': 'round' },
+        paint: {
+          'line-color': '#e8722c',
+          'line-width': 3,
+          'line-dasharray': [2, 2],
+        },
+      });
+    }
+
+    if (coords.length >= 2) {
+      const bounds = coords.reduce(
+        (b, [lng, lat]) => b.extend([lng, lat]),
+        new mapboxgl.LngLatBounds([coords[0][0], coords[0][1]], [coords[0][0], coords[0][1]]),
+      );
+      map.fitBounds(bounds, { padding: 60, duration: 600 });
+    }
+  }, [importedTrack]);
+
   useEffect(() => {
     let cancelled = false;
     let map;
@@ -76,6 +115,7 @@ export default function MapboxPlanner({ onRouteChange, onControlsReady }) {
         center: [16.3738, 48.2082],
         zoom: 11,
       });
+      mapRef.current = map;
 
       const directions = new mapboxDirectionsModule.default({
         accessToken: mapboxAccessToken,
@@ -188,6 +228,7 @@ export default function MapboxPlanner({ onRouteChange, onControlsReady }) {
     return () => {
       cancelled = true;
       map?.remove();
+      mapRef.current = null;
     };
   }, [onRouteChange, onControlsReady]);
 

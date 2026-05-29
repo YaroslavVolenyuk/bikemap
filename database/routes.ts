@@ -40,6 +40,15 @@ export const getRouteByUserId = cache(async (userId: number) => {
   return route;
 });
 
+export const getRouteByRouteId = cache(async (routeId: number, userId: number) => {
+  const [route] = await sql<Route[]>`
+    SELECT * FROM routes
+    WHERE route_id = ${routeId}
+      AND user_id = ${userId}
+  `;
+  return route ?? null;
+});
+
 export const getAllRouteIdByUserId = cache(async (userId: number) => {
   const route = await sql<{ routeId: number }[]>`
     SELECT route_id
