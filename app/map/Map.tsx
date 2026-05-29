@@ -514,6 +514,7 @@ export default function Map({ userId, username }: Props) {
     });
 
     setRouteStatus('loading');
+    setRouteDetails(undefined);
 
     fetch(`/api/routes/details?${params.toString()}`, {
       signal: controller.signal,

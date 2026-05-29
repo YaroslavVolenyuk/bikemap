@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
+// GH free tier only supports: bike, car, foot.
+// racingbike / mtb require a paid plan — all cycling profiles fall back to bike.
 const ghProfiles: Record<string, string> = {
-  road: 'racingbike',
+  road: 'bike',
   touring: 'bike',
   gravel: 'bike',
-  mtb: 'mtb',
+  mtb: 'bike',
 };
 
 const routeDetailsSchema = z.object({
