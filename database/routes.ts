@@ -1,5 +1,5 @@
 import { cache } from 'react';
-import { Route } from '../migrations/1687943012-createRoutes';
+import type { Route } from '../migrations/1687943012-createRoutes';
 import { sql } from './connect';
 
 type JsonValue =

@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createRoute, type RoutePayload } from '../../../../database/routes';
 import { getUserBySessionToken } from '../../../../database/users';
-import { Route } from '../../../../migrations/1687943012-createRoutes';
+import type { Route } from '../../../../migrations/1687943012-createRoutes';
 
 export type Error = {
   error: string;
@@ -46,7 +46,8 @@ export async function POST(
     );
   }
 
-  const sessionToken = cookies().get('sessionToken');
+  const cookieStore = await cookies();
+  const sessionToken = cookieStore.get('sessionToken');
   const user = !sessionToken?.value
     ? undefined
     : await getUserBySessionToken(sessionToken.value);

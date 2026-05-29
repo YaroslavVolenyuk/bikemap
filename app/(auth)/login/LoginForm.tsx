@@ -1,5 +1,6 @@
 'use client';
 
+import type { Route } from 'next';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -34,9 +35,11 @@ export default function LoginForm(props: Props) {
         return;
       }
 
-      router.push(
-        getSafeReturnToPath(props.returnTo) || `/profile/${data.user.username}`,
-      );
+      const redirectTo =
+        getSafeReturnToPath(props.returnTo) ??
+        (`/profile/${data.user.username}` as Route);
+
+      router.push(redirectTo);
 
       router.refresh();
     } catch {

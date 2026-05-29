@@ -1,4 +1,5 @@
 import { cookies } from 'next/headers';
+import type { Route } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { logout } from '../../(auth)/logout/actions';
@@ -9,23 +10,27 @@ import { LogoutButton } from './LogoutButton';
 import styles from './profile.module.scss';
 import UserSavedMaps from './UserSavedMaps';
 
-// type Props = {
-//   params: { username: string };
-// };
-//
-export default async function ProfileUsernamePage({ params }) {
-  const sessionTokenCookie = cookies().get('sessionToken');
+type Props = {
+  params: Promise<{ username: string }>;
+};
+
+export default async function ProfileUsernamePage({ params }: Props) {
+  const cookieStore = await cookies();
+  const { username } = await params;
+  const sessionTokenCookie = cookieStore.get('sessionToken');
 
   const session =
     sessionTokenCookie &&
     (await getValidSessionByToken(sessionTokenCookie.value));
 
-  if (!session) redirect(`/login?returnTo=/profile/${params.username}`);
+  if (!session) {
+    redirect(`/login?returnTo=/profile/${username}` as Route);
+  }
 
   const user = await getUserBySessionToken(sessionTokenCookie.value);
 
   if (!user) redirect('/login');
-  if (user.username !== params.username) redirect(`/profile/${user.username}`);
+  if (user.username !== username) redirect(`/profile/${user.username}` as Route);
 
   const savedUserPoints = await getRouteByUserId(user.id);
 

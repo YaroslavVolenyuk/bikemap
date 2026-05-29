@@ -1,5 +1,6 @@
 'use client';
 
+import type { Route } from 'next';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -31,7 +32,7 @@ export default function RegisterForm() {
         return;
       }
 
-      router.push(`/profile/${data.user.username}`);
+      router.push(`/profile/${data.user.username}` as Route);
       router.refresh();
     } catch {
       setError('Unable to register right now');

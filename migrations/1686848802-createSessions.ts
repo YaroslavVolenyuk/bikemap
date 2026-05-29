@@ -1,4 +1,4 @@
-import { Sql } from 'postgres';
+import type { Sql } from 'postgres';
 
 export type Session = {
   id: number;

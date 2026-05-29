@@ -3,10 +3,14 @@ import { redirect } from 'next/navigation';
 import { getValidSessionByToken } from '../../../database/sessions';
 import LoginForm from './LoginForm';
 
-type Props = { searchParams: { returnTo?: string | string[] } };
+type Props = {
+  searchParams: Promise<{ returnTo?: string | string[] }>;
+};
 
 export default async function LoginPage({ searchParams }: Props) {
-  const sessionTokenCookie = cookies().get('sessionToken');
+  const cookieStore = await cookies();
+  const { returnTo } = await searchParams;
+  const sessionTokenCookie = cookieStore.get('sessionToken');
 
   const session =
     sessionTokenCookie &&
@@ -14,5 +18,5 @@ export default async function LoginPage({ searchParams }: Props) {
 
   if (session) redirect('/');
 
-  return <LoginForm returnTo={searchParams.returnTo} />;
+  return <LoginForm returnTo={returnTo} />;
 }
