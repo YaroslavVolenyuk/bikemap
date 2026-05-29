@@ -19,7 +19,6 @@ import {
   MapPin,
   Save,
   Trash2,
-  Upload,
   User,
   X,
 } from 'lucide-react';
@@ -61,19 +60,11 @@ type PlannerRouteChange = RoutePoints & {
 type DockState = 'full' | 'compact' | 'hidden';
 type RouteStatus = 'idle' | 'loading' | 'ready' | 'error';
 type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
-type CyclingProfile = 'road' | 'touring' | 'gravel' | 'mtb';
 
 type MapControls = {
   clearRoute: () => void;
   reverseRoute: () => void;
 };
-
-const cyclingProfiles: { id: CyclingProfile; label: string }[] = [
-  { id: 'road', label: 'Road' },
-  { id: 'touring', label: 'Touring' },
-  { id: 'gravel', label: 'Gravel' },
-  { id: 'mtb', label: 'MTB' },
-];
 
 const accent = '#1f5fd6';
 
@@ -483,7 +474,6 @@ export default function Map({ userId, username }: Props) {
   const [dock, setDock] = useState<DockState>('full');
   const [panelOpen, setPanelOpen] = useState(true);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
-  const [profile, setProfile] = useState<CyclingProfile>('touring');
   const [mapControls, setMapControls] = useState<MapControls | null>(null);
   const [saveModalOpen, setSaveModalOpen] = useState(false);
   const [routeName, setRouteName] = useState('');
@@ -510,7 +500,6 @@ export default function Map({ userId, username }: Props) {
       startLat: String(routePoints.start[1]),
       endLng: String(routePoints.destination[0]),
       endLat: String(routePoints.destination[1]),
-      profile,
     });
 
     setRouteStatus('loading');
@@ -536,7 +525,7 @@ export default function Map({ userId, username }: Props) {
       });
 
     return () => controller.abort();
-  }, [routePoints, profile]);
+  }, [routePoints]);
 
   function openSaveModal() {
     if (!routeIsReady) return;
@@ -680,20 +669,6 @@ export default function Map({ userId, username }: Props) {
             >
               <ChevronLeft size={17} />
             </button>
-          </div>
-
-          <div className={styles.profileSwitcher}>
-            {cyclingProfiles.map((p) => (
-              <button
-                className={styles.profileTab}
-                data-active={profile === p.id}
-                key={p.id}
-                onClick={() => setProfile(p.id)}
-                type="button"
-              >
-                {p.label}
-              </button>
-            ))}
           </div>
 
           {warnings.length > 0 ? (

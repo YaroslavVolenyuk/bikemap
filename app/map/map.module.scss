@@ -593,34 +593,6 @@ $paper: #fff;
   font-size: 11px;
 }
 
-.profileSwitcher {
-  display: flex;
-  gap: 4px;
-  margin-bottom: 4px;
-  padding: 4px;
-  background: #f4f3ef;
-  border-radius: 11px;
-}
-
-.profileTab {
-  flex: 1;
-  height: 32px;
-  padding: 0 8px;
-  border: 0;
-  border-radius: 8px;
-  color: $muted;
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-  background: transparent;
-  transition: background 0.12s, color 0.12s;
-}
-
-.profileTab[data-active='true'] {
-  background: $paper;
-  color: $ink;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
 
 .warningsList {
   display: flex;

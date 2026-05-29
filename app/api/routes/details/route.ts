@@ -1,21 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
-// GH free tier only supports: bike, car, foot.
-// racingbike / mtb require a paid plan — all cycling profiles fall back to bike.
-const ghProfiles: Record<string, string> = {
-  road: 'bike',
-  touring: 'bike',
-  gravel: 'bike',
-  mtb: 'bike',
-};
-
 const routeDetailsSchema = z.object({
   startLng: z.coerce.number(),
   startLat: z.coerce.number(),
   endLng: z.coerce.number(),
   endLat: z.coerce.number(),
-  profile: z.enum(['road', 'touring', 'gravel', 'mtb']).optional().default('touring'),
 });
 
 type RouteDetailsResponseBodyGet =
@@ -48,7 +38,7 @@ export async function GET(
 
   url.searchParams.append('point', `${result.data.startLat},${result.data.startLng}`);
   url.searchParams.append('point', `${result.data.endLat},${result.data.endLng}`);
-  url.searchParams.set('profile', ghProfiles[result.data.profile] ?? 'bike');
+  url.searchParams.set('profile', 'bike');
   url.searchParams.set('points_encoded', 'false');
   url.searchParams.append('details', 'road_class');
   url.searchParams.append('details', 'surface');
