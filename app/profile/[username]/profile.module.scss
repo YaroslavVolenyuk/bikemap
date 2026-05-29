@@ -152,3 +152,144 @@
   margin: 0 0 16px;
   color: #86837b;
 }
+
+.routeListControls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  width: min(1100px, 100%);
+  margin: 0 auto 20px;
+}
+
+.searchInput {
+  height: 40px;
+  padding: 0 14px;
+  border: 1px solid #ebe9e3;
+  border-radius: 10px;
+  background: white;
+  color: #23221f;
+  font-size: 14px;
+  outline: none;
+  min-width: 220px;
+}
+
+.searchInput:focus {
+  border-color: #1f5fd6;
+}
+
+.sortTabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.sortTab {
+  height: 36px;
+  padding: 0 14px;
+  border: 1px solid #ebe9e3;
+  border-radius: 9px;
+  background: white;
+  color: #86837b;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s;
+}
+
+.sortTab[data-active='true'] {
+  background: #1f5fd6;
+  color: white;
+  border-color: #1f5fd6;
+}
+
+.routeCardTitle {
+  margin: 0 0 4px;
+  color: #23221f;
+  font-size: 18px;
+  line-height: 1.1;
+  cursor: pointer;
+}
+
+.routeCardTitle:hover {
+  color: #1f5fd6;
+}
+
+.routeCardFooter {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.editNameRow {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.editNameInput {
+  flex: 1;
+  height: 34px;
+  padding: 0 10px;
+  border: 1px solid #1f5fd6;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  min-width: 0;
+}
+
+.inlineBtn {
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid #ebe9e3;
+  border-radius: 8px;
+  background: #f4f3ef;
+  color: #46453f;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.deleteBtn {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid #ebe9e3;
+  border-radius: 8px;
+  background: #f4f3ef;
+  color: #86837b;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.deleteBtn:hover {
+  border-color: #f0b0aa;
+  background: #fbe6e3;
+  color: #b23b30;
+}
+
+.deleteConfirm {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: #b23b30;
+}
+
+.dangerBtn {
+  height: 30px;
+  padding: 0 10px;
+  border: 1px solid #e0a09a;
+  border-radius: 8px;
+  background: #fbe6e3;
+  color: #b23b30;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}

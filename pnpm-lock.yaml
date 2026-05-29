@@ -120,6 +120,9 @@ devDependencies:
   '@types/react-dom':
     specifier: ^19.2.3
     version: 19.2.3(@types/react@19.2.15)
+  dotenv-safe:
+    specifier: ^9.1.0
+    version: 9.1.0(dotenv@17.4.2)
   eslint:
     specifier: ^9.39.2
     version: 9.39.4
@@ -4754,10 +4757,17 @@ packages:
       path-type: 4.0.0
     dev: false
 
+  /dotenv-safe@9.1.0(dotenv@17.4.2):
+    resolution: {integrity: sha512-2qwVAnUN+EDpu41pIK1XiJpHXKHV9Dnti3cE1EnUXT1/BV5+B7xuSZtgZ/4LExkCpp5F6BGikraezQL+8hKCOA==}
+    peerDependencies:
+      dotenv: '>= 8.2.0'
+    dependencies:
+      dotenv: 17.4.2
+    dev: true
+
   /dotenv@17.4.2:
     resolution: {integrity: sha512-nI4U3TottKAcAD9LLud4Cb7b2QztQMUEfHbvhTH09bqXTxnSie8WnjPALV/WMCrJZ6UV/qHJ6L03OqO3LcdYZw==}
     engines: {node: '>=12'}
-    dev: false
 
   /dunder-proto@1.0.1:
     resolution: {integrity: sha512-KIN/nDJBQRcXw0MLVhZE9iQHmG68qAVIBg9CqmUYjmQIhgij9U5MFvrqkUL5FbtyyzZuOeOt0zdeRe4UY7ct+A==}

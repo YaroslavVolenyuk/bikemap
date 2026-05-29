@@ -2,7 +2,9 @@
 
 import 'mapbox-gl/dist/mapbox-gl.css';
 import {
+  AlertTriangle,
   ArrowDownRight,
+  ArrowLeftRight,
   ArrowUpRight,
   Bike,
   ChevronDown,
@@ -16,7 +18,7 @@ import {
   LogIn,
   MapPin,
   Save,
-  Upload,
+  Trash2,
   User,
   X,
 } from 'lucide-react';
@@ -59,6 +61,11 @@ type DockState = 'full' | 'compact' | 'hidden';
 type RouteStatus = 'idle' | 'loading' | 'ready' | 'error';
 type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
 
+type MapControls = {
+  clearRoute: () => void;
+  reverseRoute: () => void;
+};
+
 const accent = '#1f5fd6';
 
 function splitDistance(distanceMeters?: number) {
@@ -91,6 +98,61 @@ function formatTime(durationMs?: number) {
 function formatMeters(value?: number) {
   if (typeof value !== 'number') return '--';
   return `${Math.round(value)} m`;
+}
+
+function getRouteWarnings(details?: RouteDetails): string[] {
+  if (!details) return [];
+  const warnings: string[] = [];
+
+  const ascentPer100km =
+    details.distanceMeters > 0
+      ? (details.ascentMeters / details.distanceMeters) * 100000
+      : 0;
+  if (ascentPer100km > 1200) warnings.push('Very hilly');
+  else if (details.ascentMeters > 800) warnings.push('High ascent');
+
+  const unpavedLabels = new Set(['Gravel', 'Dirt', 'Ground', 'Grass', 'Fine gravel', 'Cobblestone']);
+  const unpavedMeters = details.surfaces
+    .filter((s) => unpavedLabels.has(s.name))
+    .reduce((sum, s) => sum + s.distanceMeters, 0);
+  const unpavedPercent =
+    details.distanceMeters > 0 ? (unpavedMeters / details.distanceMeters) * 100 : 0;
+  if (unpavedPercent > 60) warnings.push('Mostly unpaved');
+  else if (unpavedPercent > 30) warnings.push('Partly unpaved');
+
+  const busyLabels = new Set(['Main road']);
+  const busyMeters = details.wayTypes
+    .filter((w) => busyLabels.has(w.name))
+    .reduce((sum, w) => sum + w.distanceMeters, 0);
+  const busyPercent =
+    details.distanceMeters > 0 ? (busyMeters / details.distanceMeters) * 100 : 0;
+  if (busyPercent > 20) warnings.push('Busy road sections');
+
+  const unknownSurface = details.surfaces.find((s) => s.name === 'Unknown');
+  if (unknownSurface && unknownSurface.percent > 25) warnings.push('Unknown surface');
+
+  return warnings;
+}
+
+function buildGpx(details: RouteDetails, name: string): string {
+  const trkpts = details.geometry
+    .map((coord, i) => {
+      const elevPoint = details.elevation[i];
+      const ele = elevPoint ? `<ele>${elevPoint.elevationMeters.toFixed(1)}</ele>` : '';
+      return `      <trkpt lat="${coord[1]}" lon="${coord[0]}">${ele}</trkpt>`;
+    })
+    .join('\n');
+
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="bikemap" xmlns="http://www.topografix.com/GPX/1/1">
+  <metadata><name>${name.replace(/[<>&"]/g, '')}</name></metadata>
+  <trk>
+    <name>${name.replace(/[<>&"]/g, '')}</name>
+    <trkseg>
+${trkpts}
+    </trkseg>
+  </trk>
+</gpx>`;
 }
 
 function getDifficulty(details?: RouteDetails, route?: ReturnType<typeof getFallbackRouteDetails>) {
@@ -130,12 +192,16 @@ function Logo() {
 function IconButton({
   icon,
   label,
+  disabled,
+  onClick,
 }: {
   icon: ReactNode;
   label: string;
+  disabled?: boolean;
+  onClick?: () => void;
 }) {
   return (
-    <button className={styles.iconButton} title={label} type="button">
+    <button className={styles.iconButton} disabled={disabled} onClick={onClick} title={label} type="button">
       {icon}
     </button>
   );
@@ -408,6 +474,9 @@ export default function Map({ userId, username }: Props) {
   const [dock, setDock] = useState<DockState>('full');
   const [panelOpen, setPanelOpen] = useState(true);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
+  const [mapControls, setMapControls] = useState<MapControls | null>(null);
+  const [saveModalOpen, setSaveModalOpen] = useState(false);
+  const [routeName, setRouteName] = useState('');
 
   const handleRouteChange = useCallback((route: PlannerRouteChange) => {
     setRoutePoints({
@@ -416,6 +485,10 @@ export default function Map({ userId, username }: Props) {
     });
     setMapboxRoute(route.mapboxRoute);
     setSaveStatus('idle');
+  }, []);
+
+  const handleControlsReady = useCallback((controls: MapControls) => {
+    setMapControls(controls);
   }, []);
 
   useEffect(() => {
@@ -430,6 +503,7 @@ export default function Map({ userId, username }: Props) {
     });
 
     setRouteStatus('loading');
+    setRouteDetails(undefined);
 
     fetch(`/api/routes/details?${params.toString()}`, {
       signal: controller.signal,
@@ -453,6 +527,25 @@ export default function Map({ userId, username }: Props) {
     return () => controller.abort();
   }, [routePoints]);
 
+  function openSaveModal() {
+    if (!routeIsReady) return;
+    setRouteName('');
+    setSaveModalOpen(true);
+  }
+
+  function exportGpx() {
+    if (!routeDetails) return;
+    const name = 'bike-route';
+    const gpx = buildGpx(routeDetails, name);
+    const blob = new Blob([gpx], { type: 'application/gpx+xml' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${name}.gpx`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   const fallbackRoute = getFallbackRouteDetails(mapboxRoute);
   const distance = splitDistance(routeDetails?.distanceMeters || fallbackRoute?.distanceMeters);
   const difficulty = getDifficulty(routeDetails, fallbackRoute);
@@ -462,16 +555,19 @@ export default function Map({ userId, username }: Props) {
     : '--';
   const routeIsReady = Boolean(routePoints);
   const dockLeft = panelOpen ? '396px' : '24px';
+  const warnings = getRouteWarnings(routeDetails);
 
-  async function saveRoute() {
+  async function saveRoute(name: string) {
     if (!routePoints || !userId || saveStatus === 'saving') return;
 
+    setSaveModalOpen(false);
     setSaveStatus('saving');
 
     const response = await fetch('/api/routes/saveroute', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
+        name: name.trim() || undefined,
         startpointLat: routePoints.start[1],
         startpointLng: routePoints.start[0],
         endpointLat: routePoints.destination[1],
@@ -498,15 +594,19 @@ export default function Map({ userId, username }: Props) {
   return (
     <div className={styles.mapShell}>
       <div className={styles.mapCanvas} id="map" />
-      <MapboxPlanner onRouteChange={handleRouteChange} />
+      <MapboxPlanner onControlsReady={handleControlsReady} onRouteChange={handleRouteChange} />
 
       <div className={styles.topActions}>
         <Link className={styles.pillLink} href={'/old/map' as NextRoute}>
           <MapPin size={17} />
           Old design
         </Link>
-        <IconButton icon={<Upload size={18} />} label="Import GPX" />
-        <IconButton icon={<Download size={18} />} label="Export GPX" />
+        <IconButton
+          icon={<Download size={18} />}
+          label="Export GPX"
+          disabled={!routeDetails}
+          onClick={exportGpx}
+        />
         {userId && username ? (
           <Link className={styles.pillLink} href={`/profile/${username}` as NextRoute}>
             <User size={17} />
@@ -522,7 +622,7 @@ export default function Map({ userId, username }: Props) {
           <PillButton
             disabled={!routeIsReady || saveStatus === 'saving'}
             icon={<Save size={17} />}
-            onClick={saveRoute}
+            onClick={openSaveModal}
             primary
           >
             {saveStatus === 'saving'
@@ -570,6 +670,47 @@ export default function Map({ userId, username }: Props) {
               <ChevronLeft size={17} />
             </button>
           </div>
+
+          {warnings.length > 0 ? (
+            <div className={styles.warningsList}>
+              {warnings.map((w) => (
+                <span className={styles.warningChip} key={w}>
+                  <AlertTriangle size={13} />
+                  {w}
+                </span>
+              ))}
+            </div>
+          ) : null}
+
+          {routeIsReady ? (
+            <div className={styles.routeActions}>
+              <button
+                className={styles.routeActionBtn}
+                onClick={() => mapControls?.reverseRoute()}
+                title="Reverse route"
+                type="button"
+              >
+                <ArrowLeftRight size={15} />
+                Reverse
+              </button>
+              <button
+                className={styles.routeActionBtn}
+                onClick={() => {
+                  mapControls?.clearRoute();
+                  setRoutePoints(undefined);
+                  setMapboxRoute(undefined);
+                  setRouteDetails(undefined);
+                  setRouteStatus('idle');
+                  setSaveStatus('idle');
+                }}
+                title="Clear route"
+                type="button"
+              >
+                <Trash2 size={15} />
+                Clear
+              </button>
+            </div>
+          ) : null}
 
           <SectionLabel>Way types</SectionLabel>
           <WayTypeBar items={routeDetails?.wayTypes || []} />
@@ -682,6 +823,53 @@ export default function Map({ userId, username }: Props) {
       </div>
 
       <div className={styles.mapCredit}>© Mapbox © OpenStreetMap</div>
+
+      {saveModalOpen ? (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modal}>
+            <div className={styles.modalHeader}>
+              <h2>Save route</h2>
+              <button
+                className={styles.dockIconButton}
+                onClick={() => setSaveModalOpen(false)}
+                type="button"
+              >
+                <X size={16} />
+              </button>
+            </div>
+            <input
+              autoFocus
+              className={styles.modalInput}
+              maxLength={120}
+              onChange={(e) => setRouteName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') saveRoute(routeName);
+                if (e.key === 'Escape') setSaveModalOpen(false);
+              }}
+              placeholder="Route name (optional)"
+              type="text"
+              value={routeName}
+            />
+            <div className={styles.modalFooter}>
+              <button
+                className={styles.pillButton}
+                onClick={() => setSaveModalOpen(false)}
+                type="button"
+              >
+                Cancel
+              </button>
+              <button
+                className={styles.primaryPillButton}
+                onClick={() => saveRoute(routeName)}
+                type="button"
+              >
+                <Save size={16} />
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
