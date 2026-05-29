@@ -27,7 +27,6 @@ const FetchApiGraphhopper = ({
 }) => {
   const [data, setData] = useState(null);
   const [uniqueCoverages, setUniqueCoverages] = useState([]);
-  const [error, setError] = useState(null);
   console.log('uniqueCoverages', uniqueCoverages);
 
   const filterCoverages = (dataAPI) => {
@@ -44,9 +43,9 @@ const FetchApiGraphhopper = ({
   };
 
   const fetchData = () => {
-    fetch(
-      `https://graphhopper.com/api/1/route?point=${startingPlace[1]},${startingPlace[0]}&point=${destination[1]},${destination[0]}&profile=bike&points_encoded=false&details=road_class&details=surface&locale=de&elevation=true&key=fa98aa5b-16af-4242-af72-7ef45d5a215e`,
-    )
+    // Call internal server endpoint which proxies GraphHopper and keeps the API key secret
+    const url = `/api/routes/details?startLat=${startingPlace[1]}&startLng=${startingPlace[0]}&endLat=${destination[1]}&endLng=${destination[0]}`;
+    fetch(url)
       .then((response) => {
         if (!response.ok) {
           throw new Error('Failed to fetch data');
@@ -91,7 +90,7 @@ const FetchApiGraphhopper = ({
         }
       })
       .catch((error) => {
-        setError(error);
+        console.error('FetchApiGraphhopper error:', error);
       });
   };
   useEffect(() => {

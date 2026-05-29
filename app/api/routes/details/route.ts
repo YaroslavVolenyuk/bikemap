@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
-const fallbackGraphhopperApiKey = 'fa98aa5b-16af-4242-af72-7ef45d5a215e';
-
 const routeDetailsSchema = z.object({
   startLng: z.coerce.number(),
   startLat: z.coerce.number(),
@@ -29,7 +27,13 @@ export async function GET(
     return NextResponse.json({ error: 'Invalid route coordinates' }, { status: 400 });
   }
 
-  const apiKey = process.env.GRAPHHOPPER_API_KEY || fallbackGraphhopperApiKey;
+  // Read API key from environment. Do NOT keep fallback secrets in source code.
+  const apiKey = process.env.GRAPHHOPPER_API_KEY;
+
+  if (!apiKey) {
+    // Fail fast and clearly when the key is not provided so we don't keep secrets in code.
+    return NextResponse.json({ error: 'Missing GraphHopper API key (set GRAPHHOPPER_API_KEY)' }, { status: 500 });
+  }
   const url = new URL('https://graphhopper.com/api/1/route');
 
   url.searchParams.append('point', `${result.data.startLat},${result.data.startLng}`);
