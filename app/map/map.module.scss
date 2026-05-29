@@ -598,6 +598,14 @@ $paper: #fff;
   display: none;
 }
 
+.mobileSummary {
+  display: none;
+}
+
+.pillLabelText {
+  /* text label hidden on mobile */
+}
+
 .warningsList {
   display: flex;
   flex-wrap: wrap;
@@ -729,13 +737,19 @@ $paper: #fff;
   }
 
   .leftLogo {
-    top: 18px;
-    left: 12px;
+    display: none;
   }
 
-  .logo {
-    height: 44px;
-    font-size: 17px;
+  .pillLabelText {
+    display: none;
+  }
+
+  .pillLink,
+  .primaryPillLink,
+  .pillButton,
+  .primaryPillButton {
+    padding: 0 10px;
+    gap: 0;
   }
 
   .routePanel {
@@ -744,7 +758,7 @@ $paper: #fff;
     bottom: 0;
     left: 0;
     width: auto;
-    max-height: 54vh;
+    max-height: 42vh;
     overflow: auto;
     border-radius: 24px 24px 0 0;
   }
@@ -781,5 +795,14 @@ $paper: #fff;
 
   .panelElevation {
     display: block;
+  }
+
+  .mobileSummary {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px 20px;
+    padding: 16px 0 6px;
+    margin-top: 14px;
+    border-top: 1px solid #eceae4;
   }
 }

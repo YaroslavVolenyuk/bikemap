@@ -1,8 +1,12 @@
-// components/LineChart.js
+import type { ChartData } from 'chart.js';
 import React from 'react';
 import { Line } from 'react-chartjs-2';
 
-function LineChart({ chartData }) {
+type Props = {
+  chartData: ChartData<'line'>;
+};
+
+function LineChart({ chartData }: Props) {
   return (
     <div className="chart-container">
       <Line

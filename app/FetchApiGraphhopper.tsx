@@ -1,3 +1,5 @@
+'use client';
+
 import {
   Clock4,
   MoveDownRight,
@@ -19,21 +21,46 @@ import { GiGrass, GiPathDistance, GiStoneWall } from 'react-icons/gi';
 import turf from 'turf';
 import styles from './homepage.module.scss';
 
+type GraphhopperCoverage = [number, number, string];
+
+type GraphhopperApiResponse = {
+  paths?: Array<{
+    ascend: number;
+    descend: number;
+    distance: number;
+    time: number;
+    instructions?: unknown[];
+    points: {
+      coordinates: Array<[number, number, number]>;
+    };
+    details: {
+      surface?: GraphhopperCoverage[];
+    };
+  }>;
+};
+
+type Props = {
+  startingPlace: [number, number];
+  destination: [number, number];
+  setDistance: (distances: number[]) => void;
+  setElevation: (elevations: number[]) => void;
+};
+
 const FetchApiGraphhopper = ({
   startingPlace,
   destination,
   setDistance,
   setElevation,
-}) => {
-  const [data, setData] = useState(null);
-  const [uniqueCoverages, setUniqueCoverages] = useState([]);
+}: Props) => {
+  const [data, setData] = useState<GraphhopperApiResponse | null>(null);
+  const [uniqueCoverages, setUniqueCoverages] = useState<string[]>([]);
   console.log('uniqueCoverages', uniqueCoverages);
 
-  const filterCoverages = (dataAPI) => {
-    if (dataAPI && dataAPI.paths && dataAPI.paths.length > 0) {
-      const details = dataAPI.paths[0].details;
+  const filterCoverages = (dataAPI: GraphhopperApiResponse) => {
+    if (dataAPI?.paths && dataAPI.paths.length > 0) {
+      const details = dataAPI.paths[0]!.details;
 
-      const coverages = details.surface || [];
+      const coverages = details.surface ?? [];
       console.log('coverages', coverages);
       const uniqCoverages = [
         ...new Set(coverages.map((coverage) => coverage[2])),
@@ -43,58 +70,58 @@ const FetchApiGraphhopper = ({
   };
 
   const fetchData = () => {
-    // Call internal server endpoint which proxies GraphHopper and keeps the API key secret
     const url = `/api/routes/details?startLat=${startingPlace[1]}&startLng=${startingPlace[0]}&endLat=${destination[1]}&endLng=${destination[0]}`;
     fetch(url)
       .then((response) => {
         if (!response.ok) {
           throw new Error('Failed to fetch data');
         }
-        return response.json();
+        return response.json() as Promise<GraphhopperApiResponse>;
       })
       .then((dataAPI) => {
         setData(dataAPI);
         filterCoverages(dataAPI);
 
-        if (
-          dataAPI.paths &&
-          dataAPI.paths[0] &&
-          dataAPI.paths[0].instructions
-        ) {
-          const calculateDistances = (fetchedCoord) => {
-            const calculateDistances = [];
+        const path = dataAPI.paths?.[0];
+        if (path?.instructions) {
+          const calculateDistances = (
+            fetchedCoord: Array<[number, number, number]>,
+          ): number[] => {
+            const distances: number[] = [];
 
             for (let i = 0; i < fetchedCoord.length - 1; i++) {
-              const coord1 = fetchedCoord[i];
-              const coord2 = fetchedCoord[i + 1];
+              const coord1 = fetchedCoord[i]!;
+              const coord2 = fetchedCoord[i + 1]!;
 
               const point1 = turf.point([coord1[0], coord1[1]]);
               const point2 = turf.point([coord2[0], coord2[1]]);
 
               const distanceToTurf = turf.distance(point1, point2);
-              calculateDistances.push(distanceToTurf * 1000);
+              distances.push(distanceToTurf * 1000);
             }
 
-            return calculateDistances;
+            return distances;
           };
 
           const distancesToUpdate = calculateDistances(
-            dataAPI.paths[0].points.coordinates,
+            path.points.coordinates,
           );
           setDistance(distancesToUpdate);
 
-          const savedElevation = dataAPI.paths[0].points.coordinates.map(
+          const savedElevation = path.points.coordinates.map(
             (point) => point[2],
           );
           setElevation(savedElevation);
         }
       })
-      .catch((error) => {
+      .catch((error: unknown) => {
         console.error('FetchApiGraphhopper error:', error);
       });
   };
+
   useEffect(() => {
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [startingPlace, destination]);
 
   useEffect(() => {
@@ -105,9 +132,10 @@ const FetchApiGraphhopper = ({
     return () => {
       clearInterval(interval);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const getCoverageIcon = (coverage) => {
+  const getCoverageIcon = (coverage: string) => {
     switch (coverage) {
       case 'asphalt':
         return <FaRoad />;
@@ -151,22 +179,22 @@ const FetchApiGraphhopper = ({
             </h4>
             <p className={styles.buttonLikeBackground}>
               <MoveUpRight width={20} height={20} />{' '}
-              {Math.floor(data.paths[0].ascend)} m
+              {Math.floor(data.paths![0]!.ascend)} m
             </p>
             <p className={styles.buttonLikeBackground}>
               {' '}
               <MoveDownRight width={20} height={20} />{' '}
-              {Math.floor(data.paths[0].descend)} m
+              {Math.floor(data.paths![0]!.descend)} m
             </p>
             <p className={styles.buttonLikeBackground}>
               {' '}
               <MoveHorizontal width={20} height={20} />{' '}
-              {Math.floor(data.paths[0].distance)} m
+              {Math.floor(data.paths![0]!.distance)} m
             </p>
             <p className={styles.buttonLikeBackground}>
               {' '}
               <Clock4 width={20} height={20} />{' '}
-              {Math.floor(data.paths[0].time / 1000 / 60)} min
+              {Math.floor(data.paths![0]!.time / 1000 / 60)} min
             </p>
           </div>
 
@@ -174,8 +202,8 @@ const FetchApiGraphhopper = ({
             <div className={styles.pathType}>
               <ul className={styles.fakeBackground}>
                 <GiPathDistance /> Path types:
-                {uniqueCoverages.map((coverage, index) => (
-                  <li className={styles.list} key={`coverage-${index}`}>
+                {uniqueCoverages.map((coverage) => (
+                  <li className={styles.list} key={coverage}>
                     {getCoverageIcon(coverage)} {coverage}
                   </li>
                 ))}

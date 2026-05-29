@@ -2,10 +2,12 @@
   "name": "bikemap",
   "version": "0.1.1",
   "private": true,
+  "packageManager": "pnpm@11.5.0",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "test": "jest",
     "lint": "eslint .",
     "ley-new": "f(){ touch migrations/$(date +%s)-$1.ts; }; f",
     "migrate": "ley --require tsm"
@@ -38,6 +40,9 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@babel/core": "^7.29.7",
+    "@babel/preset-env": "^7.29.7",
+    "@babel/preset-typescript": "^7.29.7",
     "@jest/globals": "^30.4.1",
     "@playwright/test": "^1.60.0",
     "@ts-safeql/eslint-plugin": "^5.2.0",
@@ -49,6 +54,7 @@
     "@types/react": "^19.2.15",
     "@types/react-autocomplete": "^1.8.11",
     "@types/react-dom": "^19.2.3",
+    "babel-jest": "^30.4.1",
     "dotenv-safe": "^9.1.0",
     "eslint": "^9.39.2",
     "eslint-config-upleveled": "^10.0.0",
@@ -59,13 +65,7 @@
     "stylelint-config-css-modules": "^4.6.0",
     "stylelint-config-upleveled": "^2.0.5",
     "stylelint-scss": "^7.1.1",
+    "ts-jest": "^29.4.11",
     "typescript": "^5.9.3"
-  },
-  "pnpm": {
-    "overrides": {
-      "stylelint-config-css-modules": "4.6.0",
-      "stylelint-scss": "7.1.1",
-      "libpg-query": "^17.7.3"
-    }
   }
 }
