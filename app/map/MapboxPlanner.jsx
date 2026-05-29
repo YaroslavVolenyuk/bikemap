@@ -54,7 +54,7 @@ function setDirectionsInputValue(type, coordinates, options = {}) {
   input.dispatchEvent(new Event('input', { bubbles: true }));
 }
 
-export default function MapboxPlanner({ onRouteChange }) {
+export default function MapboxPlanner({ onRouteChange, onControlsReady }) {
   useEffect(() => {
     let cancelled = false;
     let map;
@@ -159,6 +159,24 @@ export default function MapboxPlanner({ onRouteChange }) {
           });
         }, 0);
       });
+
+      if (onControlsReady) {
+        onControlsReady({
+          clearRoute: () => {
+            directions.removeRoutes();
+            directions.setOrigin('');
+            directions.setDestination('');
+          },
+          reverseRoute: () => {
+            const origin = directions.getOrigin();
+            const destination = directions.getDestination();
+            if (origin?.geometry?.coordinates && destination?.geometry?.coordinates) {
+              directions.setOrigin(destination.geometry.coordinates);
+              directions.setDestination(origin.geometry.coordinates);
+            }
+          },
+        });
+      }
     }
 
     setupMap().catch((error) => {
@@ -171,7 +189,7 @@ export default function MapboxPlanner({ onRouteChange }) {
       cancelled = true;
       map?.remove();
     };
-  }, [onRouteChange]);
+  }, [onRouteChange, onControlsReady]);
 
   return null;
 }
