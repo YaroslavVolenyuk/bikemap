@@ -63,7 +63,8 @@
   ,"pnpm": {
     "overrides": {
       "stylelint-config-css-modules": "4.6.0",
-      "stylelint-scss": "7.1.1"
+      "stylelint-scss": "7.1.1",
+      "libpg-query": "^17.7.3"
     }
   }
 }

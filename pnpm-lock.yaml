@@ -7,6 +7,7 @@ settings:
 overrides:
   stylelint-config-css-modules: 4.6.0
   stylelint-scss: 7.1.1
+  libpg-query: ^17.7.3
 
 dependencies:
   '@mapbox/mapbox-gl-directions':
@@ -3050,7 +3051,7 @@ packages:
     peerDependencies:
       '@typescript-eslint/utils': '>=8.0.0'
       eslint: ^9.0.0 || ^10.0.0
-      libpg-query: '>=13.2.5'
+      libpg-query: ^17.7.3
     dependencies:
       '@ts-safeql/plugin-utils': 5.1.0(@typescript-eslint/utils@8.60.0)(typescript@5.9.3)
       '@typescript-eslint/utils': 8.60.0(eslint@9.39.4)(typescript@5.9.3)
