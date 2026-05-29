@@ -1,67 +1,202 @@
+$accent: #1f5fd6;
+$accent-hover: #1a55c0;
+$border: #e2e0d9;
+$text: #23221f;
+$muted: #86837b;
+$icon-muted: #a9a59b;
+
 .loginPage {
+  position: fixed;
+  inset: 0;
   display: flex;
-  flex-direction: row;
-  justify-content: center;
-  // background-color: rgb(245, 195, 59);
   align-items: center;
-  width: 100vw;
-  height: 100vh;
-  // background: linear-gradient(rgba(123, 200, 255, 0.5), rgba(134, 90, 255, 0.5)),
-  //   url('./../../../public/images/bg3.jpg');
-  background-image: url('./../../../public/images/bg6.jpg');
-  background-repeat: no-repeat;
+  justify-content: center;
+  padding: 24px;
+  font-family: -apple-system, system-ui, sans-serif;
+  background-image: url('/images/bg6.jpg');
   background-size: cover;
-  backdrop-filter: blur(5px);
+  background-position: center;
+  overflow: hidden;
 }
 
-.inputs {
-  background-color: rgb(203, 227, 247, 0.2);
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    120% 80% at 50% 45%,
+    rgba(232, 230, 223, 0.55) 0%,
+    rgba(232, 230, 223, 0.82) 60%,
+    rgba(232, 230, 223, 0.92) 100%
+  );
+  pointer-events: none;
+}
 
-  border-radius: 20px;
-  // width: 300px;
-  // height: 300px;
+.card {
+  position: relative;
+  z-index: 1;
+  width: 392px;
+  padding: 36px 36px 30px;
+  background: #fff;
+  border-radius: 22px;
+  border: 1px solid #ebe9e3;
+  box-shadow: 0 18px 50px rgba(28, 30, 40, 0.16);
+}
 
-  width: 100vw;
-  height: 100vh;
-
+.logoWrap {
   display: flex;
-
-  flex-direction: row;
   justify-content: center;
-  align-items: center;
-  backdrop-filter: blur(2px);
+  margin-bottom: 20px;
+}
+
+.heading {
+  margin: 0 0 6px;
+  font-size: 25px;
+  font-weight: 800;
+  color: $text;
+  letter-spacing: -0.02em;
+  text-align: center;
+}
+
+.subheading {
+  margin: 0 0 26px;
+  font-size: 14.5px;
+  color: $muted;
+  text-align: center;
+  line-height: 1.45;
 }
 
 .form {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  gap: 12px;
 }
 
-.inputField {
-  text-align: center;
-  margin: 10px;
-  width: 200px;
-  height: 25px;
-}
-
-.button {
+.field {
   display: flex;
-  flex-direction: column;
-  text-align: center;
-  text-decoration: none;
-  color: black;
-  font-size: medium;
-
-  width: 200px;
-  height: 35px;
   align-items: center;
-  justify-content: center;
+  gap: 11px;
+  height: 50px;
+  padding: 0 14px;
+  border-radius: 13px;
+  background: #fff;
+  border: 1px solid $border;
+  transition: border-color 0.15s, box-shadow 0.15s;
 
-  border-width: 0;
+  &:focus-within {
+    border-color: $accent;
+    box-shadow: 0 0 0 3px rgba(31, 95, 214, 0.12);
 
-  border-radius: 5px;
+    .fieldIcon {
+      color: $accent;
+    }
+  }
+}
 
-  background-color: rgb(102, 173, 245);
+.fieldIcon {
+  color: $icon-muted;
+  display: flex;
+  flex: none;
+  transition: color 0.15s;
+}
+
+.input {
+  border: none;
+  outline: none;
+  background: transparent;
+  flex: 1;
+  min-width: 0;
+  font-size: 15px;
+  color: $text;
+  font-weight: 500;
+  font-family: inherit;
+
+  &::placeholder {
+    color: $icon-muted;
+    font-weight: 400;
+  }
+}
+
+.showBtn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: $icon-muted;
+  padding: 4px;
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-family: inherit;
+
+  &:hover {
+    color: $text;
+  }
+}
+
+.forgotRow {
+  display: flex;
+  justify-content: flex-end;
+  margin: -4px 2px 2px;
+}
+
+.forgotLink {
+  font-size: 13.5px;
+  color: $accent;
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.error {
+  font-size: 13.5px;
+  color: #d63b34;
+  text-align: center;
+  padding: 8px 12px;
+  background: rgba(214, 59, 52, 0.07);
+  border-radius: 9px;
+}
+
+.submitBtn {
+  width: 100%;
+  height: 50px;
+  margin-top: 6px;
+  border-radius: 13px;
+  border: none;
+  cursor: pointer;
+  background: $accent;
+  color: #fff;
+  font-size: 15.5px;
+  font-weight: 700;
+  font-family: inherit;
+  box-shadow: 0 4px 14px rgba(31, 95, 214, 0.32);
+  transition: background 0.15s;
+
+  &:hover:not(:disabled) {
+    background: $accent-hover;
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+}
+
+.signupRow {
+  margin: 20px 0 0;
+  font-size: 14px;
+  color: $muted;
+  text-align: center;
+}
+
+.signupLink {
+  color: $accent;
+  font-weight: 700;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
 }
