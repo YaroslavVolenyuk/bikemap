@@ -17,17 +17,18 @@ type Props = {
 };
 
 export default function OldMap({ userId, username }: Props) {
-  const [distance, setDistance] = useState([]);
-  const [elevation, setElevation] = useState([]);
-  const [startingPlace, setStartingPlace] = useState('');
-  const [destination, setDestination] = useState('');
+  const [distance, setDistance] = useState<number[]>([]);
+  const [elevation, setElevation] = useState<number[]>([]);
+  const [startingPlace, setStartingPlace] = useState<[number, number] | null>(null);
+  const [destination, setDestination] = useState<[number, number] | null>(null);
+  const [routeId] = useState(() =>
+    Number.parseInt(crypto.randomUUID().replaceAll('-', '').slice(0, 7), 16),
+  );
 
-  const routeId = Math.floor(Math.random() * 100000) + 1;
-
-  const startpointLat = startingPlace[0];
-  const startpointLng = startingPlace[1];
-  const endpointLat = destination[0];
-  const endpointLng = destination[1];
+  const startpointLat = startingPlace?.[0];
+  const startpointLng = startingPlace?.[1];
+  const endpointLat = destination?.[0];
+  const endpointLng = destination?.[1];
 
   return (
     <div className={styles.background}>
@@ -68,12 +69,14 @@ export default function OldMap({ userId, username }: Props) {
         </div>
 
         <div>
-          <FetchApiGraphhopper
-            startingPlace={startingPlace}
-            destination={destination}
-            setElevation={setElevation}
-            setDistance={setDistance}
-          />
+          {startingPlace && destination ? (
+            <FetchApiGraphhopper
+              startingPlace={startingPlace}
+              destination={destination}
+              setElevation={setElevation}
+              setDistance={setDistance}
+            />
+          ) : null}
         </div>
 
         {userId ? (

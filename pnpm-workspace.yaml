@@ -1,0 +1,13 @@
+allowBuilds:
+  '@parcel/watcher': true
+  bcrypt: true
+  esbuild: true
+  sharp: true
+  unrs-resolver: true
+minimumReleaseAgeExclude:
+  - '@ts-safeql/eslint-plugin@5.2.0'
+  - '@ts-safeql/plugin-utils@5.1.0'
+overrides:
+  stylelint-config-css-modules: "4.6.0"
+  stylelint-scss: "7.1.1"
+  libpg-query: "^17.7.3"

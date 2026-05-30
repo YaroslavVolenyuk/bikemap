@@ -1,7 +1,6 @@
 import type { Sql } from 'postgres';
 
 export type Route = {
-  id: number;
   routeId: number;
   userId: number;
   startpointLat: number;

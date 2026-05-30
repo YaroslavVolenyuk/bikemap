@@ -1,11 +1,16 @@
 import { CategoryScale } from 'chart.js';
 import Chart from 'chart.js/auto';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Line } from 'react-chartjs-2';
 
 Chart.register(CategoryScale);
 
-const RoadElevationChart = ({ distance, elevation }) => {
+type Props = {
+  distance: number[];
+  elevation: number[];
+};
+
+const RoadElevationChart = ({ distance, elevation }: Props) => {
   const distTransformed = distance.map((value, index) => {
     if (index === 0) {
       return value;
@@ -33,14 +38,11 @@ const RoadElevationChart = ({ distance, elevation }) => {
     maintainAspectRatio: false,
     scales: {
       x: {
-        type: 'linear',
+        type: 'linear' as const,
         display: true,
         title: {
           display: false,
           text: 'Distance',
-        },
-        ticks: {
-          offset: true,
         },
       },
       y: {
@@ -48,9 +50,6 @@ const RoadElevationChart = ({ distance, elevation }) => {
         title: {
           display: true,
           text: 'Height',
-        },
-        ticks: {
-          offset: true,
         },
         min: 0,
       },

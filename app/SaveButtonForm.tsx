@@ -1,6 +1,15 @@
 import { useState } from 'react';
 import styles from './homepage.module.scss';
 
+type Props = {
+  routeId: number;
+  userId: number;
+  startpointLat?: number;
+  startpointLng?: number;
+  endpointLat?: number;
+  endpointLng?: number;
+};
+
 export default function SaveTourForm({
   routeId,
   userId,
@@ -8,7 +17,7 @@ export default function SaveTourForm({
   startpointLng,
   endpointLat,
   endpointLng,
-}) {
+}: Props) {
   const [error, setError] = useState('');
 
   async function saveRouteToUser() {
@@ -25,20 +34,21 @@ export default function SaveTourForm({
         }),
       });
 
-      const data = await response.json();
+      const data = (await response.json()) as Record<string, unknown>;
 
       if ('error' in data) {
-        setError(data.error);
+        setError(String(data['error']));
         return;
       }
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      console.error(err);
       setError('An error occurred while saving the route.');
     }
   }
 
   return (
     <form onSubmit={(event) => event.preventDefault()}>
+      {error && <p>{error}</p>}
       <div className={styles.centeredElements}>
         {startpointLat && endpointLat ? (
           <button className={styles.saveRouteButton} onClick={saveRouteToUser}>

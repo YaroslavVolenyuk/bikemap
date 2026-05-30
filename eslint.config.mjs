@@ -1,7 +1,8 @@
-import upleveled from 'eslint-config-upleveled';
+import nextConfig from 'eslint-config-next';
 
 const config = [
-  ...(await upleveled),
+  { ignores: ['redesign/**', 'dist/**', '.next/**'] },
+  ...nextConfig,
   {
     rules: {
       'react/no-array-index-key': 'off',
