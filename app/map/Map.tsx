@@ -220,7 +220,7 @@ export default function Map({ userId, username }: Props) {
         endpointLat: end[1],
         endpointLng: end[0],
         distanceMeters: routeDetails?.distanceMeters,
-        durationMs: routeDetails?.durationMs,
+        durationMs: routeDetails?.durationMs != null ? Math.round(routeDetails.durationMs) : undefined,
         ascentMeters: routeDetails?.ascentMeters,
         descentMeters: routeDetails?.descentMeters,
         geometry: routeDetails?.geometry,
