@@ -1,6 +1,6 @@
 'use client';
 
-import { AlertTriangle, ArrowDownRight, ArrowLeftRight, ArrowUpRight, Bike, ChevronLeft, Clock3, Trash2 } from 'lucide-react';
+import { AlertTriangle, ArrowDownRight, ArrowLeftRight, ArrowUpRight, Bike, ChevronDown, ChevronLeft, Clock3, Trash2 } from 'lucide-react';
 import styles from '../map.module.scss';
 import type { RouteDetails } from '../routeDetails';
 import type { MapControls, RouteStatus } from '../types';
@@ -52,6 +52,7 @@ export default function RoutePanel({
         </button>
       ) : null}
     <aside className={styles.routePanel} style={panelOpen ? undefined : { display: 'none' }}>
+      <div className={styles.dragHandle} />
       <div className={styles.panelContent}>
         <div className={styles.panelHeader}>
           <div>
@@ -80,13 +81,15 @@ export default function RoutePanel({
             title="Collapse panel"
             type="button"
           >
-            <ChevronLeft size={17} />
+            <span className={styles.collapseIconDesktop}><ChevronLeft size={17} /></span>
+            <span className={styles.collapseIconMobile}><ChevronDown size={17} /></span>
           </button>
         </div>
       </div>
 
       <div className={styles.panelDivider} />
 
+      {/* geocoderInputs is intentionally outside panelScrollable so suggestions can overflow */}
       <div className={styles.geocoderInputs}>
         <div className={styles.geocoderRow}>
           <span className={styles.geocoderDot} data-type="origin" />
@@ -98,69 +101,69 @@ export default function RoutePanel({
         </div>
       </div>
 
-      <div className={styles.panelDivider} />
-
-      <div className={styles.panelContent}>
-        <div className={styles.mobileSummary}>
-          <DockStat icon={<Bike size={13} />} label="Distance" unit={distance.unit} value={distance.value} />
-          <DockStat icon={<Clock3 size={13} />} label="Est. time" value={duration} />
-          <DockStat
-            icon={<ArrowUpRight size={13} />}
-            label="Ascent"
-            unit="m"
-            value={routeDetails ? `+${Math.round(routeDetails.ascentMeters)}` : '--'}
-          />
-          <DockStat
-            icon={<ArrowDownRight size={13} />}
-            label="Descent"
-            unit="m"
-            value={routeDetails ? `-${Math.round(routeDetails.descentMeters)}` : '--'}
-          />
-        </div>
-
-        {warnings.length > 0 ? (
-          <div className={styles.warningsList}>
-            {warnings.map((w) => (
-              <span className={styles.warningChip} key={w}>
-                <AlertTriangle size={13} />
-                {w}
-              </span>
-            ))}
-          </div>
-        ) : null}
-
-        <div className={styles.routeActions}>
-          {routeIsReady ? (
-            <button
-              className={styles.routeActionBtn}
-              onClick={() => mapControls?.reverseRoute()}
-              title="Reverse route"
-              type="button"
-            >
-              <ArrowLeftRight size={15} />
-              Reverse
-            </button>
-          ) : null}
+      <div className={styles.routeActions}>
+        {routeIsReady ? (
           <button
             className={styles.routeActionBtn}
-            onClick={onClear}
-            title="Clear all points"
+            onClick={() => mapControls?.reverseRoute()}
+            title="Reverse route"
             type="button"
           >
-            <Trash2 size={15} />
-            Clear
+            <ArrowLeftRight size={15} />
+            Reverse
           </button>
-        </div>
+        ) : null}
+        <button
+          className={styles.routeActionBtn}
+          onClick={onClear}
+          title="Clear all points"
+          type="button"
+        >
+          <Trash2 size={15} />
+          Clear
+        </button>
+      </div>
 
-        <SectionLabel>Way types</SectionLabel>
-        <WayTypeBar items={routeDetails?.wayTypes || []} />
+      <div className={styles.panelScrollable}>
+        <div className={styles.panelContent}>
+          <div className={styles.mobileSummary}>
+            <DockStat icon={<Bike size={13} />} label="Distance" unit={distance.unit} value={distance.value} />
+            <DockStat icon={<Clock3 size={13} />} label="Est. time" value={duration} />
+            <DockStat
+              icon={<ArrowUpRight size={13} />}
+              label="Ascent"
+              unit="m"
+              value={routeDetails ? `+${Math.round(routeDetails.ascentMeters)}` : '--'}
+            />
+            <DockStat
+              icon={<ArrowDownRight size={13} />}
+              label="Descent"
+              unit="m"
+              value={routeDetails ? `-${Math.round(routeDetails.descentMeters)}` : '--'}
+            />
+          </div>
 
-        <SectionLabel>Surface</SectionLabel>
-        <SurfaceChips items={routeDetails?.surfaces || []} />
+          {warnings.length > 0 ? (
+            <div className={styles.warningsList}>
+              {warnings.map((w) => (
+                <span className={styles.warningChip} key={w}>
+                  <AlertTriangle size={13} />
+                  {w}
+                </span>
+              ))}
+            </div>
+          ) : null}
 
-        <div className={styles.panelElevation}>
-          <SectionLabel>Elevation profile</SectionLabel>
-          <ElevationProfile details={routeDetails} />
+          <SectionLabel>Way types</SectionLabel>
+          <WayTypeBar items={routeDetails?.wayTypes || []} />
+
+          <SectionLabel>Surface</SectionLabel>
+          <SurfaceChips items={routeDetails?.surfaces || []} />
+
+          <div className={styles.panelElevation}>
+            <SectionLabel>Elevation profile</SectionLabel>
+            <ElevationProfile details={routeDetails} />
+          </div>
         </div>
       </div>
     </aside>

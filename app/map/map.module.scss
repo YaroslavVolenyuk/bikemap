@@ -208,9 +208,11 @@ $paper: #fff;
   align-items: center;
   gap: 0;
   position: relative;
+  z-index: 1;
 
   &:first-child {
     border-bottom: 1px solid $line;
+    z-index: 2; // suggestions from origin row appear above dest row
   }
 }
 
@@ -267,6 +269,8 @@ $paper: #fff;
     border: 1px solid $line;
     border-top: none;
     font-size: 13px;
+    z-index: 30;
+    position: relative;
   }
 }
 
@@ -726,6 +730,20 @@ $paper: #fff;
   /* text label hidden on mobile */
 }
 
+.dragHandle {
+  display: none;
+  width: 36px;
+  height: 4px;
+  background: #d0cec8;
+  border-radius: 2px;
+  margin: 10px auto 6px;
+  flex-shrink: 0;
+}
+
+.collapseIconMobile {
+  display: none;
+}
+
 .warningsList {
   display: flex;
   flex-wrap: wrap;
@@ -750,6 +768,7 @@ $paper: #fff;
   display: flex;
   gap: 8px;
   margin: 12px 0 0;
+  padding: 0 22px;
 }
 
 .routeActionBtn {
@@ -786,8 +805,8 @@ $paper: #fff;
   display: flex;
   align-items: center;
   gap: 0;
-  height: 72px;
-  padding: 0 12px 0 0;
+  min-height: 72px;
+  padding: max(0px, env(safe-area-inset-top)) 12px 0 0;
   background: $paper;
   border-bottom: 1px solid $line;
   box-shadow: 0 4px 16px rgba(28, 30, 40, 0.12);
@@ -797,8 +816,9 @@ $paper: #fff;
   flex: none;
   display: grid;
   place-items: center;
+  align-self: stretch;
   width: 72px;
-  height: 72px;
+  min-height: 72px;
   background: $accent;
   color: #fff;
 }
@@ -1016,9 +1036,19 @@ $paper: #fff;
     bottom: 0;
     left: 0;
     width: auto;
-    max-height: 42vh;
-    overflow: auto;
+    max-height: 55vh;
+    overflow: visible; // allow suggestions to escape the panel bounds
+    display: flex;
+    flex-direction: column;
     border-radius: 24px 24px 0 0;
+  }
+
+  .panelScrollable {
+    overflow-y: auto;
+    overflow-x: visible;
+    -webkit-overflow-scrolling: touch;
+    flex: 1;
+    min-height: 0;
   }
 
   .reopenPanelButton {
@@ -1046,8 +1076,14 @@ $paper: #fff;
     margin-left: 0;
   }
 
-  .routePanel + .bottomDock,
+  // Hide dock when panel is open; full dock always hidden on mobile
+  .panelOpen .bottomDock,
   .bottomDock[data-state='full'] {
+    display: none;
+  }
+
+  // Hide reopenPanelButton on mobile — compact BottomDock replaces it
+  .reopenPanelButton {
     display: none;
   }
 
@@ -1061,6 +1097,38 @@ $paper: #fff;
     gap: 14px 20px;
     padding: 16px 0 6px;
     margin-top: 14px;
-    border-top: 1px solid #eceae4;
+  }
+
+  // Safe area insets for bottom sheets
+  .routePanel {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .bottomDock {
+    padding-bottom: max(18px, env(safe-area-inset-bottom));
+  }
+
+  // Drag handle on bottom sheets
+  .dragHandle {
+    display: block;
+  }
+
+  // Collapse button: show ↓ on mobile instead of ←
+  .collapseIconDesktop {
+    display: none;
+  }
+
+  .collapseIconMobile {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  // Tap targets 44px (Apple HIG minimum)
+  .iconButton,
+  .pillButton,
+  .primaryPillButton,
+  .pillLink,
+  .primaryPillLink {
+    height: 44px;
   }
 }

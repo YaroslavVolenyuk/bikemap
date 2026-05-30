@@ -147,7 +147,6 @@ export default function Map({ userId, username }: Props) {
     });
 
     setRouteStatus('loading');
-    setRouteDetails(undefined);
 
     fetch(`/api/routes/details?${params.toString()}`, { signal: controller.signal })
       .then((res) => {
@@ -308,8 +307,13 @@ export default function Map({ userId, username }: Props) {
   const dockLeft = panelOpen ? '396px' : '24px';
   const warnings = getRouteWarnings(routeDetails);
 
+  function handlePanelOpen(open: boolean) {
+    setPanelOpen(open);
+    if (!open && dock !== 'compact') setDock('compact');
+  }
+
   return (
-    <div className={styles.mapShell}>
+    <div className={`${styles.mapShell}${panelOpen ? ` ${styles.panelOpen}` : ''}`}>
       <div className={styles.mapCanvas} id="map" />
       <MapboxPlanner
         importedTrack={importedTrack}
@@ -361,7 +365,7 @@ export default function Map({ userId, username }: Props) {
         routeStatus={routeStatus}
         warnings={warnings}
         onClear={clearRoute}
-        onPanelOpen={setPanelOpen}
+        onPanelOpen={handlePanelOpen}
       />
 
       <BottomDock
@@ -372,6 +376,7 @@ export default function Map({ userId, username }: Props) {
         duration={duration}
         routeDetails={routeDetails}
         onDockChange={setDock}
+        onExpandToPanel={() => { setPanelOpen(true); setDock('compact'); }}
       />
 
       {saveStatus === 'error' ? (

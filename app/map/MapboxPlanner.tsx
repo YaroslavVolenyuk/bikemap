@@ -50,6 +50,8 @@ export default function MapboxPlanner({
   onPositionUpdate,
 }: Props) {
   const mapRef = useRef<mapboxgl.Map | null>(null);
+  const onPositionUpdateRef = useRef(onPositionUpdate);
+  useEffect(() => { onPositionUpdateRef.current = onPositionUpdate; }, [onPositionUpdate]);
   const originRef = useRef<Coordinate | null>(null);
   const destRef = useRef<Coordinate | null>(null);
   const originMarkerRef = useRef<mapboxgl.Marker | null>(null);
@@ -160,7 +162,7 @@ export default function MapboxPlanner({
         lastCoords = coords;
         marker.setLngLat(coords);
         map.easeTo({ center: coords, bearing: heading ?? 0, pitch: 45, duration: 1000 });
-        onPositionUpdate?.(coords, heading);
+        onPositionUpdateRef.current?.(coords, heading);
       },
       (err) => console.warn('Nav geolocation error', err),
       { enableHighAccuracy: true, maximumAge: 1000 },
@@ -171,7 +173,7 @@ export default function MapboxPlanner({
       marker.remove();
       map.easeTo({ bearing: 0, pitch: 0, duration: 800 });
     };
-  }, [navigationMode, onPositionUpdate]);
+  }, [navigationMode]);
 
   useEffect(() => {
     let cancelled = false;
@@ -300,17 +302,23 @@ export default function MapboxPlanner({
         tryFireRouteChange();
       });
 
-      // Click to set points: first click = origin, second = destination
       map.on('click', (e) => {
         const coords: Coordinate = [e.lngLat.lng, e.lngLat.lat];
+        destRef.current = coords;
+        setMarker('destination', coords, 'B');
+        clickModeRef.current = null;
         if (!originRef.current) {
-          originRef.current = coords;
-          setMarker('origin', coords, 'A');
-          clickModeRef.current = 'destination';
+          navigator.geolocation.getCurrentPosition(
+            (pos) => {
+              const gps: Coordinate = [pos.coords.longitude, pos.coords.latitude];
+              originRef.current = gps;
+              setMarker('origin', gps, 'A');
+              tryFireRouteChange();
+            },
+            () => { /* GPS denied — user sets origin manually via geocoder */ },
+            { enableHighAccuracy: true, timeout: 10000 },
+          );
         } else {
-          destRef.current = coords;
-          setMarker('destination', coords, 'B');
-          clickModeRef.current = null;
           tryFireRouteChange();
         }
       });

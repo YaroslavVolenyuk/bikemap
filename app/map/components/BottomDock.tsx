@@ -26,6 +26,7 @@ type Props = {
   duration: string;
   averageSpeed: string;
   onDockChange: (state: DockState) => void;
+  onExpandToPanel?: () => void;
 };
 
 export default function BottomDock({
@@ -36,6 +37,7 @@ export default function BottomDock({
   duration,
   averageSpeed,
   onDockChange,
+  onExpandToPanel,
 }: Props) {
   if (dock === 'hidden') {
     return (
@@ -53,6 +55,7 @@ export default function BottomDock({
       data-state={dock}
       style={{ '--dock-left': dockLeft } as CSSProperties}
     >
+      <div className={styles.dragHandle} />
       <div className={styles.dockSummary}>
         <DockStat icon={<Bike size={13} />} label="Distance" unit={distance.unit} value={distance.value} />
         <DockStat icon={<Clock3 size={13} />} label="Est. time" value={duration} />
@@ -68,12 +71,8 @@ export default function BottomDock({
           unit="m"
           value={routeDetails ? `-${Math.round(routeDetails.descentMeters)}` : '--'}
         />
-        <DockStat icon={<Gauge size={13} />} label="Avg speed" value={averageSpeed} />
-
-        {dock === 'compact' ? (
-          <div className={styles.sparkline}>
-            <ElevationProfile compact details={routeDetails} />
-          </div>
+        {dock === 'full' ? (
+          <DockStat icon={<Gauge size={13} />} label="Avg speed" value={averageSpeed} />
         ) : null}
 
         <div className={styles.dockControls}>
@@ -87,7 +86,10 @@ export default function BottomDock({
           ) : null}
           <button
             className={styles.dockIconButton}
-            onClick={() => onDockChange(dock === 'full' ? 'compact' : 'full')}
+            onClick={() => {
+              if (dock === 'compact' && onExpandToPanel) onExpandToPanel();
+              else onDockChange(dock === 'full' ? 'compact' : 'full');
+            }}
             title={dock === 'full' ? 'Collapse' : 'Expand'}
             type="button"
           >
