@@ -69,21 +69,28 @@ export async function POST(
     wayTypes: result.data.wayTypes as RoutePayload['wayTypes'],
   };
 
-  const route = await createRoute(
-    routeId,
-    user.id,
-    result.data.startpointLat,
-    result.data.startpointLng,
-    result.data.endpointLat,
-    result.data.endpointLng,
-    payload,
-  );
+  let route;
+  try {
+    route = await createRoute(
+      routeId,
+      user.id,
+      result.data.startpointLat,
+      result.data.startpointLng,
+      result.data.endpointLat,
+      result.data.endpointLng,
+      payload,
+    );
+  } catch (err) {
+    console.error('[saveroute] createRoute threw:', err);
+    return NextResponse.json(
+      { error: 'Error creating the new route', detail: String(err) },
+      { status: 500 },
+    );
+  }
 
   if (!route) {
     return NextResponse.json(
-      {
-        error: 'Error creating the new route',
-      },
+      { error: 'Error creating the new route' },
       { status: 500 },
     );
   }

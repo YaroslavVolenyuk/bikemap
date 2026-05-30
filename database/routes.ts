@@ -101,10 +101,10 @@ export async function createRoute(
           ${payload.durationMs ?? null},
           ${payload.ascentMeters ?? null},
           ${payload.descentMeters ?? null},
-          ${payload.geometry === undefined ? null : sql.json(payload.geometry)},
-          ${payload.elevation === undefined ? null : sql.json(payload.elevation)},
-          ${payload.surfaces === undefined ? null : sql.json(payload.surfaces)},
-          ${payload.wayTypes === undefined ? null : sql.json(payload.wayTypes)}
+          ${payload.geometry === undefined ? null : JSON.stringify(payload.geometry)},
+          ${payload.elevation === undefined ? null : JSON.stringify(payload.elevation)},
+          ${payload.surfaces === undefined ? null : JSON.stringify(payload.surfaces)},
+          ${payload.wayTypes === undefined ? null : JSON.stringify(payload.wayTypes)}
         )
       RETURNING *
     `;
