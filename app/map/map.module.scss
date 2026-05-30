@@ -131,6 +131,46 @@ $paper: #fff;
   box-shadow: 0 2px 8px rgba(31, 95, 214, 0.28);
 }
 
+.gpxChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 40px;
+  padding: 0 8px 0 12px;
+  border-radius: 11px;
+  border: 1px solid #e8722c;
+  background: #fff4ee;
+  color: #c4521a;
+  font-size: 13px;
+  font-weight: 700;
+  max-width: 180px;
+}
+
+.gpxChipName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gpxChipRemove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: #c4521a;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+
+  &:hover {
+    background: #fde0cc;
+  }
+}
+
 .pillButton:disabled,
 .primaryPillButton:disabled {
   cursor: not-allowed;
