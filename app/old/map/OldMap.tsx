@@ -21,8 +21,9 @@ export default function OldMap({ userId, username }: Props) {
   const [elevation, setElevation] = useState<number[]>([]);
   const [startingPlace, setStartingPlace] = useState<[number, number] | null>(null);
   const [destination, setDestination] = useState<[number, number] | null>(null);
-
-  const routeId = Math.floor(Math.random() * 100000) + 1;
+  const [routeId] = useState(() =>
+    Number.parseInt(crypto.randomUUID().replaceAll('-', '').slice(0, 7), 16),
+  );
 
   const startpointLat = startingPlace?.[0];
   const startpointLng = startingPlace?.[1];

@@ -3,10 +3,6 @@ import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 jest.mock('../database/connect', () => ({
   sql: Object.assign(jest.fn(), { json: jest.fn((v: unknown) => v) }),
 }));
-jest.mock('next/headers', () => ({
-  cookies: jest.fn().mockResolvedValue({ get: jest.fn() }),
-  headers: jest.fn().mockReturnValue(new Headers()),
-}));
 jest.mock('../util/cookies', () => ({
   secureCookieOptions: { httpOnly: true, path: '/', sameSite: 'lax' },
   getCookie: jest.fn(),
@@ -30,6 +26,30 @@ import { POST as registerPost } from '../app/api/(auth)/register/route';
 import { createSession } from '../database/sessions';
 import { createUser, getUserByUsername, getUserWithPasswordHashByUsername } from '../database/users';
 
+type SimpleAsyncMock<T> = {
+  mockResolvedValue(value: T): unknown;
+  mockClear(): unknown;
+};
+
+const mockCompare = bcrypt.compare as unknown as SimpleAsyncMock<boolean>;
+const mockHash = bcrypt.hash as unknown as SimpleAsyncMock<string>;
+const mockCreateSession = createSession as unknown as SimpleAsyncMock<{
+  id: number;
+  token: string;
+  userId: number;
+}>;
+const mockCreateUser = createUser as unknown as SimpleAsyncMock<{
+  id: number;
+  username: string;
+}>;
+const mockGetUserByUsername = getUserByUsername as unknown as SimpleAsyncMock<
+  { id: number; username: string } | undefined
+>;
+const mockGetUserWithPasswordHashByUsername =
+  getUserWithPasswordHashByUsername as unknown as SimpleAsyncMock<
+    { id: number; username: string; passwordHash: string } | undefined
+  >;
+
 function makeRequest(url: string, body: unknown) {
   return new Request(url, {
     method: 'POST',
@@ -39,16 +59,18 @@ function makeRequest(url: string, body: unknown) {
 }
 
 describe('POST /api/(auth)/login', () => {
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
 
   it('returns 200 with user on valid credentials', async () => {
-    (getUserWithPasswordHashByUsername as jest.Mock).mockResolvedValue({
+    mockGetUserWithPasswordHashByUsername.mockResolvedValue({
       id: 1,
       username: 'alice',
       passwordHash: '$2b$10$hash',
     });
-    (bcrypt.compare as jest.Mock).mockResolvedValue(true);
-    (createSession as jest.Mock).mockResolvedValue({ id: 1, token: 'tok-abc', userId: 1 });
+    mockCompare.mockResolvedValue(true);
+    mockCreateSession.mockResolvedValue({ id: 1, token: 'tok-abc', userId: 1 });
 
     const res = await loginPost(makeRequest('http://localhost/api/login', { username: 'alice', password: 'password123' }));
     expect(res.status).toBe(200);
@@ -57,12 +79,12 @@ describe('POST /api/(auth)/login', () => {
   });
 
   it('returns 401 when password is wrong', async () => {
-    (getUserWithPasswordHashByUsername as jest.Mock).mockResolvedValue({
+    mockGetUserWithPasswordHashByUsername.mockResolvedValue({
       id: 1,
       username: 'alice',
       passwordHash: '$2b$10$hash',
     });
-    (bcrypt.compare as jest.Mock).mockResolvedValue(false);
+    mockCompare.mockResolvedValue(false);
 
     const res = await loginPost(makeRequest('http://localhost/api/login', { username: 'alice', password: 'wrongpass' }));
     expect(res.status).toBe(401);
@@ -70,20 +92,22 @@ describe('POST /api/(auth)/login', () => {
 });
 
 describe('POST /api/(auth)/register', () => {
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
 
   it('returns 406 when username already taken', async () => {
-    (getUserByUsername as jest.Mock).mockResolvedValue({ id: 1, username: 'alice' });
+    mockGetUserByUsername.mockResolvedValue({ id: 1, username: 'alice' });
 
     const res = await registerPost(makeRequest('http://localhost/api/register', { username: 'alice', password: 'validpassword' }));
     expect(res.status).toBe(406);
   });
 
   it('returns 201 on successful registration', async () => {
-    (getUserByUsername as jest.Mock).mockResolvedValue(undefined);
-    (bcrypt.hash as jest.Mock).mockResolvedValue('$2b$10$hashed');
-    (createUser as jest.Mock).mockResolvedValue({ id: 2, username: 'bob' });
-    (createSession as jest.Mock).mockResolvedValue({ id: 1, token: 'tok-xyz', userId: 2 });
+    mockGetUserByUsername.mockResolvedValue(undefined);
+    mockHash.mockResolvedValue('$2b$10$hashed');
+    mockCreateUser.mockResolvedValue({ id: 2, username: 'bob' });
+    mockCreateSession.mockResolvedValue({ id: 1, token: 'tok-xyz', userId: 2 });
 
     const res = await registerPost(makeRequest('http://localhost/api/register', { username: 'bob', password: 'validpassword' }));
     expect(res.status).toBe(201);

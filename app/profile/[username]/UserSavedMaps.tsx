@@ -1,7 +1,8 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { Route } from '../../../migrations/1687943012-createRoutes';
 import type { Coordinate } from '../../map/routeDetails';
 import styles from './profile.module.scss';
@@ -91,11 +92,10 @@ function RoutePreview({ geometry }: { geometry: Coordinate[] | null }) {
   const url = buildStaticImageUrl(geometry);
   if (url) {
     return (
-      <img
+      <Image
         alt="Route map preview"
         className={styles.routePreview}
         height={120}
-        loading="lazy"
         src={url}
         width={360}
       />
@@ -124,6 +124,13 @@ function RouteCard({ route, username, onDelete, onRename }: RouteCardProps) {
   const [editing, setEditing] = useState(false);
   const [nameValue, setNameValue] = useState(route.name ?? '');
   const [saving, setSaving] = useState(false);
+  const editInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (editing) {
+      editInputRef.current?.focus();
+    }
+  }, [editing]);
 
   async function handleDelete() {
     await onDelete(route.routeId);
@@ -148,14 +155,17 @@ function RouteCard({ route, username, onDelete, onRename }: RouteCardProps) {
             {editing ? (
               <div className={styles.editNameRow}>
                 <input
-                  autoFocus
                   className={styles.editNameInput}
                   maxLength={120}
                   onChange={(e) => setNameValue(e.target.value)}
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter') void handleRename();
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      void handleRename();
+                    }
                     if (e.key === 'Escape') setEditing(false);
                   }}
+                  ref={editInputRef}
                   type="text"
                   value={nameValue}
                 />
@@ -176,16 +186,17 @@ function RouteCard({ route, username, onDelete, onRename }: RouteCardProps) {
                 </button>
               </div>
             ) : (
-              <h2
+              <button
                 className={styles.routeCardTitle}
                 onClick={() => {
                   setNameValue(route.name ?? '');
                   setEditing(true);
                 }}
                 title="Click to rename"
+                type="button"
               >
                 {route.name ?? `Route #${route.routeId}`}
-              </h2>
+              </button>
             )}
             <p>{formatDate(route.createdAt)}</p>
           </div>

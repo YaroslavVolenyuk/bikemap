@@ -33,15 +33,30 @@ import { POST as saveRoute } from '../app/api/routes/saveroute/route';
 import { sql } from '../database/connect';
 import { getUserBySessionToken } from '../database/users';
 
-const mockCookies = cookies as jest.Mock;
-const mockSql = sql as jest.MockedFunction<() => Promise<unknown[]>>;
-const mockGetUser = getUserBySessionToken as jest.Mock;
+type CookieStoreMock = {
+  get(name: string): { value: string } | undefined;
+};
+
+type AsyncFnMock<T> = {
+  mockResolvedValue(value: T): unknown;
+  mockClear(): unknown;
+};
+
+const mockCookies = cookies as unknown as AsyncFnMock<CookieStoreMock>;
+const mockSql = sql as unknown as AsyncFnMock<unknown>;
+const mockGetUser = getUserBySessionToken as unknown as AsyncFnMock<
+  { id: number; username: string } | undefined
+>;
 
 function noCookie() {
-  mockCookies.mockResolvedValue({ get: jest.fn().mockReturnValue(undefined) });
+  mockCookies.mockResolvedValue({
+    get: () => undefined,
+  });
 }
 function withCookie(token = 'session-token') {
-  mockCookies.mockResolvedValue({ get: jest.fn().mockReturnValue({ value: token }) });
+  mockCookies.mockResolvedValue({
+    get: () => ({ value: token }),
+  });
 }
 
 describe('POST /api/routes/saveroute', () => {
@@ -60,7 +75,9 @@ describe('POST /api/routes/saveroute', () => {
 });
 
 describe('DELETE /api/routes/[routeId]', () => {
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
 
   it('returns 401 when not authenticated', async () => {
     noCookie();

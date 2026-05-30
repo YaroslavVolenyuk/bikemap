@@ -3,15 +3,22 @@ import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 jest.mock('../database/connect', () => ({
   sql: Object.assign(jest.fn(), { json: jest.fn((v: unknown) => v) }),
 }));
-jest.mock('react', () => ({ ...jest.requireActual('react'), cache: (fn: unknown) => fn }));
+jest.mock('react', () => ({ cache: (fn: unknown) => fn }));
 
 import { sql } from '../database/connect';
 import { createRoute, getRouteByRouteId } from '../database/routes';
 
-const mockSql = sql as jest.MockedFunction<() => Promise<unknown[]>>;
+type SqlMock = {
+  mockResolvedValue(value: unknown): unknown;
+  mockClear(): unknown;
+};
+
+const mockSql = sql as unknown as SqlMock;
 
 describe('getRouteByRouteId', () => {
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
 
   it('returns route when routeId and userId both match', async () => {
     const row = { routeId: 1, userId: 42, startpointLat: 48, startpointLng: 13, endpointLat: 49, endpointLng: 14 };

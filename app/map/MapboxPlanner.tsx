@@ -98,7 +98,6 @@ export default function MapboxPlanner({ onRouteChange, onControlsReady, imported
 
   useEffect(() => {
     const map = mapRef.current;
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (!map) return;
 
     const coords = importedTrack?.coordinates ?? [];

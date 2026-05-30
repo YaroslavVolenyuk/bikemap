@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import { Save, X } from 'lucide-react';
 import styles from '../map.module.scss';
 
@@ -12,6 +13,14 @@ type Props = {
 };
 
 export default function SaveModal({ open, routeName, onClose, onNameChange, onSave }: Props) {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (open) {
+      inputRef.current?.focus();
+    }
+  }, [open]);
+
   if (!open) return null;
 
   return (
@@ -24,7 +33,6 @@ export default function SaveModal({ open, routeName, onClose, onNameChange, onSa
           </button>
         </div>
         <input
-          autoFocus
           className={styles.modalInput}
           maxLength={120}
           onChange={(e) => onNameChange(e.target.value)}
@@ -33,6 +41,7 @@ export default function SaveModal({ open, routeName, onClose, onNameChange, onSa
             if (e.key === 'Escape') onClose();
           }}
           placeholder="Route name (optional)"
+          ref={inputRef}
           type="text"
           value={routeName}
         />
