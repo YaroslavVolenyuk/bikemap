@@ -79,11 +79,15 @@ export default async function RouteDetailPage({ params }: Props) {
         <p className={styles.date}>{formatDate(route.createdAt)}</p>
       </div>
 
-      {geometry.length >= 2 && (
-        <div className={styles.mapWrapper}>
-          <RouteDetailMap geometry={geometry} />
-        </div>
-      )}
+      <div className={styles.mapWrapper}>
+        <RouteDetailMap
+          endLat={route.endpointLat}
+          endLng={route.endpointLng}
+          geometry={geometry}
+          startLat={route.startpointLat}
+          startLng={route.startpointLng}
+        />
+      </div>
 
       <div className={styles.stats}>
         <div className={styles.stat}>
@@ -115,7 +119,7 @@ export default async function RouteDetailPage({ params }: Props) {
         </div>
       )}
 
-      {(wayTypes.length > 0 || surfaces.length > 0) && (
+      {wayTypes.length > 0 && (
         <div className={styles.section}>
           <SurfaceBreakdown surfaces={surfaces} wayTypes={wayTypes} />
         </div>
