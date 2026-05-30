@@ -28,13 +28,26 @@ type Props = {
   onControlsReady?: (controls: MapControls) => void;
   importedTrack?: ParsedGpx | null;
   routeGeometry?: Coordinate[];
+  navigationMode?: boolean;
+  onPositionUpdate?: (coords: Coordinate, heading: number | null) => void;
 };
+
+function calcBearing(from: Coordinate, to: Coordinate): number {
+  const lat1 = (from[1] * Math.PI) / 180;
+  const lat2 = (to[1] * Math.PI) / 180;
+  const dLng = ((to[0] - from[0]) * Math.PI) / 180;
+  const y = Math.sin(dLng) * Math.cos(lat2);
+  const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLng);
+  return ((Math.atan2(y, x) * 180) / Math.PI + 360) % 360;
+}
 
 export default function MapboxPlanner({
   onRouteChange,
   onControlsReady,
   importedTrack,
   routeGeometry,
+  navigationMode,
+  onPositionUpdate,
 }: Props) {
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const originRef = useRef<Coordinate | null>(null);
@@ -121,6 +134,44 @@ export default function MapboxPlanner({
       return () => { map.off('load', drawTrack); };
     }
   }, [importedTrack]);
+
+  // Navigation mode: GPS watch + map follow
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!navigationMode) {
+      if (map) map.easeTo({ bearing: 0, pitch: 0, duration: 800 });
+      return;
+    }
+    if (!map) return;
+
+    let lastCoords: Coordinate | null = null;
+
+    const markerEl = document.createElement('div');
+    markerEl.className = 'nav-position-marker';
+    const marker = new mapboxgl.Marker({ element: markerEl }).setLngLat([0, 0]).addTo(map);
+
+    const watchId = navigator.geolocation.watchPosition(
+      (pos) => {
+        const coords: Coordinate = [pos.coords.longitude, pos.coords.latitude];
+        let heading: number | null = pos.coords.heading ?? null;
+        if ((heading === null || isNaN(heading)) && lastCoords) {
+          heading = calcBearing(lastCoords, coords);
+        }
+        lastCoords = coords;
+        marker.setLngLat(coords);
+        map.easeTo({ center: coords, bearing: heading ?? 0, pitch: 45, duration: 1000 });
+        onPositionUpdate?.(coords, heading);
+      },
+      (err) => console.warn('Nav geolocation error', err),
+      { enableHighAccuracy: true, maximumAge: 1000 },
+    );
+
+    return () => {
+      navigator.geolocation.clearWatch(watchId);
+      marker.remove();
+      map.easeTo({ bearing: 0, pitch: 0, duration: 800 });
+    };
+  }, [navigationMode, onPositionUpdate]);
 
   useEffect(() => {
     let cancelled = false;

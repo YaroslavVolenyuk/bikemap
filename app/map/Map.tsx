@@ -6,13 +6,17 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import MapboxPlanner from './MapboxPlanner';
 import styles from './map.module.scss';
 import {
+  type Coordinate,
   type RouteDetails,
   createRouteDetails,
+  distanceBetweenMeters,
+  getCumulativeDistances,
 } from './routeDetails';
 import { getDifficulty, getRouteWarnings, formatTime, splitDistance } from './routeUtils';
 import type {
   DockState,
   MapControls,
+  NavigationState,
   RoutePoints,
   RouteStatus,
   SaveStatus,
@@ -50,14 +54,15 @@ function createRouteDetailsFromGpx(gpx: ParsedGpx): RouteDetails {
     surfaces: [],
     wayTypes: [],
     geometry: coordinates,
+    instructions: [],
   };
 }
 
 import BottomDock from './components/BottomDock';
+import NavigationOverlay from './components/NavigationOverlay';
 import RoutePanel from './components/RoutePanel';
 import SaveModal from './components/SaveModal';
 import TopActions from './components/TopActions';
-import { Logo } from './components/ui';
 
 const GPX_STORAGE_KEY = 'bikemap_imported_gpx';
 
@@ -87,7 +92,11 @@ export default function Map({ userId, username }: Props) {
   });
   const [terrainOn, setTerrainOn] = useState(false);
   const [matchingTrack, setMatchingTrack] = useState(false);
+  const [navState, setNavState] = useState<NavigationState>('idle');
+  const [currentInstructionIdx, setCurrentInstructionIdx] = useState(0);
+  const [remainingDistanceMeters, setRemainingDistanceMeters] = useState(0);
   const importFileRef = useRef<HTMLInputElement>(null);
+  const routeCumulativeDistRef = useRef<number[]>([]);
 
   // Sync GPX track to sessionStorage
   useEffect(() => {
@@ -107,6 +116,15 @@ export default function Map({ userId, username }: Props) {
       setRouteStatus('ready');
     }
   }, [importedTrack, routePoints]);
+
+  // Keep cumulative distances in sync for nav progress calculation
+  useEffect(() => {
+    if (routeDetails?.geometry) {
+      routeCumulativeDistRef.current = getCumulativeDistances(routeDetails.geometry);
+    } else {
+      routeCumulativeDistRef.current = [];
+    }
+  }, [routeDetails]);
 
   const handleRouteChange = useCallback((route: RoutePoints) => {
     setRoutePoints({ start: route.start, destination: route.destination });
@@ -149,6 +167,44 @@ export default function Map({ userId, username }: Props) {
 
     return () => controller.abort();
   }, [routePoints]);
+
+  const handlePositionUpdate = useCallback((coords: Coordinate) => {
+    const geometry = routeDetails?.geometry;
+    const instructions = routeDetails?.instructions;
+    const cumDist = routeCumulativeDistRef.current;
+    if (!geometry || !cumDist.length) return;
+
+    // Find nearest geometry point index
+    let nearestIdx = 0;
+    let minDist = Infinity;
+    for (let i = 0; i < geometry.length; i++) {
+      const d = distanceBetweenMeters(coords, geometry[i]!);
+      if (d < minDist) { minDist = d; nearestIdx = i; }
+    }
+
+    // Remaining route distance from nearest point
+    const totalDist = cumDist[cumDist.length - 1] ?? 0;
+    const traveledDist = cumDist[nearestIdx] ?? 0;
+    setRemainingDistanceMeters(Math.max(0, totalDist - traveledDist));
+
+    // Advance instruction index
+    if (instructions?.length) {
+      let nextIdx = instructions.findIndex((inst) => inst.pointIndex > nearestIdx);
+      if (nextIdx === -1) nextIdx = instructions.length - 1;
+      setCurrentInstructionIdx(nextIdx);
+    }
+  }, [routeDetails]);
+
+  function startNavigation() {
+    if (!routeDetails) return;
+    setCurrentInstructionIdx(0);
+    setRemainingDistanceMeters(routeDetails.distanceMeters);
+    setNavState('active');
+  }
+
+  function stopNavigation() {
+    setNavState('idle');
+  }
 
   function handleImportGpx(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -257,8 +313,10 @@ export default function Map({ userId, username }: Props) {
       <div className={styles.mapCanvas} id="map" />
       <MapboxPlanner
         importedTrack={importedTrack}
+        navigationMode={navState === 'active'}
         routeGeometry={routePoints ? routeDetails?.geometry : undefined}
         onControlsReady={handleControlsReady}
+        onPositionUpdate={handlePositionUpdate}
         onRouteChange={handleRouteChange}
       />
 
@@ -267,6 +325,7 @@ export default function Map({ userId, username }: Props) {
         importedTrack={importedTrack}
         mapControls={mapControls}
         matchingTrack={matchingTrack}
+        navActive={navState === 'active'}
         routeDetails={routeDetails}
         routePoints={Boolean(routePoints)}
         saveStatus={saveStatus}
@@ -277,12 +336,18 @@ export default function Map({ userId, username }: Props) {
         onExportGpx={exportGpx}
         onImportGpx={handleImportGpx}
         onOpenSaveModal={openSaveModal}
+        onStartNavigation={startNavigation}
         onTerrainToggle={setTerrainOn}
       />
 
-      <div className={styles.leftLogo}>
-        <Logo />
-      </div>
+      {navState === 'active' && routeDetails ? (
+        <NavigationOverlay
+          currentInstructionIdx={currentInstructionIdx}
+          remainingDistanceMeters={remainingDistanceMeters}
+          routeDetails={routeDetails}
+          onStop={stopNavigation}
+        />
+      ) : null}
 
       <RoutePanel
         averageSpeed={averageSpeed}

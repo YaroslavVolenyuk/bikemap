@@ -295,6 +295,20 @@ $paper: #fff;
   font-weight: 800;
   line-height: 1;
   letter-spacing: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.panelBrand {
+  font-size: 13px;
+  font-weight: 800;
+  color: $muted;
+  letter-spacing: 0;
+
+  span {
+    color: $accent;
+  }
 }
 
 .routeMeta {
@@ -760,6 +774,144 @@ $paper: #fff;
 .iconButton:disabled {
   cursor: not-allowed;
   opacity: 0.4;
+}
+
+// Navigation strip (Waze-style, edge-to-edge at top)
+.navStrip {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  height: 72px;
+  padding: 0 12px 0 0;
+  background: $paper;
+  border-bottom: 1px solid $line;
+  box-shadow: 0 4px 16px rgba(28, 30, 40, 0.12);
+}
+
+.navStripArrow {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  background: $accent;
+  color: #fff;
+}
+
+.navStripMain {
+  flex: 1;
+  min-width: 0;
+  padding: 0 10px 0 14px;
+}
+
+.navStripDist {
+  display: flex;
+  gap: 3px;
+  align-items: baseline;
+  line-height: 1;
+
+  strong {
+    font-size: 22px;
+    font-weight: 800;
+    color: $ink;
+    letter-spacing: 0;
+  }
+
+  span {
+    font-size: 13px;
+    font-weight: 700;
+    color: $muted;
+  }
+}
+
+.navStripText {
+  font-size: 13px;
+  font-weight: 600;
+  color: $ink;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 2px;
+}
+
+.navStripNext {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  color: $muted;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.navStripNextIcon {
+  flex: none;
+  display: flex;
+  align-items: center;
+  color: $muted;
+}
+
+.navStripStats {
+  flex: none;
+  text-align: right;
+  padding: 0 10px;
+}
+
+.navStripStat {
+  display: flex;
+  gap: 3px;
+  align-items: baseline;
+  justify-content: flex-end;
+
+  strong {
+    font-size: 18px;
+    font-weight: 800;
+    color: $ink;
+    letter-spacing: 0;
+  }
+
+  span {
+    font-size: 12px;
+    font-weight: 700;
+    color: $muted;
+  }
+}
+
+.navStripStatLabel {
+  font-size: 11px;
+  font-weight: 700;
+  color: $muted;
+}
+
+.navStripStop {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  border: 1px solid #e7e5df;
+  background: #f4f3ef;
+  color: $ink;
+  cursor: pointer;
+}
+
+// Nav position marker (GPS dot in nav mode)
+:global(.nav-position-marker) {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: $accent;
+  border: 3px solid #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .modalOverlay {

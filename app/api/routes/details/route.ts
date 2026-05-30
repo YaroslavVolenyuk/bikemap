@@ -44,6 +44,7 @@ export async function GET(
   url.searchParams.append('details', 'surface');
   url.searchParams.set('locale', 'en');
   url.searchParams.set('elevation', 'true');
+  url.searchParams.set('instructions', 'true');
   url.searchParams.set('key', apiKey);
 
   const response = await fetch(url, { cache: 'no-store' });
