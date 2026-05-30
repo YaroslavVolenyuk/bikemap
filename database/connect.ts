@@ -19,6 +19,14 @@ function connectOneTimeToDatabase() {
         ...postgres.camel,
         undefined: null,
       },
+      types: {
+        bigint: {
+          to: 20,
+          from: [20],
+          serialize: (x: number) => String(x),
+          parse: (x: string) => Number(x),
+        },
+      },
     });
   }
 

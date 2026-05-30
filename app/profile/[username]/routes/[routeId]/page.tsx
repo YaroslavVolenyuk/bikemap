@@ -16,6 +16,14 @@ type Props = {
   params: Promise<{ username: string; routeId: string }>;
 };
 
+function parseJsonArray<T>(value: unknown): T[] {
+  if (Array.isArray(value)) return value as T[];
+  if (typeof value === 'string') {
+    try { return JSON.parse(value) as T[]; } catch { return []; }
+  }
+  return [];
+}
+
 function formatDistance(distanceMeters?: number | null) {
   if (!distanceMeters) return '--';
   if (distanceMeters < 1000) return `${Math.round(distanceMeters)} m`;
@@ -64,10 +72,10 @@ export default async function RouteDetailPage({ params }: Props) {
   if (!route) notFound();
 
   const name = route.name || `Route #${route.routeId}`;
-  const geometry = (route.geometry as Coordinate[] | null) ?? [];
-  const elevation = (route.elevation as ElevationPoint[] | null) ?? [];
-  const wayTypes = (route.wayTypes as RouteBreakdownItem[] | null) ?? [];
-  const surfaces = (route.surfaces as RouteBreakdownItem[] | null) ?? [];
+  const geometry = parseJsonArray<Coordinate>(route.geometry);
+  const elevation = parseJsonArray<ElevationPoint>(route.elevation);
+  const wayTypes = parseJsonArray<RouteBreakdownItem>(route.wayTypes);
+  const surfaces = parseJsonArray<RouteBreakdownItem>(route.surfaces);
 
   return (
     <div className={styles.page}>
@@ -79,11 +87,15 @@ export default async function RouteDetailPage({ params }: Props) {
         <p className={styles.date}>{formatDate(route.createdAt)}</p>
       </div>
 
-      {geometry.length >= 2 && (
-        <div className={styles.mapWrapper}>
-          <RouteDetailMap geometry={geometry} />
-        </div>
-      )}
+      <div className={styles.mapWrapper}>
+        <RouteDetailMap
+          endLat={route.endpointLat}
+          endLng={route.endpointLng}
+          geometry={geometry}
+          startLat={route.startpointLat}
+          startLng={route.startpointLng}
+        />
+      </div>
 
       <div className={styles.stats}>
         <div className={styles.stat}>
@@ -115,7 +127,7 @@ export default async function RouteDetailPage({ params }: Props) {
         </div>
       )}
 
-      {(wayTypes.length > 0 || surfaces.length > 0) && (
+      {wayTypes.length > 0 && (
         <div className={styles.section}>
           <SurfaceBreakdown surfaces={surfaces} wayTypes={wayTypes} />
         </div>
