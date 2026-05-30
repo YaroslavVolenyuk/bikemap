@@ -1,6 +1,6 @@
 'use client';
 
-import { Bike, Download, History, LogIn, Mountain, Save, User } from 'lucide-react';
+import { Bike, Download, History, LogIn, Mountain, Save, Trash2, Upload, User, X } from 'lucide-react';
 import type { Route as NextRoute } from 'next';
 import Link from 'next/link';
 import type { RefObject } from 'react';
@@ -17,14 +17,15 @@ type Props = {
   terrainOn: boolean;
   routeDetails?: RouteDetails;
   importedTrack: ParsedGpx | null;
+  routePoints: boolean; // true when planned A→B route exists
   matchingTrack: boolean;
-  routeIsReady: boolean;
   saveStatus: SaveStatus;
   importFileRef: RefObject<HTMLInputElement | null>;
   onTerrainToggle: (next: boolean) => void;
   onExportGpx: () => void;
   onOpenSaveModal: () => void;
   onImportGpx: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onClearGpx: () => void;
 };
 
 export default function TopActions({
@@ -34,15 +35,19 @@ export default function TopActions({
   terrainOn,
   routeDetails,
   importedTrack,
+  routePoints,
   matchingTrack,
-  routeIsReady,
   saveStatus,
   importFileRef,
   onTerrainToggle,
   onExportGpx,
   onOpenSaveModal,
   onImportGpx,
+  onClearGpx,
 }: Props) {
+  const gpxMode = Boolean(importedTrack) && !routePoints;
+  const routeIsReady = routePoints || Boolean(importedTrack);
+
   return (
     <div className={styles.topActions}>
       <Link className={`${styles.pillLink} ${styles.oldDesignLink}`} href={'/old/map' as NextRoute}>
@@ -75,24 +80,59 @@ export default function TopActions({
         type="file"
         onChange={onImportGpx}
       />
-      <IconButton
-        icon={
-          <>
-            <Bike size={16} />
-            <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.02em' }}>
-              {matchingTrack ? '…' : 'Import'}
-            </span>
-          </>
-        }
-        label={
-          matchingTrack
-            ? 'Snapping to roads…'
-            : importedTrack
-              ? `Track: ${importedTrack.name}`
-              : 'Import GPX'
-        }
-        onClick={() => importFileRef.current?.click()}
-      />
+
+      {importedTrack ? (
+        <div className={styles.gpxChip}>
+          <Bike size={14} />
+          <span className={styles.gpxChipName} title={importedTrack.name}>
+            {matchingTrack ? 'Snapping…' : importedTrack.name}
+          </span>
+          <button
+            aria-label="Remove GPX track"
+            className={styles.gpxChipRemove}
+            type="button"
+            onClick={onClearGpx}
+          >
+            <X size={12} />
+          </button>
+        </div>
+      ) : (
+        <IconButton
+          icon={
+            <>
+              <Upload size={16} />
+              <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.02em' }}>GPX</span>
+            </>
+          }
+          label="Import GPX"
+          onClick={() => importFileRef.current?.click()}
+        />
+      )}
+
+      {userId ? (
+        <PillButton
+          disabled={!routeIsReady || saveStatus === 'saving'}
+          icon={<Save size={17} />}
+          primary
+          onClick={onOpenSaveModal}
+        >
+          <span className={styles.pillLabelText}>
+            {saveStatus === 'saving'
+              ? 'Saving…'
+              : saveStatus === 'saved'
+                ? 'Saved'
+                : gpxMode
+                  ? 'Save GPX'
+                  : 'Save route'}
+          </span>
+        </PillButton>
+      ) : (
+        <Link className={styles.primaryPillLink} href="/login">
+          <Save size={17} />
+          <span className={styles.pillLabelText}>{gpxMode ? 'Save GPX' : 'Save route'}</span>
+        </Link>
+      )}
+
       {userId && username ? (
         <Link className={styles.pillLink} href={`/profile/${username}` as NextRoute}>
           <User size={17} />
@@ -102,23 +142,6 @@ export default function TopActions({
         <Link className={styles.pillLink} href="/login">
           <LogIn size={17} />
           <span className={styles.pillLabelText}>Sign in</span>
-        </Link>
-      )}
-      {userId ? (
-        <PillButton
-          disabled={!routeIsReady || saveStatus === 'saving'}
-          icon={<Save size={17} />}
-          primary
-          onClick={onOpenSaveModal}
-        >
-          <span className={styles.pillLabelText}>
-            {saveStatus === 'saving' ? 'Saving' : saveStatus === 'saved' ? 'Saved' : 'Save route'}
-          </span>
-        </PillButton>
-      ) : (
-        <Link className={styles.primaryPillLink} href="/login">
-          <Save size={17} />
-          <span className={styles.pillLabelText}>Save route</span>
         </Link>
       )}
     </div>

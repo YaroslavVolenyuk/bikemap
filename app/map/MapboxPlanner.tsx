@@ -42,6 +42,7 @@ export default function MapboxPlanner({
   const originMarkerRef = useRef<mapboxgl.Marker | null>(null);
   const destMarkerRef = useRef<mapboxgl.Marker | null>(null);
   const clickModeRef = useRef<'origin' | 'destination' | null>(null);
+  const importedTrackRef = useRef<typeof importedTrack>(importedTrack);
 
   // Draw GH route geometry when it arrives
   useEffect(() => {
@@ -72,6 +73,11 @@ export default function MapboxPlanner({
     }
   }, [routeGeometry]);
 
+  // Keep ref in sync so the load handler can access current value
+  useEffect(() => {
+    importedTrackRef.current = importedTrack;
+  }, [importedTrack]);
+
   // Draw imported GPX track
   useEffect(() => {
     const map = mapRef.current;
@@ -84,26 +90,35 @@ export default function MapboxPlanner({
       geometry: { type: 'LineString', coordinates: coords },
     };
 
-    const existingSource = map.getSource('imported-track') as mapboxgl.GeoJSONSource | undefined;
-    if (existingSource) {
-      existingSource.setData(geojson);
-    } else if (map.isStyleLoaded() && coords.length >= 2) {
-      map.addSource('imported-track', { type: 'geojson', data: geojson });
-      map.addLayer({
-        id: 'imported-track-line',
-        type: 'line',
-        source: 'imported-track',
-        layout: { 'line-cap': 'round', 'line-join': 'round' },
-        paint: { 'line-color': '#e8722c', 'line-width': 3, 'line-dasharray': [2, 2] },
-      });
+    function drawTrack() {
+      const existingSource = map!.getSource('imported-track') as mapboxgl.GeoJSONSource | undefined;
+      if (existingSource) {
+        existingSource.setData(geojson);
+      } else if (coords.length >= 2) {
+        map!.addSource('imported-track', { type: 'geojson', data: geojson });
+        map!.addLayer({
+          id: 'imported-track-line',
+          type: 'line',
+          source: 'imported-track',
+          layout: { 'line-cap': 'round', 'line-join': 'round' },
+          paint: { 'line-color': '#e8722c', 'line-width': 3, 'line-dasharray': [2, 2] },
+        });
+      }
+
+      if (coords.length >= 2) {
+        const bounds = coords.reduce(
+          (b, [lng, lat]) => b.extend([lng, lat]),
+          new mapboxgl.LngLatBounds([coords[0]![0], coords[0]![1]], [coords[0]![0], coords[0]![1]]),
+        );
+        map!.fitBounds(bounds, { padding: 60, duration: 600 });
+      }
     }
 
-    if (coords.length >= 2) {
-      const bounds = coords.reduce(
-        (b, [lng, lat]) => b.extend([lng, lat]),
-        new mapboxgl.LngLatBounds([coords[0]![0], coords[0]![1]], [coords[0]![0], coords[0]![1]]),
-      );
-      map.fitBounds(bounds, { padding: 60, duration: 600 });
+    if (map.isStyleLoaded()) {
+      drawTrack();
+    } else {
+      map.once('load', drawTrack);
+      return () => { map.off('load', drawTrack); };
     }
   }, [importedTrack]);
 

@@ -20,11 +20,46 @@ import type {
 import { buildGpxString } from '../../util/gpx';
 import { parseGpxString, type ParsedGpx } from '../../util/parseGpx';
 import { mapMatchCoordinates } from '../../util/mapMatch';
+
+function createRouteDetailsFromGpx(gpx: ParsedGpx): RouteDetails {
+  const { coordinates, elevation } = gpx;
+  const totalDistance = elevation.length > 0
+    ? elevation[elevation.length - 1]!.distanceMeters
+    : 0;
+
+  let ascent = 0;
+  let descent = 0;
+  for (let i = 1; i < elevation.length; i++) {
+    const diff = elevation[i]!.elevationMeters - elevation[i - 1]!.elevationMeters;
+    if (diff > 0) ascent += diff;
+    else descent += -diff;
+  }
+
+  const elevValues = elevation.map((e) => e.elevationMeters);
+  // estimate ~15 km/h average cycling speed
+  const durationMs = totalDistance > 0 ? (totalDistance / 15000) * 3_600_000 : 0;
+
+  return {
+    distanceMeters: totalDistance,
+    durationMs,
+    ascentMeters: ascent,
+    descentMeters: descent,
+    highestMeters: elevValues.length ? Math.max(...elevValues) : undefined,
+    lowestMeters: elevValues.length ? Math.min(...elevValues) : undefined,
+    elevation,
+    surfaces: [],
+    wayTypes: [],
+    geometry: coordinates,
+  };
+}
+
 import BottomDock from './components/BottomDock';
 import RoutePanel from './components/RoutePanel';
 import SaveModal from './components/SaveModal';
 import TopActions from './components/TopActions';
 import { Logo } from './components/ui';
+
+const GPX_STORAGE_KEY = 'bikemap_imported_gpx';
 
 type Props = {
   userId?: number;
@@ -41,10 +76,37 @@ export default function Map({ userId, username }: Props) {
   const [mapControls, setMapControls] = useState<MapControls | null>(null);
   const [saveModalOpen, setSaveModalOpen] = useState(false);
   const [routeName, setRouteName] = useState('');
-  const [importedTrack, setImportedTrack] = useState<ParsedGpx | null>(null);
+  const [importedTrack, setImportedTrack] = useState<ParsedGpx | null>(() => {
+    if (typeof window === 'undefined') return null;
+    try {
+      const raw = sessionStorage.getItem(GPX_STORAGE_KEY);
+      return raw ? (JSON.parse(raw) as ParsedGpx) : null;
+    } catch {
+      return null;
+    }
+  });
   const [terrainOn, setTerrainOn] = useState(false);
   const [matchingTrack, setMatchingTrack] = useState(false);
   const importFileRef = useRef<HTMLInputElement>(null);
+
+  // Sync GPX track to sessionStorage
+  useEffect(() => {
+    try {
+      if (importedTrack) {
+        sessionStorage.setItem(GPX_STORAGE_KEY, JSON.stringify(importedTrack));
+      } else {
+        sessionStorage.removeItem(GPX_STORAGE_KEY);
+      }
+    } catch { /* quota exceeded — ignore */ }
+  }, [importedTrack]);
+
+  // Build RouteDetails from GPX when no planned route is active
+  useEffect(() => {
+    if (importedTrack && !routePoints) {
+      setRouteDetails(createRouteDetailsFromGpx(importedTrack));
+      setRouteStatus('ready');
+    }
+  }, [importedTrack, routePoints]);
 
   const handleRouteChange = useCallback((route: RoutePoints) => {
     setRoutePoints({ start: route.start, destination: route.destination });
@@ -117,7 +179,7 @@ export default function Map({ userId, username }: Props) {
     e.target.value = '';
   }
 
-  const routeIsReady = Boolean(routePoints);
+  const routeIsReady = Boolean(routePoints) || Boolean(importedTrack);
 
   function exportGpx() {
     if (!routeDetails) return;
@@ -134,12 +196,17 @@ export default function Map({ userId, username }: Props) {
 
   function openSaveModal() {
     if (!routeIsReady) return;
-    setRouteName('');
+    setRouteName(importedTrack?.name && !routePoints ? importedTrack.name : '');
     setSaveModalOpen(true);
   }
 
   async function saveRoute(name: string) {
-    if (!routePoints || !userId || saveStatus === 'saving') return;
+    if (!userId || saveStatus === 'saving') return;
+    const gpxStart = importedTrack?.coordinates[0];
+    const gpxEnd = importedTrack?.coordinates[importedTrack.coordinates.length - 1];
+    const start = routePoints?.start ?? gpxStart ?? null;
+    const end = routePoints?.destination ?? gpxEnd ?? null;
+    if (!start || !end) return;
     setSaveModalOpen(false);
     setSaveStatus('saving');
 
@@ -148,10 +215,10 @@ export default function Map({ userId, username }: Props) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         name: name.trim() || undefined,
-        startpointLat: routePoints.start[1],
-        startpointLng: routePoints.start[0],
-        endpointLat: routePoints.destination[1],
-        endpointLng: routePoints.destination[0],
+        startpointLat: start[1],
+        startpointLng: start[0],
+        endpointLat: end[1],
+        endpointLng: end[0],
         distanceMeters: routeDetails?.distanceMeters,
         durationMs: routeDetails?.durationMs,
         ascentMeters: routeDetails?.ascentMeters,
@@ -172,6 +239,7 @@ export default function Map({ userId, username }: Props) {
     setRouteDetails(undefined);
     setRouteStatus('idle');
     setSaveStatus('idle');
+    setImportedTrack(null);
   }
 
   const distance = splitDistance(routeDetails?.distanceMeters);
@@ -189,7 +257,7 @@ export default function Map({ userId, username }: Props) {
       <div className={styles.mapCanvas} id="map" />
       <MapboxPlanner
         importedTrack={importedTrack}
-        routeGeometry={routeDetails?.geometry}
+        routeGeometry={routePoints ? routeDetails?.geometry : undefined}
         onControlsReady={handleControlsReady}
         onRouteChange={handleRouteChange}
       />
@@ -200,11 +268,12 @@ export default function Map({ userId, username }: Props) {
         mapControls={mapControls}
         matchingTrack={matchingTrack}
         routeDetails={routeDetails}
-        routeIsReady={routeIsReady}
+        routePoints={Boolean(routePoints)}
         saveStatus={saveStatus}
         terrainOn={terrainOn}
         userId={userId}
         username={username}
+        onClearGpx={() => setImportedTrack(null)}
         onExportGpx={exportGpx}
         onImportGpx={handleImportGpx}
         onOpenSaveModal={openSaveModal}
