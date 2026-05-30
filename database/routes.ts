@@ -101,10 +101,11 @@ export async function createRoute(
           ${payload.durationMs ?? null},
           ${payload.ascentMeters ?? null},
           ${payload.descentMeters ?? null},
-          ${payload.geometry === undefined ? null : JSON.stringify(payload.geometry)},
-          ${payload.elevation === undefined ? null : JSON.stringify(payload.elevation)},
-          ${payload.surfaces === undefined ? null : JSON.stringify(payload.surfaces)},
-          ${payload.wayTypes === undefined ? null : JSON.stringify(payload.wayTypes)}
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          ${payload.geometry === undefined ? null : sql.json(payload.geometry as any)},
+          ${payload.elevation === undefined ? null : sql.json(payload.elevation as any)},
+          ${payload.surfaces === undefined ? null : sql.json(payload.surfaces as any)},
+          ${payload.wayTypes === undefined ? null : sql.json(payload.wayTypes as any)}
         )
       RETURNING *
     `;
