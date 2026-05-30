@@ -6,16 +6,13 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import MapboxPlanner from './MapboxPlanner';
 import styles from './map.module.scss';
 import {
-  type MapboxRoute,
   type RouteDetails,
   createRouteDetails,
-  getFallbackRouteDetails,
 } from './routeDetails';
 import { getDifficulty, getRouteWarnings, formatTime, splitDistance } from './routeUtils';
 import type {
   DockState,
   MapControls,
-  PlannerRouteChange,
   RoutePoints,
   RouteStatus,
   SaveStatus,
@@ -36,7 +33,6 @@ type Props = {
 
 export default function Map({ userId, username }: Props) {
   const [routePoints, setRoutePoints] = useState<RoutePoints>();
-  const [mapboxRoute, setMapboxRoute] = useState<MapboxRoute>();
   const [routeDetails, setRouteDetails] = useState<RouteDetails>();
   const [routeStatus, setRouteStatus] = useState<RouteStatus>('idle');
   const [dock, setDock] = useState<DockState>('full');
@@ -50,9 +46,8 @@ export default function Map({ userId, username }: Props) {
   const [matchingTrack, setMatchingTrack] = useState(false);
   const importFileRef = useRef<HTMLInputElement>(null);
 
-  const handleRouteChange = useCallback((route: PlannerRouteChange) => {
+  const handleRouteChange = useCallback((route: RoutePoints) => {
     setRoutePoints({ start: route.start, destination: route.destination });
-    setMapboxRoute(route.mapboxRoute);
     setSaveStatus('idle');
   }, []);
 
@@ -161,7 +156,7 @@ export default function Map({ userId, username }: Props) {
         durationMs: routeDetails?.durationMs,
         ascentMeters: routeDetails?.ascentMeters,
         descentMeters: routeDetails?.descentMeters,
-        geometry: routeDetails?.geometry || mapboxRoute?.geometry?.coordinates,
+        geometry: routeDetails?.geometry,
         elevation: routeDetails?.elevation,
         surfaces: routeDetails?.surfaces,
         wayTypes: routeDetails?.wayTypes,
@@ -174,16 +169,14 @@ export default function Map({ userId, username }: Props) {
   function clearRoute() {
     mapControls?.clearRoute();
     setRoutePoints(undefined);
-    setMapboxRoute(undefined);
     setRouteDetails(undefined);
     setRouteStatus('idle');
     setSaveStatus('idle');
   }
 
-  const fallbackRoute = getFallbackRouteDetails(mapboxRoute);
-  const distance = splitDistance(routeDetails?.distanceMeters || fallbackRoute?.distanceMeters);
-  const difficulty = getDifficulty(routeDetails, fallbackRoute);
-  const duration = formatTime(routeDetails?.durationMs || fallbackRoute?.durationMs);
+  const distance = splitDistance(routeDetails?.distanceMeters);
+  const difficulty = getDifficulty(routeDetails);
+  const duration = formatTime(routeDetails?.durationMs);
   const averageSpeed =
     routeDetails?.distanceMeters && routeDetails.durationMs
       ? `${((routeDetails.distanceMeters / 1000) / (routeDetails.durationMs / 1000 / 60 / 60)).toFixed(1)} km/h`
@@ -196,6 +189,7 @@ export default function Map({ userId, username }: Props) {
       <div className={styles.mapCanvas} id="map" />
       <MapboxPlanner
         importedTrack={importedTrack}
+        routeGeometry={routeDetails?.geometry}
         onControlsReady={handleControlsReady}
         onRouteChange={handleRouteChange}
       />
