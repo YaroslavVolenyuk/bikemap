@@ -29,24 +29,6 @@ $paper: #fff;
   margin: 0;
 }
 
-.mapShell :global(.mapboxgl-ctrl-directions) {
-  min-width: 352px;
-  max-width: 352px;
-  width: 352px;
-  border: 1px solid $line;
-  border-radius: 14px;
-  box-shadow: 0 8px 30px rgba(28, 30, 40, 0.12);
-  overflow: hidden;
-}
-
-.mapShell :global(.directions-control-inputs) {
-  background: $paper;
-}
-
-.mapShell :global(.mapboxgl-ctrl-geocoder) {
-  max-width: calc(100% - 40px);
-}
-
 .mapShell :global(.mapboxgl-ctrl-top-right) {
   right: 24px;
   top: 84px;
@@ -168,14 +150,98 @@ $paper: #fff;
 .routePanel {
   position: absolute;
   z-index: 9;
-  top: 194px;
+  top: 88px;
   left: 24px;
   width: 352px;
-  padding: 20px 22px 22px;
+  padding: 0 0 22px;
   border-radius: 18px;
+  overflow: hidden;
+}
+
+.geocoderInputs {
+  padding: 4px 0;
+  background: $paper;
+}
+
+.geocoderRow {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  position: relative;
+
+  &:first-child {
+    border-bottom: 1px solid $line;
+  }
+}
+
+.geocoderDot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-left: 16px;
+  background: #3bb2d0;
+
+  &[data-type='dest'] {
+    background: #f54e42;
+  }
+}
+
+.geocoderContainer {
+  flex: 1;
+  min-width: 0;
+
+  // Strip geocoder card styling — blend into panel
+  :global(.mapboxgl-ctrl-geocoder) {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    box-shadow: none;
+    border-radius: 0;
+    background: transparent;
+    font-size: 14px;
+  }
+
+  :global(.mapboxgl-ctrl-geocoder input[type='text']) {
+    height: 44px;
+    padding: 0 36px 0 10px;
+    font-size: 14px;
+    color: $ink;
+
+    &::placeholder {
+      color: $muted;
+    }
+  }
+
+  :global(.mapboxgl-ctrl-geocoder .mapboxgl-ctrl-geocoder--icon-search) {
+    display: none;
+  }
+
+  :global(.mapboxgl-ctrl-geocoder--pin-right) {
+    right: 8px;
+  }
+
+  :global(.suggestions) {
+    border-radius: 0 0 14px 14px;
+    box-shadow: 0 8px 20px rgba(28, 30, 40, 0.12);
+    border: 1px solid $line;
+    border-top: none;
+    font-size: 13px;
+  }
+}
+
+.panelDivider {
+  height: 1px;
+  background: $line;
+  margin: 0;
+}
+
+.panelContent {
+  padding: 0 22px;
 }
 
 .panelHeader {
+  padding-top: 16px;
   display: flex;
   gap: 14px;
   align-items: flex-start;
@@ -350,7 +416,7 @@ $paper: #fff;
 .reopenPanelButton {
   position: absolute;
   z-index: 9;
-  top: 194px;
+  top: 88px;
   left: 24px;
   display: flex;
   gap: 10px;

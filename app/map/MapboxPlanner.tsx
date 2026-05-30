@@ -1,23 +1,20 @@
 'use client';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
+import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 import '../index.css';
 import mapboxgl from 'mapbox-gl';
+import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import { useEffect, useRef } from 'react';
-import type { Coordinate, MapboxRoute } from './routeDetails';
+import type { Coordinate } from './routeDetails';
 import type { ParsedGpx } from '../../util/parseGpx';
 
 const mapboxAccessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
-
 mapboxgl.accessToken = mapboxAccessToken ?? '';
 
-type RoutePoints = {
+export type PlannerRouteChange = {
   start: Coordinate;
   destination: Coordinate;
-};
-
-export type PlannerRouteChange = RoutePoints & {
-  mapboxRoute: MapboxRoute;
 };
 
 export type MapControls = {
@@ -30,72 +27,52 @@ type Props = {
   onRouteChange: (route: PlannerRouteChange) => void;
   onControlsReady?: (controls: MapControls) => void;
   importedTrack?: ParsedGpx | null;
+  routeGeometry?: Coordinate[];
 };
 
-type DirectionsRoute = {
-  distance: number;
-  duration: number;
-  geometry: { coordinates: Coordinate[] };
-  legs: Array<{
-    steps: Array<{
-      maneuver: { location: Coordinate };
-    }>;
-  }>;
-};
-
-function getRouteEndpoint(
-  route: DirectionsRoute,
-  side: 'start' | 'destination',
-): Coordinate | undefined {
-  const legs = route?.legs ?? [];
-  const leg = side === 'start' ? legs[0] : legs[legs.length - 1];
-  const steps = leg?.steps ?? [];
-  const step = side === 'start' ? steps[0] : steps[steps.length - 1];
-  return step?.maneuver?.location;
-}
-
-function formatCoordinates(coordinates: Coordinate | undefined): string {
-  if (!coordinates) return '';
-  const [lng, lat] = coordinates;
-  return `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
-}
-
-function isGeneratedCoordinateValue(value: string): boolean {
-  return (
-    value.startsWith('Current location') ||
-    /^-?\d+(\.\d+)?,\s*-?\d+(\.\d+)?$/.test(value)
-  );
-}
-
-function setDirectionsInputValue(
-  type: 'origin' | 'destination',
-  coordinates: Coordinate | undefined,
-  options: { force?: boolean; prefix?: string } = {},
-) {
-  const containerClass =
-    type === 'origin' ? 'mapbox-directions-origin' : 'mapbox-directions-destination';
-  const container = document.getElementsByClassName(containerClass)[0];
-  const input = container?.getElementsByTagName('input')[0];
-
-  if (!input || !coordinates) return;
-
-  const currentValue = input.value.trim();
-  const shouldKeepTypedValue =
-    !options.force && currentValue && !isGeneratedCoordinateValue(currentValue);
-
-  if (shouldKeepTypedValue) return;
-
-  const coordinateLabel = formatCoordinates(coordinates);
-  input.value = options.prefix
-    ? `${options.prefix} · ${coordinateLabel}`
-    : coordinateLabel;
-  input.title = input.value;
-  input.dispatchEvent(new Event('input', { bubbles: true }));
-}
-
-export default function MapboxPlanner({ onRouteChange, onControlsReady, importedTrack }: Props) {
+export default function MapboxPlanner({
+  onRouteChange,
+  onControlsReady,
+  importedTrack,
+  routeGeometry,
+}: Props) {
   const mapRef = useRef<mapboxgl.Map | null>(null);
+  const originRef = useRef<Coordinate | null>(null);
+  const destRef = useRef<Coordinate | null>(null);
+  const originMarkerRef = useRef<mapboxgl.Marker | null>(null);
+  const destMarkerRef = useRef<mapboxgl.Marker | null>(null);
+  const clickModeRef = useRef<'origin' | 'destination' | null>(null);
 
+  // Draw GH route geometry when it arrives
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !map.isStyleLoaded()) return;
+
+    const source = map.getSource('gh-route') as mapboxgl.GeoJSONSource | undefined;
+    const geojson: GeoJSON.Feature<GeoJSON.LineString> = {
+      type: 'Feature',
+      properties: {},
+      geometry: {
+        type: 'LineString',
+        coordinates: routeGeometry ?? [],
+      },
+    };
+
+    if (source) {
+      source.setData(geojson);
+    } else if (routeGeometry && routeGeometry.length >= 2) {
+      map.addSource('gh-route', { type: 'geojson', data: geojson });
+      map.addLayer({
+        id: 'gh-route-line',
+        type: 'line',
+        source: 'gh-route',
+        layout: { 'line-cap': 'round', 'line-join': 'round' },
+        paint: { 'line-color': '#4264fb', 'line-width': 5, 'line-opacity': 0.85 },
+      });
+    }
+  }, [routeGeometry]);
+
+  // Draw imported GPX track
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
@@ -117,11 +94,7 @@ export default function MapboxPlanner({ onRouteChange, onControlsReady, imported
         type: 'line',
         source: 'imported-track',
         layout: { 'line-cap': 'round', 'line-join': 'round' },
-        paint: {
-          'line-color': '#e8722c',
-          'line-width': 3,
-          'line-dasharray': [2, 2],
-        },
+        paint: { 'line-color': '#e8722c', 'line-width': 3, 'line-dasharray': [2, 2] },
       });
     }
 
@@ -138,16 +111,53 @@ export default function MapboxPlanner({ onRouteChange, onControlsReady, imported
     let cancelled = false;
     let map: mapboxgl.Map | undefined;
 
-    async function setupMap() {
-      if (!mapboxAccessToken) {
-        throw new Error('NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN is not configured');
+    function tryFireRouteChange() {
+      const o = originRef.current;
+      const d = destRef.current;
+      if (o && d) onRouteChange({ start: o, destination: d });
+    }
+
+    function setGeocoderInput(type: 'origin' | 'destination', coords: Coordinate) {
+      const id = type === 'origin' ? 'geocoder-origin' : 'geocoder-dest';
+      const input = document.querySelector<HTMLInputElement>(`#${id} input`);
+      if (input) {
+        input.value = `${coords[1].toFixed(5)}, ${coords[0].toFixed(5)}`;
       }
+    }
 
-      const mapboxDirectionsModule = await import(
-        '@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions'
-      );
+    function setMarker(
+      type: 'origin' | 'destination',
+      coords: Coordinate,
+      label: string,
+    ) {
+      if (!map) return;
+      const markerRef = type === 'origin' ? originMarkerRef : destMarkerRef;
+      markerRef.current?.remove();
 
-      if (cancelled) return;
+      const el = document.createElement('div');
+      el.className = type === 'origin' ? 'marker-origin' : 'marker-dest';
+      const span = document.createElement('span');
+      span.textContent = label;
+      el.appendChild(span);
+
+      markerRef.current = new mapboxgl.Marker({ element: el, draggable: true })
+        .setLngLat(coords)
+        .addTo(map);
+
+      setGeocoderInput(type, coords);
+
+      markerRef.current.on('dragend', () => {
+        const lngLat = markerRef.current!.getLngLat();
+        const updated: Coordinate = [lngLat.lng, lngLat.lat];
+        if (type === 'origin') originRef.current = updated;
+        else destRef.current = updated;
+        setGeocoderInput(type, updated);
+        tryFireRouteChange();
+      });
+    }
+
+    async function setupMap() {
+      if (!mapboxAccessToken) throw new Error('NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN is not configured');
 
       map = new mapboxgl.Map({
         container: 'map',
@@ -157,22 +167,24 @@ export default function MapboxPlanner({ onRouteChange, onControlsReady, imported
       });
       mapRef.current = map;
 
-      const directions = new mapboxDirectionsModule.default({
+      if (cancelled) return;
+
+      // Geocoder for origin
+      const originGeocoder = new MapboxGeocoder({
         accessToken: mapboxAccessToken,
-        unit: 'metric',
-        alternatives: true,
-        profile: 'mapbox/cycling',
-        steps: true,
-        geometries: 'geojson',
-        controls: {
-          inputs: true,
-          instructions: false,
-          profileSwitcher: false,
-          waypointNameMarkers: true,
-          reverseGeocode: true,
-          clearButton: true,
-          interactive: true,
-        },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        mapboxgl: mapboxgl as any,
+        placeholder: 'Start point',
+        marker: false,
+      });
+
+      // Geocoder for destination
+      const destGeocoder = new MapboxGeocoder({
+        accessToken: mapboxAccessToken,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        mapboxgl: mapboxgl as any,
+        placeholder: 'End point',
+        marker: false,
       });
 
       const geolocateControl = new mapboxgl.GeolocateControl({
@@ -181,64 +193,75 @@ export default function MapboxPlanner({ onRouteChange, onControlsReady, imported
         showUserHeading: true,
       });
 
-      map.addControl(directions, 'top-left');
+      const originContainer = document.getElementById('geocoder-origin');
+      const destContainer = document.getElementById('geocoder-dest');
+      if (originContainer) originGeocoder.addTo(originContainer);
+      if (destContainer) destGeocoder.addTo(destContainer);
       map.addControl(geolocateControl, 'top-right');
       map.addControl(new mapboxgl.NavigationControl({ visualizePitch: true }), 'top-right');
 
-      map.on('load', () => {
-        const geolocateButton = document.getElementsByClassName(
-          'mapboxgl-ctrl-geolocate',
-        )[0];
-        if (geolocateButton) {
-          geolocateButton.setAttribute('title', 'Use my location as point A');
-          geolocateButton.setAttribute('aria-label', 'Use my location as point A');
-        }
+      originGeocoder.on('result', (e: { result: { geometry: { coordinates: [number, number] } } }) => {
+        const coords = e.result.geometry.coordinates as Coordinate;
+        originRef.current = coords;
+        setMarker('origin', coords, 'A');
+        tryFireRouteChange();
       });
 
-      directions.on('origin', (event) => {
-        setTimeout(() => {
-          setDirectionsInputValue('origin', event.feature?.geometry?.coordinates as Coordinate | undefined);
-        }, 0);
+      originGeocoder.on('clear', () => {
+        originRef.current = null;
+        originMarkerRef.current?.remove();
+        originMarkerRef.current = null;
       });
 
-      directions.on('destination', (event) => {
-        setTimeout(() => {
-          setDirectionsInputValue('destination', event.feature?.geometry?.coordinates as Coordinate | undefined);
-        }, 0);
+      destGeocoder.on('result', (e: { result: { geometry: { coordinates: [number, number] } } }) => {
+        const coords = e.result.geometry.coordinates as Coordinate;
+        destRef.current = coords;
+        setMarker('destination', coords, 'B');
+        tryFireRouteChange();
       });
 
-      directions.on('route', (event) => {
-        const route = event.route?.[0] as DirectionsRoute | undefined;
-        const start = route ? getRouteEndpoint(route, 'start') : undefined;
-        const dest = route ? getRouteEndpoint(route, 'destination') : undefined;
-
-        if (!route || !start || !dest) return;
-
-        setDirectionsInputValue('origin', start);
-        setDirectionsInputValue('destination', dest);
-
-        onRouteChange({
-          start,
-          destination: dest,
-          mapboxRoute: {
-            distanceMeters: route.distance,
-            durationSeconds: route.duration,
-            geometry: route.geometry,
-          },
-        });
+      destGeocoder.on('clear', () => {
+        destRef.current = null;
+        destMarkerRef.current?.remove();
+        destMarkerRef.current = null;
       });
 
       geolocateControl.on('geolocate', (event) => {
         const pos = event as unknown as GeolocationPosition;
-        const coordinates: Coordinate = [pos.coords.longitude, pos.coords.latitude];
-        directions.setOrigin(coordinates);
+        const coords: Coordinate = [pos.coords.longitude, pos.coords.latitude];
+        originRef.current = coords;
+        setMarker('origin', coords, 'A');
+        tryFireRouteChange();
+      });
 
-        setTimeout(() => {
-          setDirectionsInputValue('origin', coordinates, {
-            force: true,
-            prefix: 'Current location',
-          });
-        }, 0);
+      // Click to set points: first click = origin, second = destination
+      map.on('click', (e) => {
+        const coords: Coordinate = [e.lngLat.lng, e.lngLat.lat];
+        if (!originRef.current) {
+          originRef.current = coords;
+          setMarker('origin', coords, 'A');
+          clickModeRef.current = 'destination';
+        } else {
+          destRef.current = coords;
+          setMarker('destination', coords, 'B');
+          clickModeRef.current = null;
+          tryFireRouteChange();
+        }
+      });
+
+      map.on('load', () => {
+        // init empty GH route source so setData works after style loads
+        map!.addSource('gh-route', {
+          type: 'geojson',
+          data: { type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates: [] } },
+        });
+        map!.addLayer({
+          id: 'gh-route-line',
+          type: 'line',
+          source: 'gh-route',
+          layout: { 'line-cap': 'round', 'line-join': 'round' },
+          paint: { 'line-color': '#4264fb', 'line-width': 5, 'line-opacity': 0.85 },
+        });
       });
 
       if (onControlsReady) {
@@ -276,16 +299,30 @@ export default function MapboxPlanner({ onRouteChange, onControlsReady, imported
 
         onControlsReady({
           clearRoute: () => {
-            directions.removeRoutes();
-            directions.setOrigin('');
-            directions.setDestination('');
+            originRef.current = null;
+            destRef.current = null;
+            originMarkerRef.current?.remove();
+            destMarkerRef.current?.remove();
+            originMarkerRef.current = null;
+            destMarkerRef.current = null;
+            originGeocoder.clear();
+            destGeocoder.clear();
+            const oInput = document.querySelector<HTMLInputElement>('#geocoder-origin input');
+            const dInput = document.querySelector<HTMLInputElement>('#geocoder-dest input');
+            if (oInput) oInput.value = '';
+            if (dInput) dInput.value = '';
+            const source = mapRef.current?.getSource('gh-route') as mapboxgl.GeoJSONSource | undefined;
+            source?.setData({ type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates: [] } });
           },
           reverseRoute: () => {
-            const origin = directions.getOrigin();
-            const destination = directions.getDestination();
-            if (origin?.geometry?.coordinates && destination?.geometry?.coordinates) {
-              directions.setOrigin(destination.geometry.coordinates as Coordinate);
-              directions.setDestination(origin.geometry.coordinates as Coordinate);
+            const o = originRef.current;
+            const d = destRef.current;
+            if (o && d) {
+              originRef.current = d;
+              destRef.current = o;
+              setMarker('origin', d, 'A');
+              setMarker('destination', o, 'B');
+              tryFireRouteChange();
             }
           },
           toggleTerrain: () => {
@@ -299,15 +336,15 @@ export default function MapboxPlanner({ onRouteChange, onControlsReady, imported
     }
 
     setupMap().catch((error: unknown) => {
-      if (!cancelled) {
-        console.error('Could not initialize the route planner map', error);
-      }
+      if (!cancelled) console.error('Could not initialize the route planner map', error);
     });
 
     return () => {
       cancelled = true;
       map?.remove();
       mapRef.current = null;
+      originMarkerRef.current = null;
+      destMarkerRef.current = null;
     };
   }, [onRouteChange, onControlsReady]);
 

@@ -1,13 +1,11 @@
-import type { Coordinate, MapboxRoute } from './routeDetails';
+import type { Coordinate } from './routeDetails';
 
 export type RoutePoints = {
   start: Coordinate;
   destination: Coordinate;
 };
 
-export type PlannerRouteChange = RoutePoints & {
-  mapboxRoute: MapboxRoute;
-};
+export type PlannerRouteChange = RoutePoints;
 
 export type DockState = 'full' | 'compact' | 'hidden';
 export type RouteStatus = 'idle' | 'loading' | 'ready' | 'error';
