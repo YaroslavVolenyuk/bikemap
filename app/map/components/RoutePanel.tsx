@@ -36,28 +36,31 @@ export default function RoutePanel({
   onClear,
   onPanelOpen,
 }: Props) {
-  if (!panelOpen) {
-    return (
-      <button
-        className={styles.reopenPanelButton}
-        onClick={() => onPanelOpen(true)}
-        type="button"
-      >
-        <span>
-          <Bike size={16} />
-        </span>
-        Your Route
-        <ChevronLeft size={17} />
-      </button>
-    );
-  }
-
   return (
-    <aside className={styles.routePanel}>
+    <>
+      {!panelOpen ? (
+        <button
+          className={styles.reopenPanelButton}
+          onClick={() => onPanelOpen(true)}
+          type="button"
+        >
+          <span>
+            <Bike size={16} />
+          </span>
+          Your Route
+          <ChevronLeft size={17} />
+        </button>
+      ) : null}
+    <aside className={styles.routePanel} style={panelOpen ? undefined : { display: 'none' }}>
       <div className={styles.panelContent}>
         <div className={styles.panelHeader}>
           <div>
-            <h1>Your Route</h1>
+            <h1>
+              Your Route
+              <span className={styles.panelBrand}>
+                bike<span>map</span>
+              </span>
+            </h1>
             <div className={styles.routeMeta}>
               <DifficultyBadge level={difficulty} />
               <span>
@@ -161,5 +164,6 @@ export default function RoutePanel({
         </div>
       </div>
     </aside>
+    </>
   );
 }

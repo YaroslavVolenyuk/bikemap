@@ -20,6 +20,13 @@ export type ElevationPoint = {
   elevationMeters: number;
 };
 
+export type Instruction = {
+  sign: number;
+  text: string;
+  distanceMeters: number;
+  pointIndex: number;
+};
+
 export type RouteDetails = {
   distanceMeters: number;
   durationMs: number;
@@ -31,9 +38,17 @@ export type RouteDetails = {
   surfaces: RouteBreakdownItem[];
   wayTypes: RouteBreakdownItem[];
   geometry: Coordinate[];
+  instructions: Instruction[];
 };
 
 type GraphhopperDetail = [number, number, string];
+
+type GraphhopperInstruction = {
+  sign: number;
+  text: string;
+  distance: number;
+  interval: [number, number];
+};
 
 type GraphhopperPath = {
   distance: number;
@@ -47,6 +62,7 @@ type GraphhopperPath = {
     surface?: GraphhopperDetail[];
     road_class?: GraphhopperDetail[];
   };
+  instructions?: GraphhopperInstruction[];
 };
 
 type GraphhopperResponse = {
@@ -94,7 +110,7 @@ function toRadians(value: number) {
   return (value * Math.PI) / 180;
 }
 
-function distanceBetweenMeters(a: Coordinate, b: Coordinate) {
+export function distanceBetweenMeters(a: Coordinate, b: Coordinate) {
   const earthRadiusMeters = 6371000;
   const deltaLat = toRadians(b[1] - a[1]);
   const deltaLng = toRadians(b[0] - a[0]);
@@ -108,7 +124,7 @@ function distanceBetweenMeters(a: Coordinate, b: Coordinate) {
   return 2 * earthRadiusMeters * Math.asin(Math.sqrt(haversine));
 }
 
-function getCumulativeDistances(coordinates: Coordinate[]) {
+export function getCumulativeDistances(coordinates: Coordinate[]) {
   return coordinates.reduce<number[]>((distances, coordinate, index) => {
     if (index === 0) {
       distances.push(0);
@@ -177,6 +193,13 @@ export function createRouteDetails(data: GraphhopperResponse): RouteDetails | un
   const elevationValues = elevation.map((point) => point.elevationMeters);
   const totalDistanceMeters = path.distance || cumulativeDistances.at(-1) || 0;
 
+  const instructions: Instruction[] = (path.instructions ?? []).map((inst) => ({
+    sign: inst.sign,
+    text: inst.text,
+    distanceMeters: inst.distance,
+    pointIndex: inst.interval[0],
+  }));
+
   return {
     distanceMeters: totalDistanceMeters,
     durationMs: path.time,
@@ -199,6 +222,7 @@ export function createRouteDetails(data: GraphhopperResponse): RouteDetails | un
       wayTypeColors,
     ),
     geometry,
+    instructions,
   };
 }
 

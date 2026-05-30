@@ -1,6 +1,6 @@
 'use client';
 
-import { Bike, Download, History, LogIn, Mountain, Save, Trash2, Upload, User, X } from 'lucide-react';
+import { Bike, Download, History, LogIn, Mountain, Navigation, Save, Trash2, Upload, User, X } from 'lucide-react';
 import type { Route as NextRoute } from 'next';
 import Link from 'next/link';
 import type { RefObject } from 'react';
@@ -17,15 +17,17 @@ type Props = {
   terrainOn: boolean;
   routeDetails?: RouteDetails;
   importedTrack: ParsedGpx | null;
-  routePoints: boolean; // true when planned A→B route exists
+  routePoints: boolean;
   matchingTrack: boolean;
   saveStatus: SaveStatus;
+  navActive: boolean;
   importFileRef: RefObject<HTMLInputElement | null>;
   onTerrainToggle: (next: boolean) => void;
   onExportGpx: () => void;
   onOpenSaveModal: () => void;
   onImportGpx: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onClearGpx: () => void;
+  onStartNavigation: () => void;
 };
 
 export default function TopActions({
@@ -38,12 +40,14 @@ export default function TopActions({
   routePoints,
   matchingTrack,
   saveStatus,
+  navActive,
   importFileRef,
   onTerrainToggle,
   onExportGpx,
   onOpenSaveModal,
   onImportGpx,
   onClearGpx,
+  onStartNavigation,
 }: Props) {
   const gpxMode = Boolean(importedTrack) && !routePoints;
   const routeIsReady = routePoints || Boolean(importedTrack);
@@ -108,6 +112,16 @@ export default function TopActions({
           onClick={() => importFileRef.current?.click()}
         />
       )}
+
+      {routeDetails && !navActive ? (
+        <PillButton
+          icon={<Navigation size={17} />}
+          primary
+          onClick={onStartNavigation}
+        >
+          <span className={styles.pillLabelText}>Navigate</span>
+        </PillButton>
+      ) : null}
 
       {userId ? (
         <PillButton
