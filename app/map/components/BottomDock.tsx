@@ -21,6 +21,7 @@ import { DockStat } from './ui';
 type Props = {
   dock: DockState;
   dockLeft: string;
+  panelOpen: boolean;
   routeDetails?: RouteDetails;
   distance: { value: string; unit: string };
   duration: string;
@@ -36,6 +37,7 @@ const DAMPEN = 0.4;
 export default function BottomDock({
   dock,
   dockLeft,
+  panelOpen,
   routeDetails,
   distance,
   duration,
@@ -167,7 +169,7 @@ export default function BottomDock({
           <button
             className={styles.dockIconButton}
             onClick={() => {
-              if (dock === 'compact' && onExpandToPanel) onExpandToPanel();
+              if (dock === 'compact' && !panelOpen && onExpandToPanel) onExpandToPanel();
               else onDockChange(dock === 'full' ? 'compact' : 'full');
             }}
             title={dock === 'full' ? 'Collapse' : 'Expand'}

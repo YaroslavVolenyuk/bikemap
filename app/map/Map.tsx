@@ -312,7 +312,10 @@ export default function Map({ userId, username }: Props) {
 
   function handlePanelOpen(open: boolean) {
     setPanelOpen(open);
-    if (!open && dock !== 'compact') setDock('compact');
+    if (!open && dock === 'full') {
+      const isMobile = typeof window !== 'undefined' && window.matchMedia('(max-width: 900px)').matches;
+      if (isMobile) setDock('compact');
+    }
   }
 
   return (
@@ -393,6 +396,7 @@ export default function Map({ userId, username }: Props) {
           dock={dock}
           dockLeft={dockLeft}
           duration={duration}
+          panelOpen={panelOpen}
           routeDetails={routeDetails}
           onDockChange={setDock}
           onExpandToPanel={() => { setPanelOpen(true); setDock('compact'); }}
