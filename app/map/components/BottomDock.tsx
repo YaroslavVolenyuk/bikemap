@@ -30,6 +30,8 @@ type Props = {
 };
 
 const EXPAND_THRESHOLD = 60;
+const MAX_STRETCH = 70;
+const DAMPEN = 0.4;
 
 export default function BottomDock({
   dock,
@@ -42,23 +44,63 @@ export default function BottomDock({
   onExpandToPanel,
 }: Props) {
   const dragStartY = useRef<number | null>(null);
+  const basePb = useRef(0);
+  const sectionRef = useRef<HTMLElement | null>(null);
+
+  function resetStretch(animate: boolean) {
+    const el = sectionRef.current;
+    if (!el) return;
+    if (animate) {
+      el.style.transition = 'padding-bottom 0.25s cubic-bezier(0.22,1,0.36,1)';
+      el.style.paddingBottom = `${basePb.current}px`;
+      const onEnd = () => {
+        el.style.transition = '';
+        el.style.paddingBottom = '';
+        el.removeEventListener('transitionend', onEnd);
+      };
+      el.addEventListener('transitionend', onEnd);
+    } else {
+      el.style.transition = '';
+      el.style.paddingBottom = '';
+    }
+  }
 
   function onHandlePointerDown(e: React.PointerEvent<HTMLDivElement>) {
+    const el = sectionRef.current;
+    if (el) {
+      el.style.transition = '';
+      basePb.current = parseFloat(getComputedStyle(el).paddingBottom) || 0;
+    }
     dragStartY.current = e.clientY;
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
   }
 
+  function onHandlePointerMove(e: React.PointerEvent<HTMLDivElement>) {
+    if (dragStartY.current === null || !sectionRef.current) return;
+    const delta = dragStartY.current - e.clientY; // positive = up
+    if (delta > 0) {
+      const stretch = Math.min(delta * DAMPEN, MAX_STRETCH);
+      sectionRef.current.style.paddingBottom = `${basePb.current + stretch}px`;
+    } else {
+      sectionRef.current.style.paddingBottom = `${basePb.current}px`;
+    }
+  }
+
   function onHandlePointerUp(e: React.PointerEvent<HTMLDivElement>) {
     if (dragStartY.current === null) return;
-    const delta = dragStartY.current - e.clientY; // positive = dragged up
+    const delta = dragStartY.current - e.clientY;
     dragStartY.current = null;
     if (delta > EXPAND_THRESHOLD && onExpandToPanel) {
+      resetStretch(false);
       onExpandToPanel();
+    } else {
+      resetStretch(true);
     }
   }
 
   function onHandlePointerCancel() {
     dragStartY.current = null;
+    resetStretch(true);
   }
 
   if (dock === 'hidden') {
@@ -73,6 +115,7 @@ export default function BottomDock({
 
   return (
     <section
+      ref={sectionRef}
       className={styles.bottomDock}
       data-state={dock}
       style={{ '--dock-left': dockLeft } as CSSProperties}
@@ -81,6 +124,7 @@ export default function BottomDock({
         className={styles.dragHandle}
         onPointerCancel={onHandlePointerCancel}
         onPointerDown={onHandlePointerDown}
+        onPointerMove={onHandlePointerMove}
         onPointerUp={onHandlePointerUp}
       />
       <div className={styles.dockSummary}>
