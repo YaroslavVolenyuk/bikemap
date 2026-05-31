@@ -10,7 +10,7 @@ import {
   EyeOff,
   Gauge,
 } from 'lucide-react';
-import type { CSSProperties } from 'react';
+import { type CSSProperties, useRef } from 'react';
 import styles from '../map.module.scss';
 import type { RouteDetails } from '../routeDetails';
 import { formatMeters } from '../routeUtils';
@@ -26,7 +26,12 @@ type Props = {
   duration: string;
   averageSpeed: string;
   onDockChange: (state: DockState) => void;
+  onExpandToPanel?: () => void;
 };
+
+const EXPAND_THRESHOLD = 60;
+const MAX_STRETCH = 70;
+const DAMPEN = 0.4;
 
 export default function BottomDock({
   dock,
@@ -36,7 +41,68 @@ export default function BottomDock({
   duration,
   averageSpeed,
   onDockChange,
+  onExpandToPanel,
 }: Props) {
+  const dragStartY = useRef<number | null>(null);
+  const basePb = useRef(0);
+  const sectionRef = useRef<HTMLElement | null>(null);
+
+  function resetStretch(animate: boolean) {
+    const el = sectionRef.current;
+    if (!el) return;
+    if (animate) {
+      el.style.transition = 'padding-bottom 0.25s cubic-bezier(0.22,1,0.36,1)';
+      el.style.paddingBottom = `${basePb.current}px`;
+      const onEnd = () => {
+        el.style.transition = '';
+        el.style.paddingBottom = '';
+        el.removeEventListener('transitionend', onEnd);
+      };
+      el.addEventListener('transitionend', onEnd);
+    } else {
+      el.style.transition = '';
+      el.style.paddingBottom = '';
+    }
+  }
+
+  function onHandlePointerDown(e: React.PointerEvent<HTMLDivElement>) {
+    const el = sectionRef.current;
+    if (el) {
+      el.style.transition = '';
+      basePb.current = parseFloat(getComputedStyle(el).paddingBottom) || 0;
+    }
+    dragStartY.current = e.clientY;
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+  }
+
+  function onHandlePointerMove(e: React.PointerEvent<HTMLDivElement>) {
+    if (dragStartY.current === null || !sectionRef.current) return;
+    const delta = dragStartY.current - e.clientY; // positive = up
+    if (delta > 0) {
+      const stretch = Math.min(delta * DAMPEN, MAX_STRETCH);
+      sectionRef.current.style.paddingBottom = `${basePb.current + stretch}px`;
+    } else {
+      sectionRef.current.style.paddingBottom = `${basePb.current}px`;
+    }
+  }
+
+  function onHandlePointerUp(e: React.PointerEvent<HTMLDivElement>) {
+    if (dragStartY.current === null) return;
+    const delta = dragStartY.current - e.clientY;
+    dragStartY.current = null;
+    if (delta > EXPAND_THRESHOLD && onExpandToPanel) {
+      resetStretch(false);
+      onExpandToPanel();
+    } else {
+      resetStretch(true);
+    }
+  }
+
+  function onHandlePointerCancel() {
+    dragStartY.current = null;
+    resetStretch(true);
+  }
+
   if (dock === 'hidden') {
     return (
       <button className={styles.reopenDockButton} onClick={() => onDockChange('compact')} type="button">
@@ -49,10 +115,18 @@ export default function BottomDock({
 
   return (
     <section
+      ref={sectionRef}
       className={styles.bottomDock}
       data-state={dock}
       style={{ '--dock-left': dockLeft } as CSSProperties}
     >
+      <div
+        className={styles.dragHandle}
+        onPointerCancel={onHandlePointerCancel}
+        onPointerDown={onHandlePointerDown}
+        onPointerMove={onHandlePointerMove}
+        onPointerUp={onHandlePointerUp}
+      />
       <div className={styles.dockSummary}>
         <DockStat icon={<Bike size={13} />} label="Distance" unit={distance.unit} value={distance.value} />
         <DockStat icon={<Clock3 size={13} />} label="Est. time" value={duration} />
@@ -68,10 +142,15 @@ export default function BottomDock({
           unit="m"
           value={routeDetails ? `-${Math.round(routeDetails.descentMeters)}` : '--'}
         />
-        <DockStat icon={<Gauge size={13} />} label="Avg speed" value={averageSpeed} />
+        <DockStat
+          className={styles.dockStatHideMobileCompact}
+          icon={<Gauge size={13} />}
+          label="Avg speed"
+          value={averageSpeed}
+        />
 
         {dock === 'compact' ? (
-          <div className={styles.sparkline}>
+          <div className={`${styles.sparkline} ${styles.dockStatHideMobileCompact}`}>
             <ElevationProfile compact details={routeDetails} />
           </div>
         ) : null}
@@ -87,7 +166,10 @@ export default function BottomDock({
           ) : null}
           <button
             className={styles.dockIconButton}
-            onClick={() => onDockChange(dock === 'full' ? 'compact' : 'full')}
+            onClick={() => {
+              if (dock === 'compact' && onExpandToPanel) onExpandToPanel();
+              else onDockChange(dock === 'full' ? 'compact' : 'full');
+            }}
             title={dock === 'full' ? 'Collapse' : 'Expand'}
             type="button"
           >

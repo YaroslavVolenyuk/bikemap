@@ -1,6 +1,7 @@
 'use client';
 
-import { AlertTriangle, ArrowDownRight, ArrowLeftRight, ArrowUpRight, Bike, ChevronLeft, Clock3, Trash2 } from 'lucide-react';
+import { AlertTriangle, ArrowDownRight, ArrowLeftRight, ArrowUpRight, Bike, ChevronDown, ChevronLeft, Clock3, Trash2 } from 'lucide-react';
+import { useRef, useState } from 'react';
 import styles from '../map.module.scss';
 import type { RouteDetails } from '../routeDetails';
 import type { MapControls, RouteStatus } from '../types';
@@ -22,6 +23,8 @@ type Props = {
   onPanelOpen: (open: boolean) => void;
 };
 
+const COLLAPSE_THRESHOLD = 80;
+
 export default function RoutePanel({
   routeDetails,
   routeIsReady,
@@ -36,6 +39,52 @@ export default function RoutePanel({
   onClear,
   onPanelOpen,
 }: Props) {
+  const [panelHeight, setPanelHeight] = useState<number | null>(null);
+  const panelRef = useRef<HTMLElement | null>(null);
+  const dragStartY = useRef<number | null>(null);
+  const dragStartHeight = useRef<number>(0);
+  const didDrag = useRef(false);
+
+  function handleCollapse() {
+    setPanelHeight(null);
+    onPanelOpen(false);
+  }
+
+  function onHandlePointerDown(e: React.PointerEvent<HTMLDivElement>) {
+    dragStartY.current = e.clientY;
+    dragStartHeight.current = panelRef.current?.getBoundingClientRect().height ?? 0;
+    didDrag.current = false;
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+  }
+
+  function onHandlePointerMove(e: React.PointerEvent<HTMLDivElement>) {
+    if (dragStartY.current === null) return;
+    didDrag.current = true;
+    const delta = dragStartY.current - e.clientY;
+    const newH = Math.max(80, Math.min(window.innerHeight * 0.92, dragStartHeight.current + delta));
+    setPanelHeight(newH);
+  }
+
+  function onHandlePointerUp(e: React.PointerEvent<HTMLDivElement>) {
+    if (dragStartY.current === null) return;
+    const delta = dragStartY.current - e.clientY;
+    dragStartY.current = null;
+    if (!didDrag.current) return;
+    didDrag.current = false;
+    if (delta < -COLLAPSE_THRESHOLD) {
+      handleCollapse();
+    } else if (Math.abs(delta) < 15) {
+      setPanelHeight(null);
+    }
+    // else: keep expanded/contracted at dragged height
+  }
+
+  function onHandlePointerCancel() {
+    dragStartY.current = null;
+    didDrag.current = false;
+    setPanelHeight(null);
+  }
+
   return (
     <>
       {!panelOpen ? (
@@ -51,7 +100,24 @@ export default function RoutePanel({
           <ChevronLeft size={17} />
         </button>
       ) : null}
-    <aside className={styles.routePanel} style={panelOpen ? undefined : { display: 'none' }}>
+    <aside
+      ref={panelRef}
+      className={styles.routePanel}
+      style={
+        !panelOpen
+          ? { display: 'none' }
+          : panelHeight !== null
+            ? { height: panelHeight, maxHeight: 'none' }
+            : undefined
+      }
+    >
+      <div
+        className={styles.dragHandle}
+        onPointerCancel={onHandlePointerCancel}
+        onPointerDown={onHandlePointerDown}
+        onPointerMove={onHandlePointerMove}
+        onPointerUp={onHandlePointerUp}
+      />
       <div className={styles.panelContent}>
         <div className={styles.panelHeader}>
           <div>
@@ -76,17 +142,19 @@ export default function RoutePanel({
           </div>
           <button
             className={styles.panelCollapseButton}
-            onClick={() => onPanelOpen(false)}
+            onClick={handleCollapse}
             title="Collapse panel"
             type="button"
           >
-            <ChevronLeft size={17} />
+            <span className={styles.collapseIconDesktop}><ChevronLeft size={17} /></span>
+            <span className={styles.collapseIconMobile}><ChevronDown size={17} /></span>
           </button>
         </div>
       </div>
 
       <div className={styles.panelDivider} />
 
+      {/* geocoderInputs is intentionally outside panelScrollable so suggestions can overflow */}
       <div className={styles.geocoderInputs}>
         <div className={styles.geocoderRow}>
           <span className={styles.geocoderDot} data-type="origin" />
@@ -98,69 +166,69 @@ export default function RoutePanel({
         </div>
       </div>
 
-      <div className={styles.panelDivider} />
-
-      <div className={styles.panelContent}>
-        <div className={styles.mobileSummary}>
-          <DockStat icon={<Bike size={13} />} label="Distance" unit={distance.unit} value={distance.value} />
-          <DockStat icon={<Clock3 size={13} />} label="Est. time" value={duration} />
-          <DockStat
-            icon={<ArrowUpRight size={13} />}
-            label="Ascent"
-            unit="m"
-            value={routeDetails ? `+${Math.round(routeDetails.ascentMeters)}` : '--'}
-          />
-          <DockStat
-            icon={<ArrowDownRight size={13} />}
-            label="Descent"
-            unit="m"
-            value={routeDetails ? `-${Math.round(routeDetails.descentMeters)}` : '--'}
-          />
-        </div>
-
-        {warnings.length > 0 ? (
-          <div className={styles.warningsList}>
-            {warnings.map((w) => (
-              <span className={styles.warningChip} key={w}>
-                <AlertTriangle size={13} />
-                {w}
-              </span>
-            ))}
-          </div>
-        ) : null}
-
-        <div className={styles.routeActions}>
-          {routeIsReady ? (
-            <button
-              className={styles.routeActionBtn}
-              onClick={() => mapControls?.reverseRoute()}
-              title="Reverse route"
-              type="button"
-            >
-              <ArrowLeftRight size={15} />
-              Reverse
-            </button>
-          ) : null}
+      <div className={styles.routeActions}>
+        {routeIsReady ? (
           <button
             className={styles.routeActionBtn}
-            onClick={onClear}
-            title="Clear all points"
+            onClick={() => mapControls?.reverseRoute()}
+            title="Reverse route"
             type="button"
           >
-            <Trash2 size={15} />
-            Clear
+            <ArrowLeftRight size={15} />
+            Reverse
           </button>
-        </div>
+        ) : null}
+        <button
+          className={styles.routeActionBtn}
+          onClick={onClear}
+          title="Clear all points"
+          type="button"
+        >
+          <Trash2 size={15} />
+          Clear
+        </button>
+      </div>
 
-        <SectionLabel>Way types</SectionLabel>
-        <WayTypeBar items={routeDetails?.wayTypes || []} />
+      <div className={styles.panelScrollable}>
+        <div className={styles.panelContent}>
+          <div className={styles.mobileSummary}>
+            <DockStat icon={<Bike size={13} />} label="Distance" unit={distance.unit} value={distance.value} />
+            <DockStat icon={<Clock3 size={13} />} label="Est. time" value={duration} />
+            <DockStat
+              icon={<ArrowUpRight size={13} />}
+              label="Ascent"
+              unit="m"
+              value={routeDetails ? `+${Math.round(routeDetails.ascentMeters)}` : '--'}
+            />
+            <DockStat
+              icon={<ArrowDownRight size={13} />}
+              label="Descent"
+              unit="m"
+              value={routeDetails ? `-${Math.round(routeDetails.descentMeters)}` : '--'}
+            />
+          </div>
 
-        <SectionLabel>Surface</SectionLabel>
-        <SurfaceChips items={routeDetails?.surfaces || []} />
+          {warnings.length > 0 ? (
+            <div className={styles.warningsList}>
+              {warnings.map((w) => (
+                <span className={styles.warningChip} key={w}>
+                  <AlertTriangle size={13} />
+                  {w}
+                </span>
+              ))}
+            </div>
+          ) : null}
 
-        <div className={styles.panelElevation}>
-          <SectionLabel>Elevation profile</SectionLabel>
-          <ElevationProfile details={routeDetails} />
+          <SectionLabel>Way types</SectionLabel>
+          <WayTypeBar items={routeDetails?.wayTypes || []} />
+
+          <SectionLabel>Surface</SectionLabel>
+          <SurfaceChips items={routeDetails?.surfaces || []} />
+
+          <div className={styles.panelElevation}>
+            <SectionLabel>Elevation profile</SectionLabel>
+            <ElevationProfile details={routeDetails} />
+          </div>
         </div>
       </div>
     </aside>

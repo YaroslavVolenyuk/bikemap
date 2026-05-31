@@ -58,6 +58,7 @@ function createRouteDetailsFromGpx(gpx: ParsedGpx): RouteDetails {
   };
 }
 
+import { Navigation } from 'lucide-react';
 import BottomDock from './components/BottomDock';
 import NavigationOverlay from './components/NavigationOverlay';
 import RoutePanel from './components/RoutePanel';
@@ -93,6 +94,7 @@ export default function Map({ userId, username }: Props) {
   const [terrainOn, setTerrainOn] = useState(false);
   const [matchingTrack, setMatchingTrack] = useState(false);
   const [navState, setNavState] = useState<NavigationState>('idle');
+  const [navFollowing, setNavFollowing] = useState(true);
   const [currentInstructionIdx, setCurrentInstructionIdx] = useState(0);
   const [remainingDistanceMeters, setRemainingDistanceMeters] = useState(0);
   const importFileRef = useRef<HTMLInputElement>(null);
@@ -147,7 +149,6 @@ export default function Map({ userId, username }: Props) {
     });
 
     setRouteStatus('loading');
-    setRouteDetails(undefined);
 
     fetch(`/api/routes/details?${params.toString()}`, { signal: controller.signal })
       .then((res) => {
@@ -199,6 +200,7 @@ export default function Map({ userId, username }: Props) {
     if (!routeDetails) return;
     setCurrentInstructionIdx(0);
     setRemainingDistanceMeters(routeDetails.distanceMeters);
+    setNavFollowing(true);
     setNavState('active');
   }
 
@@ -308,14 +310,21 @@ export default function Map({ userId, username }: Props) {
   const dockLeft = panelOpen ? '396px' : '24px';
   const warnings = getRouteWarnings(routeDetails);
 
+  function handlePanelOpen(open: boolean) {
+    setPanelOpen(open);
+    if (!open && dock !== 'compact') setDock('compact');
+  }
+
   return (
-    <div className={styles.mapShell}>
+    <div className={`${styles.mapShell}${panelOpen ? ` ${styles.panelOpen}` : ''}`}>
       <div className={styles.mapCanvas} id="map" />
       <MapboxPlanner
         importedTrack={importedTrack}
+        navFollowing={navFollowing}
         navigationMode={navState === 'active'}
         routeGeometry={routePoints ? routeDetails?.geometry : undefined}
         onControlsReady={handleControlsReady}
+        onNavFollowingChange={setNavFollowing}
         onPositionUpdate={handlePositionUpdate}
         onRouteChange={handleRouteChange}
       />
@@ -349,30 +358,46 @@ export default function Map({ userId, username }: Props) {
         />
       ) : null}
 
-      <RoutePanel
-        averageSpeed={averageSpeed}
-        difficulty={difficulty}
-        distance={distance}
-        duration={duration}
-        mapControls={mapControls}
-        panelOpen={panelOpen}
-        routeDetails={routeDetails}
-        routeIsReady={routeIsReady}
-        routeStatus={routeStatus}
-        warnings={warnings}
-        onClear={clearRoute}
-        onPanelOpen={setPanelOpen}
-      />
+      {navState === 'active' && !navFollowing ? (
+        <button
+          className={styles.recenterButton}
+          onClick={() => setNavFollowing(true)}
+          type="button"
+        >
+          <Navigation size={18} />
+          Recenter
+        </button>
+      ) : null}
 
-      <BottomDock
-        averageSpeed={averageSpeed}
-        distance={distance}
-        dock={dock}
-        dockLeft={dockLeft}
-        duration={duration}
-        routeDetails={routeDetails}
-        onDockChange={setDock}
-      />
+      {navState !== 'active' ? (
+        <RoutePanel
+          averageSpeed={averageSpeed}
+          difficulty={difficulty}
+          distance={distance}
+          duration={duration}
+          mapControls={mapControls}
+          panelOpen={panelOpen}
+          routeDetails={routeDetails}
+          routeIsReady={routeIsReady}
+          routeStatus={routeStatus}
+          warnings={warnings}
+          onClear={clearRoute}
+          onPanelOpen={handlePanelOpen}
+        />
+      ) : null}
+
+      {navState !== 'active' ? (
+        <BottomDock
+          averageSpeed={averageSpeed}
+          distance={distance}
+          dock={dock}
+          dockLeft={dockLeft}
+          duration={duration}
+          routeDetails={routeDetails}
+          onDockChange={setDock}
+          onExpandToPanel={() => { setPanelOpen(true); setDock('compact'); }}
+        />
+      ) : null}
 
       {saveStatus === 'error' ? (
         <div className={styles.toast}>

@@ -29,7 +29,9 @@ type Props = {
   importedTrack?: ParsedGpx | null;
   routeGeometry?: Coordinate[];
   navigationMode?: boolean;
+  navFollowing?: boolean;
   onPositionUpdate?: (coords: Coordinate, heading: number | null) => void;
+  onNavFollowingChange?: (following: boolean) => void;
 };
 
 function calcBearing(from: Coordinate, to: Coordinate): number {
@@ -47,9 +49,20 @@ export default function MapboxPlanner({
   importedTrack,
   routeGeometry,
   navigationMode,
+  navFollowing,
   onPositionUpdate,
+  onNavFollowingChange,
 }: Props) {
   const mapRef = useRef<mapboxgl.Map | null>(null);
+  const geolocateControlRef = useRef<mapboxgl.GeolocateControl | null>(null);
+  const onPositionUpdateRef = useRef(onPositionUpdate);
+  useEffect(() => { onPositionUpdateRef.current = onPositionUpdate; }, [onPositionUpdate]);
+  const onNavFollowingChangeRef = useRef(onNavFollowingChange);
+  useEffect(() => { onNavFollowingChangeRef.current = onNavFollowingChange; }, [onNavFollowingChange]);
+  const isFollowingRef = useRef(true);
+  const navigationModeRef = useRef(!!navigationMode);
+  useEffect(() => { navigationModeRef.current = !!navigationMode; }, [navigationMode]);
+  const lastNavCoordsRef = useRef<{ coords: Coordinate; heading: number | null } | null>(null);
   const originRef = useRef<Coordinate | null>(null);
   const destRef = useRef<Coordinate | null>(null);
   const originMarkerRef = useRef<mapboxgl.Marker | null>(null);
@@ -138,18 +151,44 @@ export default function MapboxPlanner({
   // Navigation mode: GPS watch + map follow
   useEffect(() => {
     const map = mapRef.current;
+    const geoCtrl = geolocateControlRef.current;
     if (!navigationMode) {
-      if (map) map.easeTo({ bearing: 0, pitch: 0, duration: 800 });
+      if (map) {
+        map.easeTo({ bearing: 0, pitch: 0, duration: 800 });
+        // Restore geolocate control when leaving nav mode
+        if (geoCtrl && !map.hasControl(geoCtrl)) {
+          map.addControl(geoCtrl, 'top-right');
+        }
+      }
+      isFollowingRef.current = true;
+      lastNavCoordsRef.current = null;
       return;
     }
     if (!map) return;
 
+    // Remove geolocate control — it auto-follows GPS independently and fights our nav logic
+    if (geoCtrl && map.hasControl(geoCtrl)) {
+      map.removeControl(geoCtrl);
+    }
+
+    isFollowingRef.current = true;
     let lastCoords: Coordinate | null = null;
 
     const markerEl = document.createElement('div');
     markerEl.className = 'nav-position-marker';
     const marker = new mapboxgl.Marker({ element: markerEl }).setLngLat([0, 0]).addTo(map);
 
+    // Detect user-initiated map moves → stop following
+    function onMoveStart(e: { originalEvent?: Event }) {
+      if (e.originalEvent && isFollowingRef.current) {
+        isFollowingRef.current = false;
+        onNavFollowingChangeRef.current?.(false);
+      }
+    }
+     
+    map.on('movestart', onMoveStart as any);
+
+    let firstFix = true;
     const watchId = navigator.geolocation.watchPosition(
       (pos) => {
         const coords: Coordinate = [pos.coords.longitude, pos.coords.latitude];
@@ -158,9 +197,14 @@ export default function MapboxPlanner({
           heading = calcBearing(lastCoords, coords);
         }
         lastCoords = coords;
+        lastNavCoordsRef.current = { coords, heading };
         marker.setLngLat(coords);
-        map.easeTo({ center: coords, bearing: heading ?? 0, pitch: 45, duration: 1000 });
-        onPositionUpdate?.(coords, heading);
+        if (isFollowingRef.current) {
+          const zoomOpts = firstFix ? { zoom: 17 } : {};
+          map.easeTo({ center: coords, bearing: heading ?? 0, pitch: 45, duration: 1000, ...zoomOpts });
+        }
+        firstFix = false;
+        onPositionUpdateRef.current?.(coords, heading);
       },
       (err) => console.warn('Nav geolocation error', err),
       { enableHighAccuracy: true, maximumAge: 1000 },
@@ -168,10 +212,23 @@ export default function MapboxPlanner({
 
     return () => {
       navigator.geolocation.clearWatch(watchId);
+       
+      map.off('movestart', onMoveStart as any);
       marker.remove();
       map.easeTo({ bearing: 0, pitch: 0, duration: 800 });
     };
-  }, [navigationMode, onPositionUpdate]);
+  }, [navigationMode]);
+
+  // Re-enable following when navFollowing prop flips to true
+  useEffect(() => {
+    if (!navFollowing) return;
+    isFollowingRef.current = true;
+    const last = lastNavCoordsRef.current;
+    const map = mapRef.current;
+    if (last && map) {
+      map.easeTo({ center: last.coords, bearing: last.heading ?? 0, pitch: 45, zoom: 17, duration: 600 });
+    }
+  }, [navFollowing]);
 
   useEffect(() => {
     let cancelled = false;
@@ -213,6 +270,7 @@ export default function MapboxPlanner({
       setGeocoderInput(type, coords);
 
       markerRef.current.on('dragend', () => {
+        if (navigationModeRef.current) return;
         const lngLat = markerRef.current!.getLngLat();
         const updated: Coordinate = [lngLat.lng, lngLat.lat];
         if (type === 'origin') originRef.current = updated;
@@ -238,7 +296,7 @@ export default function MapboxPlanner({
       // Geocoder for origin
       const originGeocoder = new MapboxGeocoder({
         accessToken: mapboxAccessToken,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         
         mapboxgl: mapboxgl as any,
         placeholder: 'Start point',
         marker: false,
@@ -247,7 +305,7 @@ export default function MapboxPlanner({
       // Geocoder for destination
       const destGeocoder = new MapboxGeocoder({
         accessToken: mapboxAccessToken,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         
         mapboxgl: mapboxgl as any,
         placeholder: 'End point',
         marker: false,
@@ -258,6 +316,7 @@ export default function MapboxPlanner({
         trackUserLocation: true,
         showUserHeading: true,
       });
+      geolocateControlRef.current = geolocateControl;
 
       const originContainer = document.getElementById('geocoder-origin');
       const destContainer = document.getElementById('geocoder-dest');
@@ -267,6 +326,7 @@ export default function MapboxPlanner({
       map.addControl(new mapboxgl.NavigationControl({ visualizePitch: true }), 'top-right');
 
       originGeocoder.on('result', (e: { result: { geometry: { coordinates: [number, number] } } }) => {
+        if (navigationModeRef.current) return;
         const coords = e.result.geometry.coordinates as Coordinate;
         originRef.current = coords;
         setMarker('origin', coords, 'A');
@@ -274,12 +334,14 @@ export default function MapboxPlanner({
       });
 
       originGeocoder.on('clear', () => {
+        if (navigationModeRef.current) return;
         originRef.current = null;
         originMarkerRef.current?.remove();
         originMarkerRef.current = null;
       });
 
       destGeocoder.on('result', (e: { result: { geometry: { coordinates: [number, number] } } }) => {
+        if (navigationModeRef.current) return;
         const coords = e.result.geometry.coordinates as Coordinate;
         destRef.current = coords;
         setMarker('destination', coords, 'B');
@@ -287,12 +349,14 @@ export default function MapboxPlanner({
       });
 
       destGeocoder.on('clear', () => {
+        if (navigationModeRef.current) return;
         destRef.current = null;
         destMarkerRef.current?.remove();
         destMarkerRef.current = null;
       });
 
       geolocateControl.on('geolocate', (event) => {
+        if (navigationModeRef.current) return;
         const pos = event as unknown as GeolocationPosition;
         const coords: Coordinate = [pos.coords.longitude, pos.coords.latitude];
         originRef.current = coords;
@@ -300,17 +364,24 @@ export default function MapboxPlanner({
         tryFireRouteChange();
       });
 
-      // Click to set points: first click = origin, second = destination
       map.on('click', (e) => {
+        if (navigationModeRef.current) return;
         const coords: Coordinate = [e.lngLat.lng, e.lngLat.lat];
+        destRef.current = coords;
+        setMarker('destination', coords, 'B');
+        clickModeRef.current = null;
         if (!originRef.current) {
-          originRef.current = coords;
-          setMarker('origin', coords, 'A');
-          clickModeRef.current = 'destination';
+          navigator.geolocation.getCurrentPosition(
+            (pos) => {
+              const gps: Coordinate = [pos.coords.longitude, pos.coords.latitude];
+              originRef.current = gps;
+              setMarker('origin', gps, 'A');
+              tryFireRouteChange();
+            },
+            () => { /* GPS denied — user sets origin manually via geocoder */ },
+            { enableHighAccuracy: true, timeout: 10000 },
+          );
         } else {
-          destRef.current = coords;
-          setMarker('destination', coords, 'B');
-          clickModeRef.current = null;
           tryFireRouteChange();
         }
       });
