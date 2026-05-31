@@ -1,7 +1,7 @@
 'use client';
 
 import { AlertTriangle, ArrowDownRight, ArrowLeftRight, ArrowUpRight, Bike, ChevronDown, ChevronLeft, Clock3, Trash2 } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import styles from '../map.module.scss';
 import type { RouteDetails } from '../routeDetails';
 import type { MapControls, RouteStatus } from '../types';
@@ -45,9 +45,10 @@ export default function RoutePanel({
   const dragStartHeight = useRef<number>(0);
   const didDrag = useRef(false);
 
-  useEffect(() => {
-    if (!panelOpen) setPanelHeight(null);
-  }, [panelOpen]);
+  function handleCollapse() {
+    setPanelHeight(null);
+    onPanelOpen(false);
+  }
 
   function onHandlePointerDown(e: React.PointerEvent<HTMLDivElement>) {
     dragStartY.current = e.clientY;
@@ -71,8 +72,7 @@ export default function RoutePanel({
     if (!didDrag.current) return;
     didDrag.current = false;
     if (delta < -COLLAPSE_THRESHOLD) {
-      setPanelHeight(null);
-      onPanelOpen(false);
+      handleCollapse();
     } else if (Math.abs(delta) < 15) {
       setPanelHeight(null);
     }
@@ -142,7 +142,7 @@ export default function RoutePanel({
           </div>
           <button
             className={styles.panelCollapseButton}
-            onClick={() => onPanelOpen(false)}
+            onClick={handleCollapse}
             title="Collapse panel"
             type="button"
           >

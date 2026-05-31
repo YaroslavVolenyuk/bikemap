@@ -185,7 +185,7 @@ export default function MapboxPlanner({
         onNavFollowingChangeRef.current?.(false);
       }
     }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     map.on('movestart', onMoveStart as any);
 
     let firstFix = true;
@@ -212,7 +212,7 @@ export default function MapboxPlanner({
 
     return () => {
       navigator.geolocation.clearWatch(watchId);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       map.off('movestart', onMoveStart as any);
       marker.remove();
       map.easeTo({ bearing: 0, pitch: 0, duration: 800 });
@@ -296,7 +296,7 @@ export default function MapboxPlanner({
       // Geocoder for origin
       const originGeocoder = new MapboxGeocoder({
         accessToken: mapboxAccessToken,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         
         mapboxgl: mapboxgl as any,
         placeholder: 'Start point',
         marker: false,
@@ -305,7 +305,7 @@ export default function MapboxPlanner({
       // Geocoder for destination
       const destGeocoder = new MapboxGeocoder({
         accessToken: mapboxAccessToken,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         
         mapboxgl: mapboxgl as any,
         placeholder: 'End point',
         marker: false,
