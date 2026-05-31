@@ -1,6 +1,7 @@
 'use client';
 
 import { AlertTriangle, ArrowDownRight, ArrowLeftRight, ArrowUpRight, Bike, ChevronDown, ChevronLeft, Clock3, Trash2 } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import styles from '../map.module.scss';
 import type { RouteDetails } from '../routeDetails';
 import type { MapControls, RouteStatus } from '../types';
@@ -22,6 +23,8 @@ type Props = {
   onPanelOpen: (open: boolean) => void;
 };
 
+const COLLAPSE_THRESHOLD = 80;
+
 export default function RoutePanel({
   routeDetails,
   routeIsReady,
@@ -36,6 +39,52 @@ export default function RoutePanel({
   onClear,
   onPanelOpen,
 }: Props) {
+  const [panelHeight, setPanelHeight] = useState<number | null>(null);
+  const panelRef = useRef<HTMLElement | null>(null);
+  const dragStartY = useRef<number | null>(null);
+  const dragStartHeight = useRef<number>(0);
+  const didDrag = useRef(false);
+
+  useEffect(() => {
+    if (!panelOpen) setPanelHeight(null);
+  }, [panelOpen]);
+
+  function onHandlePointerDown(e: React.PointerEvent<HTMLDivElement>) {
+    dragStartY.current = e.clientY;
+    dragStartHeight.current = panelRef.current?.getBoundingClientRect().height ?? 0;
+    didDrag.current = false;
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+  }
+
+  function onHandlePointerMove(e: React.PointerEvent<HTMLDivElement>) {
+    if (dragStartY.current === null) return;
+    didDrag.current = true;
+    const delta = dragStartY.current - e.clientY;
+    const newH = Math.max(80, Math.min(window.innerHeight * 0.92, dragStartHeight.current + delta));
+    setPanelHeight(newH);
+  }
+
+  function onHandlePointerUp(e: React.PointerEvent<HTMLDivElement>) {
+    if (dragStartY.current === null) return;
+    const delta = dragStartY.current - e.clientY;
+    dragStartY.current = null;
+    if (!didDrag.current) return;
+    didDrag.current = false;
+    if (delta < -COLLAPSE_THRESHOLD) {
+      setPanelHeight(null);
+      onPanelOpen(false);
+    } else if (Math.abs(delta) < 15) {
+      setPanelHeight(null);
+    }
+    // else: keep expanded/contracted at dragged height
+  }
+
+  function onHandlePointerCancel() {
+    dragStartY.current = null;
+    didDrag.current = false;
+    setPanelHeight(null);
+  }
+
   return (
     <>
       {!panelOpen ? (
@@ -51,8 +100,24 @@ export default function RoutePanel({
           <ChevronLeft size={17} />
         </button>
       ) : null}
-    <aside className={styles.routePanel} style={panelOpen ? undefined : { display: 'none' }}>
-      <div className={styles.dragHandle} />
+    <aside
+      ref={panelRef}
+      className={styles.routePanel}
+      style={
+        !panelOpen
+          ? { display: 'none' }
+          : panelHeight !== null
+            ? { height: panelHeight, maxHeight: 'none' }
+            : undefined
+      }
+    >
+      <div
+        className={styles.dragHandle}
+        onPointerCancel={onHandlePointerCancel}
+        onPointerDown={onHandlePointerDown}
+        onPointerMove={onHandlePointerMove}
+        onPointerUp={onHandlePointerUp}
+      />
       <div className={styles.panelContent}>
         <div className={styles.panelHeader}>
           <div>

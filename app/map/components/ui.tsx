@@ -78,14 +78,16 @@ export function DockStat({
   unit,
   label,
   icon,
+  className,
 }: {
   value: string;
   unit?: string;
   label: string;
   icon?: ReactNode;
+  className?: string;
 }) {
   return (
-    <div className={styles.dockStat}>
+    <div className={`${styles.dockStat}${className ? ` ${className}` : ''}`}>
       <div className={styles.dockStatValue}>
         <span>{value}</span>
         {unit ? <small>{unit}</small> : null}
