@@ -1,6 +1,7 @@
 import './globals.css';
 import type { ReactNode } from 'react';
 import { Inter } from 'next/font/google';
+import Script from 'next/script';
 import ServiceWorkerRegistrar from './Components/ServiceWorkerRegistrar';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -32,6 +33,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <meta name="apple-mobile-web-app-title" content="BikeTheMap" />
       </head>
       <body className={inter.className}>
+        <Script
+          src="https://js-cdn.dynatracelabs.com/jstag/14c129c054c/bf78827gzs/1917ec4e1112641a_complete.js"
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
         <ServiceWorkerRegistrar />
         {children}
       </body>
