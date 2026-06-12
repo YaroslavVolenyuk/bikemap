@@ -36,7 +36,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <Script
           src="https://js-cdn.dynatracelabs.com/jstag/14c129c054c/bf78827gzs/1917ec4e1112641a_complete.js"
           crossOrigin="anonymous"
-          strategy="afterInteractive"
+          strategy="beforeInteractive"
         />
         <ServiceWorkerRegistrar />
         {children}
